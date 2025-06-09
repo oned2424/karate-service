@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KarateMaster Admin - Demo Version</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Admin Panel Styles - Complete Standalone Version */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #dc2626;
+            --accent-color: #f59e0b;
+            --neutral-dark: #1f2937;
+            --neutral-medium: #6b7280;
+            --neutral-light: #f9fafb;
+            --white: #ffffff;
+            --text-primary: var(--neutral-dark);
+            --text-secondary: var(--neutral-medium);
+            --background: var(--white);
+            --surface: var(--neutral-light);
+            --border: #e5e7eb;
+            --shadow: rgba(31, 41, 55, 0.12);
+            --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, #4338ca 100%);
+            --gradient-accent: linear-gradient(135deg, var(--accent-color) 0%, #d97706 100%);
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--surface);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Dashboard Layout */
+        .admin-dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px var(--shadow);
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .admin-logo i {
+            font-size: 1.75rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-nav {
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .nav-link i {
+            font-size: 1.125rem;
+            width: 20px;
+        }
+
+        .admin-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .admin-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .admin-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .admin-btn.primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .admin-btn.secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--shadow);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+
+        .stat-change.positive {
+            color: #10b981;
+        }
+
+        /* Upload Form */
+        .upload-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .upload-form {
+            max-width: 600px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: var(--surface);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(30, 58, 138, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .upload-hint {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Videos Table */
+        .videos-table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--shadow);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .videos-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .videos-table th,
+        .videos-table td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .videos-table th {
+            background: var(--surface);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .videos-table tr:hover {
+            background: var(--surface);
+        }
+
+        .video-thumbnail {
+            width: 80px;
+            height: 45px;
+            background: var(--gradient-primary);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.875rem;
+        }
+
+        .video-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .action-btn.edit {
+            background: rgba(59, 130, 246, 0.1);
+            color: #1d4ed8;
+        }
+
+        .action-btn.delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: #065f46;
+        }
+
+        .category-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .category-badge.kata {
+            background: rgba(99, 102, 241, 0.1);
+            color: #4338ca;
+        }
+
+        .category-badge.kumite {
+            background: rgba(220, 38, 38, 0.1);
+            color: #dc2626;
+        }
+
+        .category-badge.kihon {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .demo-notice {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .demo-notice h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .demo-notice p {
+            opacity: 0.9;
+        }
+
+        /* License Info */
+        .license-cards {
+            margin-top: 1rem;
+        }
+
+        .license-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .license-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.125rem;
+        }
+
+        .license-requirements {
+            margin-top: 1rem;
+        }
+
+        .license-requirements ul {
+            margin-top: 0.5rem;
+            padding-left: 1.5rem;
+        }
+
+        .license-requirements li {
+            margin-bottom: 0.25rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .admin-sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 1rem 0;
+            }
+            
+            .admin-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            
+            .sidebar-nav {
+                display: flex;
+                overflow-x: auto;
+                padding: 0 1rem;
+            }
+            
+            .nav-item {
+                flex-shrink: 0;
+                margin-right: 0.5rem;
+                margin-bottom: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .videos-table-container {
+                overflow-x: auto;
+            }
+            
+            .videos-table {
+                min-width: 800px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-dashboard">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="admin-logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>KarateMaster Admin</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-nav">
+                <div class="nav-item">
+                    <a class="nav-link active" data-section="dashboard">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" data-section="upload">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Upload Video</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" data-section="videos">
+                        <i class="fas fa-video"></i>
+                        <span>Manage Videos</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" data-section="licenses">
+                        <i class="fas fa-certificate"></i>
+                        <span>Licenses</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" data-section="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="admin-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="admin-header">
+                    <h1>Dashboard</h1>
+                    <div class="admin-actions">
+                        <span style="color: var(--text-secondary);">Welcome, <strong>Admin</strong></span>
+                    </div>
+                </div>
+
+                <div class="demo-notice">
+                    <h3>🎯 Demo Admin Panel</h3>
+                    <p>This is a standalone demo of the KarateMaster admin interface. In the full version, this would connect to a live backend server.</p>
+                </div>
+
+                <!-- Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-number">247</span>
+                        <span class="stat-label">Total Videos</span>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +12% this month
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">1.2M</span>
+                        <span class="stat-label">Total Views</span>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +8% this month
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">15.3K</span>
+                        <span class="stat-label">Active Users</span>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +15% this month
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">4.9</span>
+                        <span class="stat-label">Average Rating</span>
+                        <div class="stat-change positive">
+                            <i class="fas fa-star"></i> 4.9/5.0
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Videos -->
+                <div class="videos-table-container">
+                    <div class="table-header">
+                        <h3>Recent Videos</h3>
+                        <a class="admin-btn primary" data-section="upload">
+                            <i class="fas fa-plus"></i>
+                            Add New Video
+                        </a>
+                    </div>
+                    <table class="videos-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Views</th>
+                                <th>Upload Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>平安初段 - 基本解説</strong></td>
+                                <td><span class="category-badge kata">Kata</span></td>
+                                <td>12,450</td>
+                                <td>2024-06-08</td>
+                                <td><span class="status-badge active">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>組手基本技術</strong></td>
+                                <td><span class="category-badge kumite">Kumite</span></td>
+                                <td>8,920</td>
+                                <td>2024-06-07</td>
+                                <td><span class="status-badge active">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>正拳突きの基本</strong></td>
+                                <td><span class="category-badge kihon">Kihon</span></td>
+                                <td>15,670</td>
+                                <td>2024-06-06</td>
+                                <td><span class="status-badge active">Active</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Upload Section -->
+            <section id="upload-section" class="content-section">
+                <div class="admin-header">
+                    <h1>Upload New Video</h1>
+                    <div class="admin-actions">
+                        <button class="admin-btn secondary" data-section="videos">
+                            <i class="fas fa-list"></i>
+                            View All Videos
+                        </button>
+                    </div>
+                </div>
+
+                <div class="demo-notice">
+                    <h3>📤 Video Upload Interface</h3>
+                    <p>In the full version, this form would process video uploads with FFmpeg and store metadata in the database.</p>
+                </div>
+
+                <div class="upload-container">
+                    <form class="upload-form" onsubmit="handleDemoUpload(event)">
+                        <div class="file-upload-area" onclick="document.getElementById('demoFile').click()">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-text">Click to upload or drag and drop</div>
+                            <div class="upload-hint">MP4, max 100MB (CC-BY licensed content only)</div>
+                            <input type="file" id="demoFile" accept="video/mp4" style="display: none;">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="videoTitle">Title *</label>
+                                <input type="text" id="videoTitle" class="form-control" placeholder="Enter video title" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="videoCategory">Category *</label>
+                                <select id="videoCategory" class="form-control" required>
+                                    <option value="">Select Category</option>
+                                    <option value="kata">Kata (Forms)</option>
+                                    <option value="kumite">Kumite (Sparring)</option>
+                                    <option value="kihon">Kihon (Basics)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="videoDescription">Description</label>
+                            <textarea id="videoDescription" class="form-control" rows="3" placeholder="Describe the techniques, level, and key learning points..."></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="videoLicense">License *</label>
+                                <select id="videoLicense" class="form-control" required>
+                                    <option value="">Select License</option>
+                                    <option value="CC BY 4.0">CC BY 4.0</option>
+                                    <option value="CC BY-SA 4.0">CC BY-SA 4.0</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="videoTags">Tags</label>
+                                <input type="text" id="videoTags" class="form-control" placeholder="beginner, form, basics (comma separated)">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="videoAttribution">Attribution *</label>
+                                <input type="text" id="videoAttribution" class="form-control" placeholder="Master's name or organization" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="videoAttributionUrl">Attribution URL</label>
+                                <input type="url" id="videoAttributionUrl" class="form-control" placeholder="https://example.com">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="admin-btn primary" style="width: 100%; margin-top: 1rem;">
+                            <i class="fas fa-upload"></i>
+                            Upload Video (Demo)
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Videos Management Section -->
+            <section id="videos-section" class="content-section">
+                <div class="admin-header">
+                    <h1>Video Management</h1>
+                    <div class="admin-actions">
+                        <button class="admin-btn primary" data-section="upload">
+                            <i class="fas fa-plus"></i>
+                            Add New Video
+                        </button>
+                        <button class="admin-btn secondary" onclick="showNotification('Videos refreshed', 'success')">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="demo-notice">
+                    <h3>🎬 Video Management Interface</h3>
+                    <p>In the full version, this would display all uploaded videos with real edit/delete functionality.</p>
+                </div>
+
+                <div class="videos-table-container">
+                    <div class="table-header">
+                        <h3>All Videos</h3>
+                        <input type="text" placeholder="Search videos..." style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px;">
+                    </div>
+                    <table class="videos-table">
+                        <thead>
+                            <tr>
+                                <th>Thumbnail</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Duration</th>
+                                <th>Views</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="video-thumbnail">
+                                        <i class="fas fa-play"></i>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>平安初段 - 完全解説</strong>
+                                        <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                                            山田先生
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="category-badge kata">Kata</span></td>
+                                <td>3:25</td>
+                                <td>12,450</td>
+                                <td><span class="status-badge active">Active</span></td>
+                                <td>
+                                    <div class="video-actions">
+                                        <button class="action-btn edit" onclick="showNotification('Edit function (demo)', 'info')" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" onclick="showNotification('Delete function (demo)', 'info')" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="video-thumbnail">
+                                        <i class="fas fa-play"></i>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>組手基本技術</strong>
+                                        <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                                            田中先生
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="category-badge kumite">Kumite</span></td>
+                                <td>5:12</td>
+                                <td>8,920</td>
+                                <td><span class="status-badge active">Active</span></td>
+                                <td>
+                                    <div class="video-actions">
+                                        <button class="action-btn edit" onclick="showNotification('Edit function (demo)', 'info')" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" onclick="showNotification('Delete function (demo)', 'info')" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="video-thumbnail">
+                                        <i class="fas fa-play"></i>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>正拳突きの基本</strong>
+                                        <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                                            佐藤先生
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="category-badge kihon">Kihon</span></td>
+                                <td>4:33</td>
+                                <td>15,670</td>
+                                <td><span class="status-badge active">Active</span></td>
+                                <td>
+                                    <div class="video-actions">
+                                        <button class="action-btn edit" onclick="showNotification('Edit function (demo)', 'info')" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" onclick="showNotification('Delete function (demo)', 'info')" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Licenses Section -->
+            <section id="licenses-section" class="content-section">
+                <div class="admin-header">
+                    <h1>License Management</h1>
+                </div>
+
+                <div class="upload-container">
+                    <h3>Supported Licenses</h3>
+                    <div class="license-cards">
+                        <div class="license-card">
+                            <h4>Creative Commons Attribution 4.0 (CC BY 4.0)</h4>
+                            <p>Allows others to distribute, remix, adapt, and build upon the material with proper attribution.</p>
+                            <div class="license-requirements">
+                                <strong>Requirements:</strong>
+                                <ul>
+                                    <li>Attribution to the original creator</li>
+                                    <li>Link to the license</li>
+                                    <li>Indication of changes made</li>
+                                    <li>No additional restrictions may be applied</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="license-card">
+                            <h4>Creative Commons Attribution-ShareAlike 4.0 (CC BY-SA 4.0)</h4>
+                            <p>Similar to CC BY, but adaptations must be shared under the same license.</p>
+                            <div class="license-requirements">
+                                <strong>Additional Requirements:</strong>
+                                <ul>
+                                    <li>Derivative works must use the same license</li>
+                                    <li>Share alike provisions apply</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings-section" class="content-section">
+                <div class="admin-header">
+                    <h1>System Settings</h1>
+                </div>
+
+                <div class="upload-container">
+                    <h3>Platform Configuration</h3>
+                    <div class="form-group">
+                        <label>Maximum File Size</label>
+                        <input type="text" class="form-control" value="100 MB" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Supported Formats</label>
+                        <input type="text" class="form-control" value="MP4, WebM" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Admin Email</label>
+                        <input type="email" class="form-control" value="admin@karatemaster.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Platform URL</label>
+                        <input type="text" class="form-control" value="https://karatemaster.com" disabled>
+                    </div>
+                    <button class="admin-btn primary">
+                        <i class="fas fa-save"></i>
+                        Save Settings (Demo)
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Navigation functionality
+        document.querySelectorAll('.nav-link[data-section], .admin-btn[data-section]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const section = this.getAttribute('data-section');
+                showSection(section);
+            });
+        });
+
+        function showSection(sectionName) {
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+
+            // Update content
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`${sectionName}-section`).classList.add('active');
+        }
+
+        // Demo upload functionality
+        function handleDemoUpload(event) {
+            event.preventDefault();
+            showNotification('Demo upload completed! In the full version, this would process the video with FFmpeg.', 'success');
+        }
+
+        // File upload demo
+        document.getElementById('demoFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                showNotification(`File selected: ${file.name} (${formatFileSize(file.size)})`, 'info');
+            }
+        });
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                max-width: 350px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                ${type === 'success' ? 'background: #10b981;' : ''}
+                ${type === 'error' ? 'background: #ef4444;' : ''}
+                ${type === 'info' ? 'background: #3b82f6;' : ''}
+            `;
+
+            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+            notification.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 4000);
+        }
+
+        // Utility functions
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Initialize
+        console.log('🥋 KarateMaster Admin Demo Loaded');
+        console.log('Features demonstrated:');
+        console.log('- Professional admin interface');
+        console.log('- Video upload form with validation');
+        console.log('- Content management system');
+        console.log('- License management');
+        console.log('- Statistics dashboard');
+        
+        // Show welcome notification
+        setTimeout(() => {
+            showNotification('Welcome to KarateMaster Admin Demo! This showcases the complete admin interface.', 'info');
+        }, 1000);
+    </script>
+</body>
+</html>

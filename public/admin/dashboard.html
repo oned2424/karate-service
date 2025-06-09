@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KarateMaster Admin Dashboard</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/admin.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-dashboard">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="admin-logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <h2>KarateMaster Admin</h2>
+                </div>
+            </div>
+            
+            <div class="sidebar-nav">
+                <div class="nav-item">
+                    <a href="#dashboard" class="nav-link active" data-section="dashboard">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#upload" class="nav-link" data-section="upload">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Upload Video</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#videos" class="nav-link" data-section="videos">
+                        <i class="fas fa-video"></i>
+                        <span>Manage Videos</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#licenses" class="nav-link" data-section="licenses">
+                        <i class="fas fa-certificate"></i>
+                        <span>Licenses</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#settings" class="nav-link" data-section="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="admin-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="admin-header">
+                    <h1>Dashboard</h1>
+                    <div class="admin-actions">
+                        <span class="admin-user">Welcome, <strong id="adminUsername">Admin</strong></span>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-number" id="totalVideos">0</span>
+                        <span class="stat-label">Total Videos</span>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +12% this month
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="totalViews">0</span>
+                        <span class="stat-label">Total Views</span>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +8% this month
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="activeUsers">0</span>
+                        <span class="stat-label">Active Users</span>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +15% this month
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="avgRating">0</span>
+                        <span class="stat-label">Average Rating</span>
+                        <div class="stat-change positive">
+                            <i class="fas fa-star"></i> 4.9/5.0
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="videos-table-container">
+                    <div class="table-header">
+                        <h3>Recent Videos</h3>
+                        <a href="#upload" class="admin-btn primary" onclick="showSection('upload')">
+                            <i class="fas fa-plus"></i>
+                            Add New Video
+                        </a>
+                    </div>
+                    <div id="recentVideosTable"></div>
+                </div>
+            </section>
+
+            <!-- Upload Section -->
+            <section id="upload-section" class="content-section">
+                <div class="admin-header">
+                    <h1>Upload New Video</h1>
+                    <div class="admin-actions">
+                        <button class="admin-btn secondary" onclick="showSection('videos')">
+                            <i class="fas fa-list"></i>
+                            View All Videos
+                        </button>
+                    </div>
+                </div>
+
+                <div class="upload-container">
+                    <form id="videoUploadForm" class="upload-form">
+                        <div class="file-upload-area" onclick="document.getElementById('videoFile').click()">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-text">Click to upload or drag and drop</div>
+                            <div class="upload-hint">MP4, max 100MB (CC-BY licensed content only)</div>
+                            <input type="file" id="videoFile" name="video" accept="video/mp4" required>
+                            <div id="selectedFile" class="selected-file" style="display: none;"></div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="videoTitle">Title *</label>
+                                <input type="text" id="videoTitle" name="title" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="videoCategory">Category *</label>
+                                <select id="videoCategory" name="category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="kata">Kata (Forms)</option>
+                                    <option value="kumite">Kumite (Sparring)</option>
+                                    <option value="kihon">Kihon (Basics)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="videoDescription">Description</label>
+                            <textarea id="videoDescription" name="description" rows="3" placeholder="Describe the techniques, level, and key learning points..."></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="videoLicense">License *</label>
+                                <select id="videoLicense" name="license" required>
+                                    <option value="">Select License</option>
+                                    <option value="CC BY 4.0">CC BY 4.0</option>
+                                    <option value="CC BY-SA 4.0">CC BY-SA 4.0</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="videoTags">Tags</label>
+                                <input type="text" id="videoTags" name="tags" placeholder="beginner, form, basics (comma separated)">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="videoAttribution">Attribution *</label>
+                                <input type="text" id="videoAttribution" name="attribution" required placeholder="Master's name or organization">
+                            </div>
+                            <div class="form-group">
+                                <label for="videoAttributionUrl">Attribution URL</label>
+                                <input type="url" id="videoAttributionUrl" name="attributionUrl" placeholder="https://example.com">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="admin-btn primary" style="width: 100%; margin-top: 1rem;">
+                            <i class="fas fa-upload"></i>
+                            Upload Video
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Videos Management Section -->
+            <section id="videos-section" class="content-section">
+                <div class="admin-header">
+                    <h1>Video Management</h1>
+                    <div class="admin-actions">
+                        <button class="admin-btn primary" onclick="showSection('upload')">
+                            <i class="fas fa-plus"></i>
+                            Add New Video
+                        </button>
+                        <button class="admin-btn secondary" onclick="refreshVideos()">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="videos-table-container">
+                    <div class="table-header">
+                        <h3>All Videos</h3>
+                        <div class="search-controls">
+                            <input type="text" id="videoSearch" placeholder="Search videos..." style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px;">
+                        </div>
+                    </div>
+                    <div id="videosTableContainer">
+                        <table class="videos-table">
+                            <thead>
+                                <tr>
+                                    <th>Thumbnail</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Duration</th>
+                                    <th>Views</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="videosTableBody">
+                                <!-- Videos will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Licenses Section -->
+            <section id="licenses-section" class="content-section">
+                <div class="admin-header">
+                    <h1>License Management</h1>
+                </div>
+
+                <div class="upload-container">
+                    <h3>Supported Licenses</h3>
+                    <div class="license-cards">
+                        <div class="license-card">
+                            <h4>Creative Commons Attribution 4.0 (CC BY 4.0)</h4>
+                            <p>Allows others to distribute, remix, adapt, and build upon the material with proper attribution.</p>
+                            <div class="license-requirements">
+                                <strong>Requirements:</strong>
+                                <ul>
+                                    <li>Attribution to the original creator</li>
+                                    <li>Link to the license</li>
+                                    <li>Indication of changes made</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings-section" class="content-section">
+                <div class="admin-header">
+                    <h1>System Settings</h1>
+                </div>
+
+                <div class="upload-container">
+                    <h3>Platform Configuration</h3>
+                    <div class="form-group">
+                        <label>Maximum File Size</label>
+                        <input type="text" value="100 MB" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Supported Formats</label>
+                        <input type="text" value="MP4" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Admin Email</label>
+                        <input type="email" value="admin@karatemaster.com">
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Edit Video Modal -->
+    <div id="editVideoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Video</h3>
+                <button class="modal-close" onclick="closeModal('editVideoModal')">&times;</button>
+            </div>
+            <form id="editVideoForm">
+                <input type="hidden" id="editVideoId">
+                <div class="form-group">
+                    <label for="editVideoTitle">Title</label>
+                    <input type="text" id="editVideoTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="editVideoDescription">Description</label>
+                    <textarea id="editVideoDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editVideoCategory">Category</label>
+                    <select id="editVideoCategory">
+                        <option value="kata">Kata</option>
+                        <option value="kumite">Kumite</option>
+                        <option value="kihon">Kihon</option>
+                    </select>
+                </div>
+                <button type="submit" class="admin-btn primary">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/admin.js"></script>
+</body>
+</html>

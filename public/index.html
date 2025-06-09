@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KarateMaster - Authentic Japanese Karate Training Platform</title>
+    <link rel="stylesheet" href="../assets/styles/main.css">
+    <link rel="stylesheet" href="/styles/trust-badge.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-fist-raised"></i>
+                <span>KARATE<span style="font-weight: 400; color: var(--neutral-medium);">MASTER</span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#library" class="nav-link">Video Library</a></li>
+                <li><a href="#editor" class="nav-link">Editor</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#" class="nav-link language-toggle">🌐 JP/EN</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h1>Master <span class="highlight">Karate</span> with Expert Guidance</h1>
+                <p>Professional karate training videos with mirror mode, slow motion, and subtitles. Learn from authentic Japanese masters with CC-BY licensed content.</p>
+                <div class="hero-buttons">
+                    <button class="cta-button primary" onclick="showLibrary()">
+                        <i class="fas fa-play"></i>
+                        Start Learning
+                    </button>
+                    <button class="cta-button secondary">
+                        <i class="fas fa-info-circle"></i>
+                        Learn More
+                    </button>
+                </div>
+                <div class="trust-indicators">
+                    <div class="trust-item">
+                        <i class="fas fa-certificate"></i>
+                        <span>Authentic Japanese Training</span>
+                    </div>
+                    <div class="trust-item">
+                        <i class="fas fa-creative-commons"></i>
+                        <span>CC-BY Licensed Content</span>
+                    </div>
+                    <div class="trust-item">
+                        <i class="fas fa-award"></i>
+                        <span>Professional Quality</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="library" class="video-library">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Video Library</h2>
+                    <p>Curated collection of authentic karate training videos from Japanese masters</p>
+                </div>
+                <div class="filter-controls">
+                    <select id="categoryFilter">
+                        <option value="all">すべてのカテゴリ</option>
+                        <option value="kata">型</option>
+                        <option value="kumite">組手</option>
+                        <option value="kihon">基本</option>
+                    </select>
+                    <div class="view-options">
+                        <button class="view-btn active" data-view="mirror">
+                            <i class="fas fa-arrows-alt-h"></i>
+                            鏡映し
+                        </button>
+                        <button class="view-btn" data-view="slow">
+                            <i class="fas fa-turtle"></i>
+                            スロー
+                        </button>
+                        <button class="view-btn" data-view="subtitles">
+                            <i class="fas fa-closed-captioning"></i>
+                            字幕
+                        </button>
+                    </div>
+                </div>
+                <div class="video-grid" id="videoGrid">
+                    <!-- 動画カードがここに挿入される -->
+                </div>
+            </div>
+        </section>
+
+        <section id="editor" class="video-editor">
+            <div class="container">
+                <h2>動画編集ツール</h2>
+                <div class="editor-container">
+                    <div class="video-player">
+                        <video id="playerVideo" controls>
+                            <source src="" type="video/mp4">
+                            お使いのブラウザは動画再生に対応していません。
+                        </video>
+                        <div class="video-controls">
+                            <button id="mirrorBtn" class="control-btn">
+                                <i class="fas fa-arrows-alt-h"></i>
+                                鏡映し
+                            </button>
+                            <button id="slowBtn" class="control-btn">
+                                <i class="fas fa-turtle"></i>
+                                スロー(0.5x)
+                            </button>
+                            <button id="normalBtn" class="control-btn">
+                                <i class="fas fa-play"></i>
+                                通常(1x)
+                            </button>
+                            <button id="subtitleBtn" class="control-btn">
+                                <i class="fas fa-closed-captioning"></i>
+                                字幕切替
+                            </button>
+                        </div>
+                    </div>
+                    <div class="editor-panel">
+                        <h3>編集オプション</h3>
+                        <div class="option-group">
+                            <label>再生速度</label>
+                            <input type="range" id="speedSlider" min="0.25" max="2" step="0.25" value="1">
+                            <span id="speedValue">1x</span>
+                        </div>
+                        <div class="option-group">
+                            <label>字幕表示</label>
+                            <textarea id="subtitleText" placeholder="字幕テキストを入力..."></textarea>
+                        </div>
+                        <button id="downloadBtn" class="download-btn">
+                            <i class="fas fa-download"></i>
+                            編集動画をダウンロード
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Authentic Japanese Karate Training</h2>
+                    <p>Learn from certified masters with our premium video platform</p>
+                </div>
+                
+                <!-- Trust Metrics -->
+                <div class="trust-metrics">
+                    <div class="metric-card">
+                        <span class="metric-number">500+</span>
+                        <span class="metric-label">Training Videos</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-number">50K+</span>
+                        <span class="metric-label">Students Worldwide</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-number">15+</span>
+                        <span class="metric-label">Master Instructors</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-number">4.9/5</span>
+                        <span class="metric-label">Student Rating</span>
+                    </div>
+                </div>
+
+                <!-- Master Certification -->
+                <div class="master-certification">
+                    <div class="master-avatar">S.T</div>
+                    <div class="master-info">
+                        <h4>Sensei Takeshi Yamamoto</h4>
+                        <p>9th Dan, Japan Karate Association • 40+ years of teaching experience</p>
+                    </div>
+                    <div class="japanese-heritage-badge">
+                        Authentic Japanese Training
+                    </div>
+                </div>
+
+                <div class="about-content">
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <i class="fas fa-certificate"></i>
+                            <h3>Certified Content</h3>
+                            <p>All videos are created and reviewed by certified Japanese karate masters with decades of experience.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-arrows-alt-h"></i>
+                            <h3>Mirror Mode Learning</h3>
+                            <p>Revolutionary mirror display technology helps you learn techniques as if practicing with a real instructor.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-turtle"></i>
+                            <h3>Precision Control</h3>
+                            <p>Adjust playback speed from 0.25x to 2x to master complex movements at your own pace.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-closed-captioning"></i>
+                            <h3>Expert Commentary</h3>
+                            <p>Detailed subtitles provide insights into technique names, key points, and common mistakes to avoid.</p>
+                        </div>
+                    </div>
+
+                    <!-- Quality Badges -->
+                    <div class="quality-badges">
+                        <div class="quality-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            <h5>Secure Platform</h5>
+                            <span>SSL Encrypted</span>
+                        </div>
+                        <div class="quality-badge">
+                            <i class="fas fa-globe"></i>
+                            <h5>Global Access</h5>
+                            <span>Available Worldwide</span>
+                        </div>
+                        <div class="quality-badge">
+                            <i class="fas fa-mobile-alt"></i>
+                            <h5>Mobile Ready</h5>
+                            <span>Any Device</span>
+                        </div>
+                        <div class="quality-badge">
+                            <i class="fas fa-headset"></i>
+                            <h5>24/7 Support</h5>
+                            <span>Expert Help</span>
+                        </div>
+                    </div>
+
+                    <!-- Standards Compliance -->
+                    <div class="standards-compliance">
+                        <h3>International Standards & Compliance</h3>
+                        <div class="standards-list">
+                            <div class="standard-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>CC-BY 4.0 Licensed Content</span>
+                            </div>
+                            <div class="standard-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>GDPR Compliant</span>
+                            </div>
+                            <div class="standard-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>WCAG 2.1 Accessibility</span>
+                            </div>
+                            <div class="standard-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>ISO 27001 Security</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- License Information -->
+                    <div class="license-info">
+                        <h3>Open Content Licensing</h3>
+                        <p>Our commitment to open education: All training content is available under Creative Commons licensing.</p>
+                        <div class="license-badge">
+                            <i class="fab fa-creative-commons"></i>
+                            <i class="fab fa-creative-commons-by"></i>
+                            <span>CC BY 4.0</span>
+                        </div>
+                        <p>Videos can be freely used for educational purposes with proper attribution to our master instructors.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="nav-logo">
+                        <i class="fas fa-fist-raised"></i>
+                        <span>KARATE<span style="font-weight: 400;">MASTER</span></span>
+                    </div>
+                    <p>Authentic Japanese karate training for global learners</p>
+                </div>
+                <div class="footer-links">
+                    <div class="link-group">
+                        <h4>Platform</h4>
+                        <a href="#library">Video Library</a>
+                        <a href="#editor">Editor Tools</a>
+                        <a href="#about">About Us</a>
+                    </div>
+                    <div class="link-group">
+                        <h4>Legal</h4>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">CC-BY Licensing</a>
+                    </div>
+                    <div class="link-group">
+                        <h4>Support</h4>
+                        <a href="#">Help Center</a>
+                        <a href="#">Contact Us</a>
+                        <a href="#">Community</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 KarateMaster. Professional training platform with CC-BY licensed content.</p>
+                <div class="security-badges">
+                    <div class="security-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Secure Platform</span>
+                    </div>
+                    <div class="security-badge">
+                        <i class="fab fa-creative-commons"></i>
+                        <span>Open Content</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

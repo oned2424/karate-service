@@ -1,0 +1,30 @@
+{
+  "name": "karate-video-service",
+  "version": "1.0.0",
+  "description": "空手動画キュレーション＆編集サービス",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "build": "webpack --mode production",
+    "test": "jest"
+  },
+  "keywords": ["karate", "video", "curation", "editing", "cc-by"],
+  "author": "Karate Video Service",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "ffmpeg-static": "^5.2.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "node-fetch": "^3.3.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "jest": "^29.7.0"
+  }
+}
