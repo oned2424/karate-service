@@ -1,13 +1,13 @@
 {
   "name": "karate-video-service",
   "version": "1.0.0",
-  "description": "空手動画キュレーション＆編集サービス - GitHub Deployment",
-  "main": "index.js",
+  "description": "空手動画キュレーション＆編集サービス - Replit版",
+  "main": "replit-server.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node index.js"
+    "start": "node replit-server.js",
+    "dev": "node replit-server.js"
   },
-  "keywords": ["karate", "video", "curation", "replit", "cc-by"],
+  "keywords": ["karate", "video", "curation", "replit"],
   "author": "Karate Video Service",
   "license": "MIT",
   "dependencies": {
