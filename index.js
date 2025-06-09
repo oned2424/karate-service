@@ -1,49 +1,29 @@
 // Replit用の簡易サーバー（FFmpegなしバージョン）
 const express = require('express');
-console.log('[DEBUG] express loaded');
 const cors = require('cors');
-console.log('[DEBUG] cors loaded');
 const multer = require('multer');
-console.log('[DEBUG] multer loaded');
 const path = require('path');
-console.log('[DEBUG] path loaded');
 const fs = require('fs');
-console.log('[DEBUG] fs loaded');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ミドルウェア設定
-console.log('[DEBUG] Setting up middleware...');
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-console.log('[DEBUG] Middleware setup complete.');
 
 // 静的ファイルの配信
-console.log('[DEBUG] Setting up static file serving...');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/styles', express.static(path.join(__dirname, 'assets/styles')));
-console.log('[DEBUG] Static file serving setup complete.');
 
 // アップロードディレクトリの作成
-console.log('[DEBUG] Checking for uploads directory...');
 const uploadDir = path.join(__dirname, 'uploads');
-try {
-    if (!fs.existsSync(uploadDir)) {
-        console.log(`[DEBUG] Uploads directory not found. Creating it at: ${uploadDir}`);
-        fs.mkdirSync(uploadDir, { recursive: true });
-        console.log('[DEBUG] Uploads directory created successfully.');
-    } else {
-        console.log('[DEBUG] Uploads directory already exists.');
-    }
-} catch (error) {
-    console.error('[FATAL] Could not create uploads directory!', error);
-    process.exit(1); // ディレクトリが作れない場合は致命的エラーとして終了
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
 }
 
 // ファイルアップロード設定（Replit対応）
-console.log('[DEBUG] Setting up multer...');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, uploadDir);
@@ -349,8 +329,7 @@ app.use((req, res) => {
 
 // サーバー起動
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[SUCCESS] 🥋 空手動画サービス(Replit版)がポート ${PORT} で起動しました`);
-    console.log(`   アクセスURL: https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`);
+    console.log(`🥋 空手動画サービス(Replit版)がポート ${PORT} で起動しました`);
     console.log('');
     console.log('利用可能な機能:');
     console.log('- 動画アップロード（実際のファイル保存）');
