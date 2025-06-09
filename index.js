@@ -95,6 +95,10 @@ app.get('/admin/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/admin/index.html'));
 });
 
+app.get('/admin-standalone', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin-standalone.html'));
+});
+
 // API: 動画一覧取得
 app.get('/api/videos', (req, res) => {
     const { category, search } = req.query;
