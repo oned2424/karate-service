@@ -136,11 +136,12 @@ body {
     min-height: 100vh;
     display: flex;
     align-items: center;
+    justify-content: center;
     position: relative;
     background: var(--gradient-primary);
     color: white;
     text-align: center;
-    padding-top: 80px;
+    padding: 80px 2rem 0;
     overflow: hidden;
 }
 
@@ -160,6 +161,9 @@ body {
 .hero-content {
     z-index: 2;
     position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .hero-content h1 {
