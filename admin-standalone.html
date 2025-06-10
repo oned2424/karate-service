@@ -564,6 +564,271 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Calendar Styles */
+        .calendar-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 2rem;
+        }
+
+        .calendar-stat-card {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--shadow);
+            text-align: center;
+        }
+
+        .calendar-stat-number {
+            font-size: 32px;
+            font-weight: 800;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .calendar-stat-label {
+            color: #9E9E9E;
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .calendar-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .month-nav {
+            height: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .month-nav-btn {
+            background: none;
+            border: none;
+            color: #00BCD4;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .month-nav-btn:hover {
+            background: rgba(0, 188, 212, 0.1);
+        }
+
+        .month-display {
+            font-size: 16px;
+            color: #333333;
+            font-weight: 500;
+        }
+
+        .calendar-grid {
+            width: 100%;
+        }
+
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .day-header {
+            text-align: center;
+            color: #9E9E9E;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 8px;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .calendar-day {
+            position: relative;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            color: #333333;
+        }
+
+        .calendar-day:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-day.other-month {
+            color: #E0E0E0;
+        }
+
+        .calendar-day.has-emotion {
+            color: white;
+            width: 32px;
+            height: 32px;
+            margin: auto;
+        }
+
+        .calendar-day.emotion-rad { background: #FF5252; }
+        .calendar-day.emotion-good { background: #4CAF50; }
+        .calendar-day.emotion-meh { background: #2196F3; }
+        .calendar-day.emotion-bad { background: #FF9800; }
+        .calendar-day.emotion-awful { background: #FF5252; }
+
+        .emotion-legend {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--shadow);
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .emotion-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .emotion-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .emotion-label {
+            font-size: 12px;
+            color: #9E9E9E;
+            font-weight: 500;
+        }
+
+        /* Emotion Selection Modal */
+        .emotion-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .emotion-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .emotion-modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .emotion-modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .emotion-selector {
+            display: flex;
+            justify-content: space-around;
+            gap: 1rem;
+        }
+
+        .emotion-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            background: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 60px;
+        }
+
+        .emotion-btn:hover {
+            border-color: #ddd;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .emotion-btn .emotion-icon {
+            font-size: 32px;
+            margin-bottom: 0.5rem;
+        }
+
+        .emotion-btn .emotion-label {
+            font-size: 12px;
+            color: #9E9E9E;
+        }
+
+        /* Responsive Calendar */
+        @media (max-width: 768px) {
+            .calendar-stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+            
+            .emotion-legend {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .emotion-selector {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar-stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .calendar-stat-number {
+                font-size: 24px;
+            }
+            
+            .calendar-day {
+                height: 35px;
+                font-size: 12px;
+            }
+            
+            .calendar-day.has-emotion {
+                width: 28px;
+                height: 28px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -600,6 +865,12 @@
                     <a class="nav-link" data-section="licenses">
                         <i class="fas fa-certificate"></i>
                         <span>Licenses</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" data-section="calendar">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Calendar</span>
                     </a>
                 </div>
                 <div class="nav-item">
@@ -956,6 +1227,90 @@
                 </div>
             </section>
 
+            <!-- Calendar Section -->
+            <section id="calendar-section" class="content-section">
+                <div class="admin-header">
+                    <h1>Calendar & Comments</h1>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="calendar-stats-grid">
+                    <div class="calendar-stat-card">
+                        <span class="calendar-stat-number" style="color: #FF9800;">7</span>
+                        <span class="calendar-stat-label">CURRENT STREAK</span>
+                    </div>
+                    <div class="calendar-stat-card">
+                        <span class="calendar-stat-number" style="color: #FF9800;">7</span>
+                        <span class="calendar-stat-label">LONGEST STREAK</span>
+                    </div>
+                    <div class="calendar-stat-card">
+                        <span class="calendar-stat-number" style="color: #4CAF50;">73%</span>
+                        <span class="calendar-stat-label">COMPLETION RATE</span>
+                    </div>
+                    <div class="calendar-stat-card">
+                        <span class="calendar-stat-number" style="color: #333333;">11</span>
+                        <span class="calendar-stat-label">TOTAL COMPLETIONS</span>
+                    </div>
+                </div>
+
+                <!-- Calendar Container -->
+                <div class="calendar-container">
+                    <!-- Month Navigation -->
+                    <div class="month-nav">
+                        <button class="month-nav-btn" onclick="changeMonth(-1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span class="month-display" id="monthDisplay">December 2024</span>
+                        <button class="month-nav-btn" onclick="changeMonth(1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Calendar Grid -->
+                    <div class="calendar-grid">
+                        <!-- Days of week header -->
+                        <div class="calendar-header">
+                            <div class="day-header">S</div>
+                            <div class="day-header">M</div>
+                            <div class="day-header">T</div>
+                            <div class="day-header">W</div>
+                            <div class="day-header">T</div>
+                            <div class="day-header">F</div>
+                            <div class="day-header">S</div>
+                        </div>
+                        
+                        <!-- Calendar days -->
+                        <div class="calendar-days" id="calendarDays">
+                            <!-- Days will be generated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emotion Legend -->
+                <div class="emotion-legend">
+                    <div class="emotion-item">
+                        <div class="emotion-icon" style="color: #FF5252;">😄</div>
+                        <span class="emotion-label">rad</span>
+                    </div>
+                    <div class="emotion-item">
+                        <div class="emotion-icon" style="color: #4CAF50;">😊</div>
+                        <span class="emotion-label">good</span>
+                    </div>
+                    <div class="emotion-item">
+                        <div class="emotion-icon" style="color: #2196F3;">😐</div>
+                        <span class="emotion-label">meh</span>
+                    </div>
+                    <div class="emotion-item">
+                        <div class="emotion-icon" style="color: #FF9800;">😟</div>
+                        <span class="emotion-label">bad</span>
+                    </div>
+                    <div class="emotion-item">
+                        <div class="emotion-icon" style="color: #FF5252;">😢</div>
+                        <span class="emotion-label">awful</span>
+                    </div>
+                </div>
+            </section>
+
             <!-- Settings Section -->
             <section id="settings-section" class="content-section">
                 <div class="admin-header">
@@ -987,6 +1342,35 @@
                 </div>
             </section>
         </main>
+    </div>
+
+    <!-- Emotion Selection Modal -->
+    <div id="emotionModal" class="emotion-modal">
+        <div class="emotion-modal-content">
+            <h3 class="emotion-modal-title">How was your day?</h3>
+            <div class="emotion-selector">
+                <button class="emotion-btn" onclick="selectEmotion('rad')">
+                    <div class="emotion-icon" style="color: #FF5252;">😄</div>
+                    <div class="emotion-label">rad</div>
+                </button>
+                <button class="emotion-btn" onclick="selectEmotion('good')">
+                    <div class="emotion-icon" style="color: #4CAF50;">😊</div>
+                    <div class="emotion-label">good</div>
+                </button>
+                <button class="emotion-btn" onclick="selectEmotion('meh')">
+                    <div class="emotion-icon" style="color: #2196F3;">😐</div>
+                    <div class="emotion-label">meh</div>
+                </button>
+                <button class="emotion-btn" onclick="selectEmotion('bad')">
+                    <div class="emotion-icon" style="color: #FF9800;">😟</div>
+                    <div class="emotion-label">bad</div>
+                </button>
+                <button class="emotion-btn" onclick="selectEmotion('awful')">
+                    <div class="emotion-icon" style="color: #FF5252;">😢</div>
+                    <div class="emotion-label">awful</div>
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1391,7 +1775,196 @@
                     setTimeout(() => loadVideos(), 100);
                 });
             });
+            
+            // Initialize calendar when switching to calendar section
+            document.querySelectorAll('.nav-link[data-section="calendar"], .admin-btn[data-section="calendar"]').forEach(link => {
+                link.addEventListener('click', function() {
+                    setTimeout(() => initializeCalendar(), 100);
+                });
+            });
         });
+
+        // Calendar functionality
+        let currentMonth = 11; // December (0-indexed)
+        let currentYear = 2024;
+        let selectedDay = null;
+        let emotionData = {
+            // Sample data for December 2024
+            '2024-12-2': 'meh',
+            '2024-12-3': 'good', 
+            '2024-12-5': 'bad',
+            '2024-12-6': 'rad',
+            '2024-12-9': 'meh',
+            '2024-12-10': 'good',
+            '2024-12-12': 'bad',
+            '2024-12-13': 'rad',
+            '2024-12-17': 'good',
+            '2024-12-19': 'bad',
+            '2024-12-20': 'rad'
+        };
+
+        const monthNames = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+
+        function generateCalendar(month, year) {
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+            
+            const calendarDays = document.getElementById('calendarDays');
+            calendarDays.innerHTML = '';
+            
+            // Previous month's trailing days
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const day = daysInPrevMonth - i;
+                const dayElement = createDayElement(day, true);
+                calendarDays.appendChild(dayElement);
+            }
+            
+            // Current month's days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = createDayElement(day, false);
+                calendarDays.appendChild(dayElement);
+            }
+            
+            // Next month's leading days
+            const totalCells = calendarDays.children.length;
+            const remainingCells = 42 - totalCells; // 6 rows × 7 days
+            for (let day = 1; day <= remainingCells; day++) {
+                const dayElement = createDayElement(day, true);
+                calendarDays.appendChild(dayElement);
+            }
+            
+            // Update month display
+            document.getElementById('monthDisplay').textContent = 
+                `${monthNames[month]} ${year}`;
+        }
+
+        function createDayElement(day, isOtherMonth) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            dayElement.textContent = day;
+            
+            if (isOtherMonth) {
+                dayElement.classList.add('other-month');
+            } else {
+                // Check if this day has an emotion
+                const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
+                const emotion = emotionData[dateKey];
+                
+                if (emotion) {
+                    dayElement.classList.add('has-emotion', `emotion-${emotion}`);
+                }
+                
+                // Add click handler for current month days
+                dayElement.addEventListener('click', () => {
+                    if (!isOtherMonth) {
+                        selectedDay = day;
+                        showEmotionModal();
+                    }
+                });
+            }
+            
+            return dayElement;
+        }
+
+        function changeMonth(direction) {
+            currentMonth += direction;
+            
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            
+            // Add slide animation class
+            const calendarGrid = document.querySelector('.calendar-grid');
+            calendarGrid.style.transform = `translateX(${direction > 0 ? '100%' : '-100%'})`;
+            calendarGrid.style.opacity = '0';
+            
+            setTimeout(() => {
+                generateCalendar(currentMonth, currentYear);
+                calendarGrid.style.transform = `translateX(${direction > 0 ? '-100%' : '100%'})`;
+                
+                setTimeout(() => {
+                    calendarGrid.style.transition = 'all 0.3s ease';
+                    calendarGrid.style.transform = 'translateX(0)';
+                    calendarGrid.style.opacity = '1';
+                    
+                    setTimeout(() => {
+                        calendarGrid.style.transition = '';
+                    }, 300);
+                }, 50);
+            }, 150);
+        }
+
+        function showEmotionModal() {
+            const modal = document.getElementById('emotionModal');
+            modal.classList.add('active');
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeEmotionModal();
+                }
+            });
+        }
+
+        function closeEmotionModal() {
+            const modal = document.getElementById('emotionModal');
+            modal.classList.remove('active');
+        }
+
+        function selectEmotion(emotion) {
+            if (selectedDay) {
+                const dateKey = `${currentYear}-${currentMonth + 1}-${selectedDay}`;
+                emotionData[dateKey] = emotion;
+                
+                // Update calendar display
+                generateCalendar(currentMonth, currentYear);
+                
+                // Update statistics
+                updateCalendarStats();
+                
+                // Close modal with animation
+                closeEmotionModal();
+                
+                // Show notification
+                showNotification(`${selectedDay}日の気分を「${emotion}」に設定しました`, 'success');
+            }
+        }
+
+        function updateCalendarStats() {
+            const emotions = Object.values(emotionData);
+            const totalDays = emotions.length;
+            
+            if (totalDays === 0) return;
+            
+            // Calculate completion rate (assuming this month has entries)
+            const thisMonthEntries = Object.keys(emotionData).filter(date => {
+                const [year, month] = date.split('-');
+                return parseInt(year) === currentYear && parseInt(month) === currentMonth + 1;
+            });
+            
+            const completionRate = Math.round((thisMonthEntries.length / new Date(currentYear, currentMonth + 1, 0).getDate()) * 100);
+            
+            // Update stats display
+            const statCards = document.querySelectorAll('.calendar-stat-card');
+            if (statCards.length >= 3) {
+                statCards[2].querySelector('.calendar-stat-number').textContent = `${completionRate}%`;
+                statCards[3].querySelector('.calendar-stat-number').textContent = totalDays;
+            }
+        }
+
+        // Initialize calendar when calendar section is shown
+        function initializeCalendar() {
+            generateCalendar(currentMonth, currentYear);
+            updateCalendarStats();
+        }
 
         // Initialize
         console.log('🥋 KarateMaster Admin System Loaded');
@@ -1400,6 +1973,7 @@
         console.log('- Dynamic video management');
         console.log('- Live statistics dashboard');
         console.log('- Admin authentication');
+        console.log('- Calendar & emotion tracking');
         
         // Show welcome notification
         setTimeout(() => {
