@@ -1309,7 +1309,7 @@ function updateCalendarStats() {
     // Count completions from month start to today (only if viewing current month)
     let totalCompletions;
     if (currentYear === today.getFullYear() && currentMonth === today.getMonth()) {
-        // Current month: count from month start to today
+        // Current month: count from month start to today (inclusive)
         const dayOfMonth = today.getDate();
         totalCompletions = Object.keys(emotionData).filter(date => {
             const [year, month, day] = date.split('-').map(Number);
@@ -1521,6 +1521,15 @@ function updateDashboardStats() {
 
 // Initialize calendar when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    // Clean up any duplicate emotion modals (prevent 3-emoji modal issue)
+    const allEmotionModals = document.querySelectorAll('.emotion-modal');
+    if (allEmotionModals.length > 1) {
+        // Keep only the first one and remove others
+        for (let i = 1; i < allEmotionModals.length; i++) {
+            allEmotionModals[i].remove();
+        }
+    }
+    
     // Initialize mini calendar
     if (document.getElementById('miniCalendarDays')) {
         generateMiniCalendar(miniCurrentMonth, miniCurrentYear);
