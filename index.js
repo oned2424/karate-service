@@ -30,6 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 // 静的ファイルの配信
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/styles', express.static(path.join(__dirname, 'assets/styles')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // アップロードディレクトリの作成
 const uploadDir = path.join(__dirname, 'uploads');

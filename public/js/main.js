@@ -443,6 +443,11 @@ class KarateVideoService {
         videoGrid.innerHTML = videos.map(video => `
             <div class="video-card" data-video-id="${video.id}">
                 <div class="video-thumbnail" onclick="karateService.playVideoFromAPI(${video.id})">
+                    ${video.filename ? `
+                        <video class="video-preview" preload="metadata">
+                            <source src="/uploads/${video.filename}" type="video/mp4">
+                        </video>
+                    ` : ''}
                     <button class="play-overlay">
                         <i class="fas fa-play"></i>
                     </button>
@@ -529,16 +534,43 @@ class KarateVideoService {
                 method: 'GET'
             });
 
-            // For now, show notification (later implement actual video player)
+            // Find and play the actual video
             const video = this.apiVideos.find(v => v.id === videoId);
-            if (video) {
-                this.showNotification(`再生中: ${video.title}`, 'info');
-                // TODO: Implement actual video playback
-                // this.loadVideoPlayer(video);
+            if (video && video.filename) {
+                this.loadVideoPlayer(video);
+                this.showNotification(`再生中: ${video.title}`, 'success');
+            } else {
+                this.showNotification('動画ファイルが見つかりません', 'error');
             }
         } catch (error) {
             console.error('Error playing video:', error);
             this.showNotification('動画の再生に失敗しました', 'error');
+        }
+    }
+
+    // Load video into player
+    loadVideoPlayer(video) {
+        const playerVideo = document.getElementById('playerVideo');
+        if (!playerVideo) {
+            this.showNotification('動画プレイヤーが見つかりません', 'error');
+            return;
+        }
+
+        this.currentVideo = video;
+        
+        // Set video source
+        playerVideo.src = `/uploads/${video.filename}`;
+        playerVideo.load();
+        
+        // Scroll to editor section
+        document.getElementById('editor').scrollIntoView({ 
+            behavior: 'smooth' 
+        });
+
+        // Update player title
+        const editorTitle = document.querySelector('#editor h2');
+        if (editorTitle) {
+            editorTitle.textContent = `動画編集ツール - ${video.title}`;
         }
     }
 
