@@ -1,14 +1,28 @@
-// Replit用の簡易サーバー（FFmpegなしバージョン）
+// Replit用の簡易サーバー（FFmpegなしバージョン + 管理者認証）
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// セッション設定
+app.use(session({
+    secret: 'karate-admin-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { 
+        secure: false, // HTTPでも動作するようにfalse
+        maxAge: 24 * 60 * 60 * 1000 // 24時間
+    }
+}));
+
 // ミドルウェア設定
+app.use(cookieParser());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -34,7 +48,7 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({
+const upload = multer({ 
     storage: storage,
     fileFilter: (req, file, cb) => {
         if (file.mimetype.startsWith('video/')) {
@@ -82,12 +96,22 @@ let videos = [
 
 let nextVideoId = 3;
 
+// 管理者認証ミドルウェア
+function requireAuth(req, res, next) {
+    if (req.session.isAuthenticated) {
+        next();
+    } else {
+        res.redirect('/login.html');
+    }
+}
+
 // ルート定義
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-app.get('/admin-standalone', (req, res) => {
+// 管理者画面（認証が必要）
+app.get('/admin-standalone', requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'admin-standalone.html'));
 });
 
@@ -95,8 +119,38 @@ app.get('/admin', (req, res) => {
     res.redirect('/admin/');
 });
 
-app.get('/admin/', (req, res) => {
+app.get('/admin/', requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'public/admin/index.html'));
+});
+
+// ログインページ
+app.get('/login.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+// ログイン処理
+app.post('/login', (req, res) => {
+    const { password } = req.body;
+    
+    if (password === 'karate-admin-2024') {
+        req.session.isAuthenticated = true;
+        res.json({ success: true, message: 'ログイン成功' });
+    } else {
+        res.status(401).json({ success: false, message: 'パスワードが間違っています' });
+    }
+});
+
+// ログアウト処理
+app.post('/logout', (req, res) => {
+    req.session.destroy();
+    res.json({ success: true, message: 'ログアウトしました' });
+});
+
+// 認証状態チェック API
+app.get('/api/auth-check', (req, res) => {
+    res.json({ 
+        isAuthenticated: !!req.session.isAuthenticated 
+    });
 });
 
 // API: 動画一覧取得
@@ -144,8 +198,8 @@ app.get('/api/videos/:id', (req, res) => {
     });
 });
 
-// API: 動画アップロード（Replit版）
-app.post('/api/upload', upload.single('video'), (req, res) => {
+// API: 動画アップロード（Replit版・認証が必要）
+app.post('/api/upload', requireAuth, upload.single('video'), (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({
@@ -214,8 +268,8 @@ app.post('/api/upload', upload.single('video'), (req, res) => {
     }
 });
 
-// API: 動画更新
-app.put('/api/videos/:id', (req, res) => {
+// API: 動画更新（認証が必要）
+app.put('/api/videos/:id', requireAuth, (req, res) => {
     const videoId = parseInt(req.params.id);
     const videoIndex = videos.findIndex(v => v.id === videoId);
     
@@ -239,8 +293,8 @@ app.put('/api/videos/:id', (req, res) => {
     });
 });
 
-// API: 動画削除
-app.delete('/api/videos/:id', (req, res) => {
+// API: 動画削除（認証が必要）
+app.delete('/api/videos/:id', requireAuth, (req, res) => {
     const videoId = parseInt(req.params.id);
     const videoIndex = videos.findIndex(v => v.id === videoId);
     
@@ -267,8 +321,8 @@ app.delete('/api/videos/:id', (req, res) => {
     });
 });
 
-// API: 統計情報
-app.get('/api/stats', (req, res) => {
+// API: 統計情報（認証が必要）
+app.get('/api/stats', requireAuth, (req, res) => {
     const totalVideos = videos.length;
     const totalViews = videos.reduce((sum, video) => sum + video.views, 0);
     const categoryCounts = videos.reduce((counts, video) => {
@@ -330,12 +384,13 @@ app.use((req, res) => {
 // サーバー起動
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🥋 空手動画サービス(Replit版)がポート ${PORT} で起動しました`);
+    console.log(`   アクセスURL: https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`);
     console.log('');
     console.log('利用可能な機能:');
     console.log('- 動画アップロード（実際のファイル保存）');
     console.log('- 動画一覧・検索・管理');
     console.log('- CC-BYライセンス管理');
-    console.log('- 管理者画面');
+    console.log('- 管理者画面（認証機能付き）');
     console.log('');
     console.log('注意: FFmpeg動画編集機能は除外（Replit制限のため）');
 });
