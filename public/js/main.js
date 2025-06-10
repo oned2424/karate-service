@@ -718,43 +718,11 @@ KarateVideoService.prototype.setupTodayPracticeButton = function() {
     const todayBtn = document.getElementById('todayPracticeBtn');
     if (!todayBtn) return;
     
-    todayBtn.addEventListener('click', async () => {
+    todayBtn.addEventListener('click', () => {
         if (this.todayCompleted) return;
         
-        try {
-            todayBtn.disabled = true;
-            todayBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Recording...';
-            
-            const response = await fetch('/api/practice/today', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                this.todayCompleted = true;
-                this.streakData = result.data.streak;
-                this.updateTodayButton();
-                this.updateStreakDisplay();
-                this.renderMiniCalendar();
-                this.showNotification('🎉 ' + result.message, 'success');
-                
-                // 練習後の日記モーダルを表示
-                setTimeout(() => {
-                    this.showJournalModal();
-                }, 1000);
-            } else {
-                this.showNotification(result.message, 'error');
-                todayBtn.disabled = false;
-                this.updateTodayButton();
-            }
-        } catch (error) {
-            console.error('Error recording practice:', error);
-            this.showNotification('記録に失敗しました', 'error');
-            todayBtn.disabled = false;
-            this.updateTodayButton();
-        }
+        // 直接感情選択モーダルを開く
+        openTodayEmotionModal();
     });
 };
 
@@ -1274,6 +1242,11 @@ function saveEmotion() {
         const todayKey = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
         if (dateKey === todayKey) {
             updateTodayDisplay();
+            
+            // If this is today's practice, record it on the server
+            if (window.karateService) {
+                recordTodayPractice();
+            }
         }
         
         // If this was for today, reset the flag
@@ -1293,6 +1266,31 @@ function saveEmotion() {
 
 function skipEmotion() {
     closeEmotionModal();
+}
+
+// Today's practice recording function
+async function recordTodayPractice() {
+    try {
+        const response = await fetch('/api/practice/today', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            window.karateService.todayCompleted = true;
+            window.karateService.streakData = result.data.streak;
+            window.karateService.updateTodayButton();
+            window.karateService.updateStreakDisplay();
+            window.karateService.showNotification('🎉 ' + result.message, 'success');
+        } else {
+            window.karateService.showNotification(result.message, 'error');
+        }
+    } catch (error) {
+        console.error('Error recording practice:', error);
+        window.karateService.showNotification('記録に失敗しました', 'error');
+    }
 }
 
 function updateCalendarStats() {
