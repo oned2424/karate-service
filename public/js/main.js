@@ -1344,6 +1344,7 @@ function saveEmotion() {
         
         // Update statistics
         updateCalendarStats();
+        updateMiniStats();
         
         // If this was for today, update Today's Practice display
         if (isSelectingForToday) {
@@ -1369,8 +1370,6 @@ function updateCalendarStats() {
     const emotions = Object.values(emotionData);
     const totalDays = emotions.length;
     
-    if (totalDays === 0) return;
-    
     // Calculate completion rate for current month
     const thisMonthEntries = Object.keys(emotionData).filter(date => {
         const [year, month] = date.split('-');
@@ -1378,7 +1377,7 @@ function updateCalendarStats() {
     });
     
     const daysInCurrentMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const completionRate = Math.round((thisMonthEntries.length / daysInCurrentMonth) * 100);
+    const completionRate = thisMonthEntries.length > 0 ? Math.round((thisMonthEntries.length / daysInCurrentMonth) * 100) : 0;
     
     // Calculate streaks
     let currentStreak = 0;
@@ -1404,24 +1403,37 @@ function updateCalendarStats() {
     // Calculate longest streak
     const sortedDates = Object.keys(emotionData).sort();
     let tempStreak = 0;
-    for (let date of sortedDates) {
-        tempStreak++;
-        longestStreak = Math.max(longestStreak, tempStreak);
-    }
+    let currentStreakCount = 0;
+    let lastDate = null;
     
-    // Update stats display
-    const statCards = document.querySelectorAll('.calendar-stat-card');
-    if (statCards.length >= 4) {
-        const currentStreakEl = statCards[0].querySelector('.calendar-stat-number');
-        const longestStreakEl = statCards[1].querySelector('.calendar-stat-number');
-        const completionRateEl = statCards[2].querySelector('.calendar-stat-number');
-        const totalDaysEl = statCards[3].querySelector('.calendar-stat-number');
-        
-        if (currentStreakEl) currentStreakEl.textContent = currentStreak;
-        if (longestStreakEl) longestStreakEl.textContent = longestStreak;
-        if (completionRateEl) completionRateEl.textContent = `${completionRate}%`;
-        if (totalDaysEl) totalDaysEl.textContent = totalDays;
+    for (let dateStr of sortedDates) {
+        const currentDate = new Date(dateStr);
+        if (lastDate) {
+            const diffTime = currentDate - lastDate;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays === 1) {
+                currentStreakCount++;
+            } else {
+                longestStreak = Math.max(longestStreak, currentStreakCount);
+                currentStreakCount = 1;
+            }
+        } else {
+            currentStreakCount = 1;
+        }
+        lastDate = currentDate;
     }
+    longestStreak = Math.max(longestStreak, currentStreakCount);
+    
+    // Update full calendar stats display
+    const fullCurrentStreakEl = document.getElementById('fullCurrentStreak');
+    const fullLongestStreakEl = document.getElementById('fullLongestStreak');
+    const fullCompletionRateEl = document.getElementById('fullCompletionRate');
+    const fullTotalDaysEl = document.getElementById('fullTotalDays');
+    
+    if (fullCurrentStreakEl) fullCurrentStreakEl.textContent = currentStreak;
+    if (fullLongestStreakEl) fullLongestStreakEl.textContent = longestStreak;
+    if (fullCompletionRateEl) fullCompletionRateEl.textContent = `${completionRate}%`;
+    if (fullTotalDaysEl) fullTotalDaysEl.textContent = totalDays;
 }
 
 // Mini Calendar functionality
@@ -1529,7 +1541,7 @@ function updateMiniStats() {
     });
     
     const daysInCurrentMonth = new Date(miniCurrentYear, miniCurrentMonth + 1, 0).getDate();
-    const completionRate = Math.round((thisMonthEntries.length / daysInCurrentMonth) * 100);
+    const completionRate = thisMonthEntries.length > 0 ? Math.round((thisMonthEntries.length / daysInCurrentMonth) * 100) : 0;
     
     // Calculate current streak
     let currentStreak = 0;
@@ -1549,15 +1561,12 @@ function updateMiniStats() {
         }
     }
     
-    // Update mini stats display
-    const miniStatCards = document.querySelectorAll('.mini-stat-card');
-    if (miniStatCards.length >= 2) {
-        const currentStreakEl = miniStatCards[0].querySelector('.mini-stat-number');
-        const completionRateEl = miniStatCards[1].querySelector('.mini-stat-number');
-        
-        if (currentStreakEl) currentStreakEl.textContent = currentStreak;
-        if (completionRateEl) completionRateEl.textContent = `${completionRate}%`;
-    }
+    // Update mini stats display using IDs
+    const miniCurrentStreakEl = document.getElementById('miniCurrentStreak');
+    const miniCompletionRateEl = document.getElementById('miniCompletionRate');
+    
+    if (miniCurrentStreakEl) miniCurrentStreakEl.textContent = currentStreak;
+    if (miniCompletionRateEl) miniCompletionRateEl.textContent = `${completionRate}%`;
 }
 
 // Initialize calendar when page loads
@@ -1575,6 +1584,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize Today's Practice display
     updateTodayDisplay();
+    
+    // Initialize statistics
+    updateCalendarStats();
+    updateMiniStats();
 });
 
 // Today's Practice functions
