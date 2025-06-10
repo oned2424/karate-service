@@ -22,6 +22,40 @@
                 <li><a href="#editor" class="nav-link">Editor</a></li>
                 <li><a href="#about" class="nav-link">About</a></li>
                 <li><a href="#" class="nav-link language-toggle">🌐 JP/EN</a></li>
+                
+                <!-- ユーザー認証メニュー -->
+                <li class="user-menu">
+                    <div id="userAuthSection" class="auth-section">
+                        <!-- ゲスト状態 -->
+                        <div id="guestState" class="auth-state">
+                            <a href="/user-login.html" class="login-btn">
+                                <i class="fas fa-sign-in-alt"></i>
+                                ログイン
+                            </a>
+                        </div>
+                        
+                        <!-- ログイン状態 -->
+                        <div id="loggedInState" class="auth-state" style="display: none;">
+                            <div class="user-dropdown">
+                                <button class="user-button" onclick="toggleUserMenu()">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span id="userName">ユーザー</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div class="dropdown-menu" id="userDropdown">
+                                    <a href="#" onclick="showProfile()">
+                                        <i class="fas fa-user"></i>
+                                        プロフィール
+                                    </a>
+                                    <a href="#" onclick="logoutUser()">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        ログアウト
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
             </ul>
         </div>
     </nav>

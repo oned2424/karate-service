@@ -12,6 +12,10 @@ class KarateVideoService {
         this.streakData = { current: 0, longest: 0, total: 0 };
         this.todayCompleted = false;
         
+        // ユーザー認証関連
+        this.currentUser = null;
+        this.isLoggedIn = false;
+        
         this.init();
     }
 
@@ -21,6 +25,9 @@ class KarateVideoService {
         this.setupVideoControls();
         this.setupSmoothScrolling();
         this.setupVideoLibrary();
+        
+        // ユーザー認証初期化
+        this.initUserAuth();
         
         // 習慣化パッケージ初期化
         this.initHabitDashboard();
@@ -976,3 +983,148 @@ KarateVideoService.prototype.saveJournal = async function() {
 function showFullCalendar() {
     window.karateService.showNotification('フルカレンダー機能は近日公開予定です', 'info');
 }
+
+// ==== ユーザー認証機能 ====
+
+// ユーザー認証初期化
+KarateVideoService.prototype.initUserAuth = async function() {
+    await this.checkAuthStatus();
+    this.updateDashboardForUser();
+};
+
+// 認証状態チェック
+KarateVideoService.prototype.checkAuthStatus = async function() {
+    try {
+        const response = await fetch('/api/user/auth-status');
+        const result = await response.json();
+        
+        if (result.success) {
+            this.isLoggedIn = result.isLoggedIn;
+            this.currentUser = result.user;
+            this.updateAuthUI();
+        }
+    } catch (error) {
+        console.error('Auth status check error:', error);
+        this.isLoggedIn = false;
+        this.currentUser = null;
+        this.updateAuthUI();
+    }
+};
+
+// 認証UIの更新
+KarateVideoService.prototype.updateAuthUI = function() {
+    const guestState = document.getElementById('guestState');
+    const loggedInState = document.getElementById('loggedInState');
+    const userName = document.getElementById('userName');
+    
+    if (this.isLoggedIn && this.currentUser) {
+        guestState.style.display = 'none';
+        loggedInState.style.display = 'block';
+        userName.textContent = this.currentUser.displayName || this.currentUser.username;
+    } else {
+        guestState.style.display = 'block';
+        loggedInState.style.display = 'none';
+    }
+};
+
+// ダッシュボードのユーザー表示更新
+KarateVideoService.prototype.updateDashboardForUser = function() {
+    const dashboardHeader = document.querySelector('.dashboard-header');
+    if (!dashboardHeader) return;
+    
+    // 既存のユーザー表示を削除
+    const existingWelcome = document.querySelector('.dashboard-user-welcome');
+    const existingNotice = document.querySelector('.guest-notice');
+    if (existingWelcome) existingWelcome.remove();
+    if (existingNotice) existingNotice.remove();
+    
+    const welcomeDiv = document.createElement('div');
+    
+    if (this.isLoggedIn && this.currentUser) {
+        // ログインユーザー向け表示
+        welcomeDiv.className = 'dashboard-user-welcome';
+        welcomeDiv.innerHTML = `
+            <h3>Welcome back, ${this.currentUser.displayName || this.currentUser.username}! 🥋</h3>
+            <p>あなた専用の練習記録をトラッキングしています</p>
+        `;
+    } else {
+        // ゲストユーザー向け表示
+        welcomeDiv.className = 'guest-notice';
+        welcomeDiv.innerHTML = `
+            <h4>🎯 ゲストモードで体験中</h4>
+            <p>アカウントを作成すると、あなただけの練習記録を永続的に保存できます！</p>
+            <a href="/user-login.html" class="login-btn">
+                <i class="fas fa-user-plus"></i>
+                アカウント作成でデータを保存
+            </a>
+        `;
+    }
+    
+    dashboardHeader.parentNode.insertBefore(welcomeDiv, dashboardHeader.nextSibling);
+};
+
+// ユーザーメニューの表示切り替え
+function toggleUserMenu() {
+    const dropdown = document.getElementById('userDropdown');
+    dropdown.classList.toggle('show');
+}
+
+// プロフィール表示
+function showProfile() {
+    const dropdown = document.getElementById('userDropdown');
+    dropdown.classList.remove('show');
+    
+    if (window.karateService.currentUser) {
+        const user = window.karateService.currentUser;
+        const profileInfo = `
+ユーザー名: ${user.username}
+表示名: ${user.displayName}
+メール: ${user.email}
+登録日: ${new Date(user.createdAt).toLocaleDateString()}
+最終ログイン: ${user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : '初回ログイン'}
+        `;
+        alert('プロフィール情報:\n\n' + profileInfo);
+    }
+}
+
+// ログアウト
+async function logoutUser() {
+    const dropdown = document.getElementById('userDropdown');
+    dropdown.classList.remove('show');
+    
+    try {
+        const response = await fetch('/api/user/logout', {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            window.karateService.showNotification('ログアウトしました', 'success');
+            window.karateService.isLoggedIn = false;
+            window.karateService.currentUser = null;
+            window.karateService.updateAuthUI();
+            window.karateService.updateDashboardForUser();
+            
+            // ページをリロードして状態をリセット
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            window.karateService.showNotification('ログアウトに失敗しました', 'error');
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+        window.karateService.showNotification('ログアウト中にエラーが発生しました', 'error');
+    }
+}
+
+// ドロップダウンメニューの外側クリックで閉じる
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('userDropdown');
+    const userButton = document.querySelector('.user-button');
+    
+    if (dropdown && !userButton.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.remove('show');
+    }
+});

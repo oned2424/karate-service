@@ -97,10 +97,18 @@ let videos = [
 
 let nextVideoId = 3;
 
-// 習慣化パッケージ用データ構造
+// ユーザー認証システム用データ構造
+let users = []; // ユーザーアカウント { id, username, email, password, displayName, createdAt, lastLogin }
+let userPracticeRecords = {}; // ユーザー別練習記録 { userId: [records] }
+let userJournalEntries = {}; // ユーザー別日記エントリ { userId: [entries] }
+let userSettings = {}; // ユーザー別設定 { userId: settings }
+
+let nextUserId = 1;
+
+// 習慣化パッケージ用データ構造（グローバル - 後方互換性のため残す）
 let practiceRecords = []; // 練習記録 { id, date, completed, timestamp }
 let journalEntries = []; // 日記エントリ { id, date, mood, text, videoId?, timestamp }
-let userSettings = { // ユーザー設定
+let globalUserSettings = { // グローバル設定（ゲストユーザー用）
     notifications: {
         enabled: true,
         time: '19:00',
@@ -139,6 +147,55 @@ function requireAuth(req, res, next) {
     } else {
         res.redirect('/login.html');
     }
+}
+
+// ユーザー認証ミドルウェア
+function requireUser(req, res, next) {
+    if (req.session.userId) {
+        req.userId = req.session.userId;
+        next();
+    } else {
+        res.status(401).json({
+            success: false,
+            message: 'ログインが必要です',
+            requireLogin: true
+        });
+    }
+}
+
+// オプショナルユーザー認証（ゲストも許可）
+function optionalUser(req, res, next) {
+    req.userId = req.session.userId || null;
+    next();
+}
+
+// パスワードハッシュ化のヘルパー関数（簡易版）
+function hashPassword(password) {
+    // 実際の本番環境では bcrypt を使用
+    return Buffer.from(password).toString('base64');
+}
+
+function verifyPassword(password, hashedPassword) {
+    return hashPassword(password) === hashedPassword;
+}
+
+// ユーザー用デフォルト設定
+function createDefaultUserSettings() {
+    return {
+        notifications: {
+            enabled: true,
+            time: '19:00',
+            channels: {
+                push: true,
+                email: false
+            }
+        },
+        streak: {
+            current: 0,
+            longest: 0,
+            total: 0
+        }
+    };
 }
 
 // ルート定義
@@ -187,6 +244,178 @@ app.get('/api/auth-check', (req, res) => {
     res.json({ 
         isAuthenticated: !!req.session.isAuthenticated 
     });
+});
+
+// ==== ユーザー認証システム API ====
+
+// ユーザー登録
+app.post('/api/user/register', (req, res) => {
+    const { username, email, password, displayName } = req.body;
+    
+    // バリデーション
+    if (!username || !email || !password) {
+        return res.status(400).json({
+            success: false,
+            message: 'ユーザー名、メール、パスワードは必須です'
+        });
+    }
+    
+    if (password.length < 6) {
+        return res.status(400).json({
+            success: false,
+            message: 'パスワードは6文字以上である必要があります'
+        });
+    }
+    
+    // 既存ユーザーチェック
+    const existingUser = users.find(user => 
+        user.username === username || user.email === email
+    );
+    
+    if (existingUser) {
+        return res.status(409).json({
+            success: false,
+            message: 'このユーザー名またはメールアドレスは既に使用されています'
+        });
+    }
+    
+    // 新しいユーザー作成
+    const newUser = {
+        id: nextUserId++,
+        username: username,
+        email: email,
+        password: hashPassword(password),
+        displayName: displayName || username,
+        createdAt: new Date().toISOString(),
+        lastLogin: null
+    };
+    
+    users.push(newUser);
+    
+    // ユーザー専用データ初期化
+    userPracticeRecords[newUser.id] = [];
+    userJournalEntries[newUser.id] = [];
+    userSettings[newUser.id] = createDefaultUserSettings();
+    
+    // セッション設定（自動ログイン）
+    req.session.userId = newUser.id;
+    req.session.username = newUser.username;
+    
+    res.json({
+        success: true,
+        message: 'アカウントが作成されました',
+        user: {
+            id: newUser.id,
+            username: newUser.username,
+            email: newUser.email,
+            displayName: newUser.displayName
+        }
+    });
+});
+
+// ユーザーログイン
+app.post('/api/user/login', (req, res) => {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+        return res.status(400).json({
+            success: false,
+            message: 'ユーザー名とパスワードを入力してください'
+        });
+    }
+    
+    // ユーザー検索（ユーザー名またはメールアドレス）
+    const user = users.find(u => 
+        u.username === username || u.email === username
+    );
+    
+    if (!user || !verifyPassword(password, user.password)) {
+        return res.status(401).json({
+            success: false,
+            message: 'ユーザー名またはパスワードが間違っています'
+        });
+    }
+    
+    // ログイン時刻更新
+    user.lastLogin = new Date().toISOString();
+    
+    // セッション設定
+    req.session.userId = user.id;
+    req.session.username = user.username;
+    
+    res.json({
+        success: true,
+        message: 'ログインしました',
+        user: {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            displayName: user.displayName,
+            lastLogin: user.lastLogin
+        }
+    });
+});
+
+// ユーザーログアウト
+app.post('/api/user/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({
+                success: false,
+                message: 'ログアウトに失敗しました'
+            });
+        }
+        res.json({
+            success: true,
+            message: 'ログアウトしました'
+        });
+    });
+});
+
+// ユーザー情報取得
+app.get('/api/user/profile', requireUser, (req, res) => {
+    const user = users.find(u => u.id === req.userId);
+    
+    if (!user) {
+        return res.status(404).json({
+            success: false,
+            message: 'ユーザーが見つかりません'
+        });
+    }
+    
+    res.json({
+        success: true,
+        user: {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            displayName: user.displayName,
+            createdAt: user.createdAt,
+            lastLogin: user.lastLogin
+        }
+    });
+});
+
+// ユーザーログイン状態チェック
+app.get('/api/user/auth-status', (req, res) => {
+    if (req.session.userId) {
+        const user = users.find(u => u.id === req.session.userId);
+        res.json({
+            success: true,
+            isLoggedIn: true,
+            user: user ? {
+                id: user.id,
+                username: user.username,
+                displayName: user.displayName
+            } : null
+        });
+    } else {
+        res.json({
+            success: true,
+            isLoggedIn: false,
+            user: null
+        });
+    }
 });
 
 // API: 動画一覧取得
@@ -377,12 +606,16 @@ app.get('/api/stats', requireAuth, (req, res) => {
     });
 });
 
-// ==== 習慣化パッケージ API ====
+// ==== 習慣化パッケージ API (ユーザー対応) ====
 
 // API: 今日の練習記録 (Today✓ボタン)
-app.post('/api/practice/today', (req, res) => {
+app.post('/api/practice/today', optionalUser, (req, res) => {
     const today = new Date().toISOString().split('T')[0];
-    const existingRecord = practiceRecords.find(record => record.date === today);
+    const userId = req.userId;
+    
+    // ユーザー記録を取得（ログイン済みまたはゲスト）
+    const records = userId ? userPracticeRecords[userId] : practiceRecords;
+    const existingRecord = records.find(record => record.date === today);
     
     if (existingRecord) {
         return res.json({
@@ -396,40 +629,68 @@ app.post('/api/practice/today', (req, res) => {
         id: nextPracticeId++,
         date: today,
         completed: true,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        userId: userId || null
     };
     
-    practiceRecords.push(newRecord);
-    
-    // ストリーク計算
-    updateStreak();
-    
-    res.json({
-        success: true,
-        message: '今日の練習を記録しました！',
-        data: {
-            record: newRecord,
-            streak: userSettings.streak
+    // ユーザー別記録に追加
+    if (userId) {
+        if (!userPracticeRecords[userId]) {
+            userPracticeRecords[userId] = [];
         }
-    });
+        userPracticeRecords[userId].push(newRecord);
+        // ユーザー別ストリーク計算
+        updateUserStreak(userId);
+        const streak = userSettings[userId]?.streak || { current: 0, longest: 0, total: 0 };
+        
+        res.json({
+            success: true,
+            message: '今日の練習を記録しました！',
+            data: {
+                record: newRecord,
+                streak: streak
+            }
+        });
+    } else {
+        // ゲストユーザー（グローバル記録）
+        practiceRecords.push(newRecord);
+        updateStreak();
+        
+        res.json({
+            success: true,
+            message: '今日の練習を記録しました！',
+            data: {
+                record: newRecord,
+                streak: globalUserSettings.streak
+            }
+        });
+    }
 });
 
 // API: ストリーク情報取得
-app.get('/api/practice/streak', (req, res) => {
+app.get('/api/practice/streak', optionalUser, (req, res) => {
+    const userId = req.userId;
+    const streak = userId 
+        ? userSettings[userId]?.streak || { current: 0, longest: 0, total: 0 }
+        : globalUserSettings.streak;
+    
     res.json({
         success: true,
-        data: userSettings.streak
+        data: streak
     });
 });
 
 // API: 練習カレンダーデータ
-app.get('/api/practice/calendar', (req, res) => {
+app.get('/api/practice/calendar', optionalUser, (req, res) => {
     const { year, month } = req.query;
-    let filteredRecords = practiceRecords;
+    const userId = req.userId;
+    
+    let allRecords = userId ? userPracticeRecords[userId] || [] : practiceRecords;
+    let filteredRecords = allRecords;
     
     if (year && month) {
         const filterDate = `${year}-${month.padStart(2, '0')}`;
-        filteredRecords = practiceRecords.filter(record => 
+        filteredRecords = allRecords.filter(record => 
             record.date.startsWith(filterDate)
         );
     }
@@ -445,8 +706,9 @@ app.get('/api/practice/calendar', (req, res) => {
 });
 
 // API: 練習後日記保存
-app.post('/api/journal', (req, res) => {
+app.post('/api/journal', optionalUser, (req, res) => {
     const { mood, text, videoId } = req.body;
+    const userId = req.userId;
     const today = new Date().toISOString().split('T')[0];
     
     if (!mood || !['happy', 'neutral', 'tired'].includes(mood)) {
@@ -462,10 +724,20 @@ app.post('/api/journal', (req, res) => {
         mood: mood,
         text: text || '',
         videoId: videoId || null,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        userId: userId || null
     };
     
-    journalEntries.push(newEntry);
+    // ユーザー別記録に追加
+    if (userId) {
+        if (!userJournalEntries[userId]) {
+            userJournalEntries[userId] = [];
+        }
+        userJournalEntries[userId].push(newEntry);
+    } else {
+        // ゲストユーザー（グローバル記録）
+        journalEntries.push(newEntry);
+    }
     
     res.json({
         success: true,
@@ -523,16 +795,41 @@ app.put('/api/settings', (req, res) => {
     });
 });
 
-// ストリーク計算ヘルパー関数
+// ストリーク計算ヘルパー関数（グローバル用）
 function updateStreak() {
     const sortedRecords = practiceRecords
         .sort((a, b) => new Date(b.date) - new Date(a.date));
     
     if (sortedRecords.length === 0) {
-        userSettings.streak = { current: 0, longest: 0, total: 0 };
+        globalUserSettings.streak = { current: 0, longest: 0, total: 0 };
         return;
     }
     
+    const streak = calculateStreakFromRecords(sortedRecords);
+    globalUserSettings.streak = streak;
+}
+
+// ユーザー別ストリーク計算ヘルパー関数
+function updateUserStreak(userId) {
+    if (!userPracticeRecords[userId]) {
+        userSettings[userId].streak = { current: 0, longest: 0, total: 0 };
+        return;
+    }
+    
+    const sortedRecords = userPracticeRecords[userId]
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    if (sortedRecords.length === 0) {
+        userSettings[userId].streak = { current: 0, longest: 0, total: 0 };
+        return;
+    }
+    
+    const streak = calculateStreakFromRecords(sortedRecords);
+    userSettings[userId].streak = streak;
+}
+
+// 共通ストリーク計算ロジック
+function calculateStreakFromRecords(sortedRecords) {
     let currentStreak = 0;
     let longestStreak = 0;
     let tempStreak = 0;
@@ -565,10 +862,10 @@ function updateStreak() {
         currentStreak = 1;
     }
     
-    userSettings.streak = {
+    return {
         current: currentStreak,
         longest: Math.max(longestStreak, currentStreak),
-        total: practiceRecords.length
+        total: sortedRecords.length
     };
 }
 

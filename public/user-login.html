@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログイン - KarateMaster</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--indigo-traditional) 100%);
+            padding: 2rem;
+        }
+        
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .auth-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .auth-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            background: var(--surface);
+            padding: 0.25rem;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+        }
+        
+        .auth-tab.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .input-group i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .auth-button {
+            width: 100%;
+            padding: 1rem;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        
+        .auth-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.3);
+        }
+        
+        .auth-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .guest-access {
+            text-align: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .guest-button {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .guest-button:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .error-message {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            display: none;
+        }
+        
+        .success-message {
+            background: #efe;
+            border: 1px solid #cfc;
+            color: #3c3;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            display: none;
+        }
+        
+        .loading {
+            opacity: 0.6;
+        }
+        
+        .loading .auth-button {
+            background: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1><i class="fas fa-fist-raised"></i> KarateMaster</h1>
+                <p>Your personal karate training tracker</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchTab('login')">ログイン</button>
+                <button class="auth-tab" onclick="switchTab('register')">新規登録</button>
+            </div>
+            
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+            
+            <!-- ログインフォーム -->
+            <form class="auth-form active" id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">ユーザー名またはメールアドレス</label>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="loginUsername" name="username" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">パスワード</label>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" name="password" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="auth-button">
+                    <i class="fas fa-sign-in-alt"></i>
+                    ログイン
+                </button>
+            </form>
+            
+            <!-- 登録フォーム -->
+            <form class="auth-form" id="registerForm">
+                <div class="form-group">
+                    <label for="registerUsername">ユーザー名</label>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="registerUsername" name="username" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="registerEmail">メールアドレス</label>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="registerEmail" name="email" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="registerDisplayName">表示名（任意）</label>
+                    <div class="input-group">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="registerDisplayName" name="displayName">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="registerPassword">パスワード（6文字以上）</label>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="registerPassword" name="password" required minlength="6">
+                    </div>
+                </div>
+                
+                <button type="submit" class="auth-button">
+                    <i class="fas fa-user-plus"></i>
+                    アカウント作成
+                </button>
+            </form>
+            
+            <div class="guest-access">
+                <p style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.875rem;">
+                    アカウントなしでも体験できます
+                </p>
+                <a href="/" class="guest-button">
+                    <i class="fas fa-eye"></i>
+                    ゲストとして続行
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // タブ切り替え
+        function switchTab(tab) {
+            // タブボタンの状態更新
+            document.querySelectorAll('.auth-tab').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // フォームの表示切り替え
+            document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+            document.getElementById(tab === 'login' ? 'loginForm' : 'registerForm').classList.add('active');
+            
+            // メッセージクリア
+            clearMessages();
+        }
+
+        // メッセージ表示
+        function showMessage(message, type = 'error') {
+            clearMessages();
+            const messageEl = document.getElementById(type === 'error' ? 'errorMessage' : 'successMessage');
+            messageEl.textContent = message;
+            messageEl.style.display = 'block';
+        }
+
+        function clearMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        // ローディング状態
+        function setLoading(loading) {
+            document.querySelector('.auth-container').classList.toggle('loading', loading);
+            document.querySelectorAll('.auth-button').forEach(btn => {
+                btn.disabled = loading;
+                if (loading) {
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 処理中...';
+                }
+            });
+        }
+
+        // ログインフォーム処理
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearMessages();
+            setLoading(true);
+
+            const formData = new FormData(e.target);
+            const loginData = {
+                username: formData.get('username'),
+                password: formData.get('password')
+            };
+
+            try {
+                const response = await fetch('/api/user/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(loginData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('ログイン成功！リダイレクトしています...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('ネットワークエラーが発生しました', 'error');
+                console.error('Login error:', error);
+            } finally {
+                setLoading(false);
+                // ボタンテキストを元に戻す
+                document.querySelector('#loginForm .auth-button').innerHTML = '<i class="fas fa-sign-in-alt"></i> ログイン';
+            }
+        });
+
+        // 登録フォーム処理
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearMessages();
+            setLoading(true);
+
+            const formData = new FormData(e.target);
+            const registerData = {
+                username: formData.get('username'),
+                email: formData.get('email'),
+                displayName: formData.get('displayName') || formData.get('username'),
+                password: formData.get('password')
+            };
+
+            try {
+                const response = await fetch('/api/user/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(registerData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('アカウント作成成功！ログインしています...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('ネットワークエラーが発生しました', 'error');
+                console.error('Register error:', error);
+            } finally {
+                setLoading(false);
+                // ボタンテキストを元に戻す
+                document.querySelector('#registerForm .auth-button').innerHTML = '<i class="fas fa-user-plus"></i> アカウント作成';
+            }
+        });
+
+        // 既にログインしているかチェック
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/api/user/auth-status');
+                const result = await response.json();
+                
+                if (result.success && result.isLoggedIn) {
+                    // 既にログインしている場合はリダイレクト
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+            }
+        }
+
+        // ページ読み込み時に認証状態チェック
+        window.addEventListener('load', checkAuthStatus);
+    </script>
+</body>
+</html>
