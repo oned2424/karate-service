@@ -97,6 +97,41 @@ let videos = [
 
 let nextVideoId = 3;
 
+// 習慣化パッケージ用データ構造
+let practiceRecords = []; // 練習記録 { id, date, completed, timestamp }
+let journalEntries = []; // 日記エントリ { id, date, mood, text, videoId?, timestamp }
+let userSettings = { // ユーザー設定
+    notifications: {
+        enabled: true,
+        time: '19:00',
+        channels: {
+            push: true,
+            email: false
+        }
+    },
+    streak: {
+        current: 0,
+        longest: 0,
+        total: 0
+    }
+};
+
+// 月替わり日本語フレーズ
+let monthlyPhrases = [
+    {
+        id: 1,
+        month: '2025-06',
+        japanese: '礼に始まり礼に終わる',
+        romaji: 'Rei ni hajimari rei ni owaru',
+        english: 'Begin with respect, end with respect',
+        explanation: 'Traditional martial arts principle emphasizing respect in all aspects of training.',
+        active: true
+    }
+];
+
+let nextPracticeId = 1;
+let nextJournalId = 1;
+
 // 管理者認証ミドルウェア
 function requireAuth(req, res, next) {
     if (req.session.isAuthenticated) {
@@ -341,6 +376,201 @@ app.get('/api/stats', requireAuth, (req, res) => {
         }
     });
 });
+
+// ==== 習慣化パッケージ API ====
+
+// API: 今日の練習記録 (Today✓ボタン)
+app.post('/api/practice/today', (req, res) => {
+    const today = new Date().toISOString().split('T')[0];
+    const existingRecord = practiceRecords.find(record => record.date === today);
+    
+    if (existingRecord) {
+        return res.json({
+            success: false,
+            message: '今日はすでに練習を記録済みです',
+            data: existingRecord
+        });
+    }
+    
+    const newRecord = {
+        id: nextPracticeId++,
+        date: today,
+        completed: true,
+        timestamp: new Date().toISOString()
+    };
+    
+    practiceRecords.push(newRecord);
+    
+    // ストリーク計算
+    updateStreak();
+    
+    res.json({
+        success: true,
+        message: '今日の練習を記録しました！',
+        data: {
+            record: newRecord,
+            streak: userSettings.streak
+        }
+    });
+});
+
+// API: ストリーク情報取得
+app.get('/api/practice/streak', (req, res) => {
+    res.json({
+        success: true,
+        data: userSettings.streak
+    });
+});
+
+// API: 練習カレンダーデータ
+app.get('/api/practice/calendar', (req, res) => {
+    const { year, month } = req.query;
+    let filteredRecords = practiceRecords;
+    
+    if (year && month) {
+        const filterDate = `${year}-${month.padStart(2, '0')}`;
+        filteredRecords = practiceRecords.filter(record => 
+            record.date.startsWith(filterDate)
+        );
+    }
+    
+    res.json({
+        success: true,
+        data: filteredRecords.map(record => ({
+            date: record.date,
+            completed: record.completed,
+            title: '練習完了'
+        }))
+    });
+});
+
+// API: 練習後日記保存
+app.post('/api/journal', (req, res) => {
+    const { mood, text, videoId } = req.body;
+    const today = new Date().toISOString().split('T')[0];
+    
+    if (!mood || !['happy', 'neutral', 'tired'].includes(mood)) {
+        return res.status(400).json({
+            success: false,
+            message: '有効なムードを選択してください'
+        });
+    }
+    
+    const newEntry = {
+        id: nextJournalId++,
+        date: today,
+        mood: mood,
+        text: text || '',
+        videoId: videoId || null,
+        timestamp: new Date().toISOString()
+    };
+    
+    journalEntries.push(newEntry);
+    
+    res.json({
+        success: true,
+        message: '練習日記を保存しました',
+        data: newEntry
+    });
+});
+
+// API: 日記履歴取得
+app.get('/api/journal', (req, res) => {
+    const { limit = 10 } = req.query;
+    const recentEntries = journalEntries
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, parseInt(limit));
+    
+    res.json({
+        success: true,
+        data: recentEntries
+    });
+});
+
+// API: 月替わりフレーズ取得
+app.get('/api/phrase/current', (req, res) => {
+    const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+    const currentPhrase = monthlyPhrases.find(phrase => 
+        phrase.month === currentMonth && phrase.active
+    );
+    
+    res.json({
+        success: true,
+        data: currentPhrase || null
+    });
+});
+
+// API: ユーザー設定取得
+app.get('/api/settings', (req, res) => {
+    res.json({
+        success: true,
+        data: userSettings
+    });
+});
+
+// API: ユーザー設定更新
+app.put('/api/settings', (req, res) => {
+    const { notifications } = req.body;
+    
+    if (notifications) {
+        userSettings.notifications = { ...userSettings.notifications, ...notifications };
+    }
+    
+    res.json({
+        success: true,
+        message: '設定を更新しました',
+        data: userSettings
+    });
+});
+
+// ストリーク計算ヘルパー関数
+function updateStreak() {
+    const sortedRecords = practiceRecords
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    if (sortedRecords.length === 0) {
+        userSettings.streak = { current: 0, longest: 0, total: 0 };
+        return;
+    }
+    
+    let currentStreak = 0;
+    let longestStreak = 0;
+    let tempStreak = 0;
+    const today = new Date();
+    
+    // 連続日数計算
+    for (let i = 0; i < sortedRecords.length; i++) {
+        const recordDate = new Date(sortedRecords[i].date);
+        const daysDiff = Math.floor((today - recordDate) / (1000 * 60 * 60 * 24));
+        
+        if (i === 0 && daysDiff <= 1) {
+            currentStreak = 1;
+            tempStreak = 1;
+        } else if (i > 0) {
+            const prevDate = new Date(sortedRecords[i - 1].date);
+            const prevDiff = Math.floor((prevDate - recordDate) / (1000 * 60 * 60 * 24));
+            
+            if (prevDiff === 1) {
+                if (i === 1 && daysDiff <= 1) currentStreak++;
+                tempStreak++;
+            } else {
+                if (tempStreak > longestStreak) longestStreak = tempStreak;
+                tempStreak = 1;
+            }
+        }
+    }
+    
+    if (tempStreak > longestStreak) longestStreak = tempStreak;
+    if (currentStreak === 0 && sortedRecords[0].date === today.toISOString().split('T')[0]) {
+        currentStreak = 1;
+    }
+    
+    userSettings.streak = {
+        current: currentStreak,
+        longest: Math.max(longestStreak, currentStreak),
+        total: practiceRecords.length
+    };
+}
 
 // API: ライセンス情報
 app.get('/api/licenses', (req, res) => {

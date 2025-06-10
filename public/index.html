@@ -17,6 +17,7 @@
             </div>
             <ul class="nav-menu">
                 <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#dashboard" class="nav-link">Dashboard</a></li>
                 <li><a href="#library" class="nav-link">Video Library</a></li>
                 <li><a href="#editor" class="nav-link">Editor</a></li>
                 <li><a href="#about" class="nav-link">About</a></li>
@@ -57,6 +58,84 @@
             </div>
         </section>
 
+        <!-- 習慣化ダッシュボード -->
+        <section id="dashboard" class="habit-dashboard">
+            <div class="container">
+                <div class="dashboard-header">
+                    <h2>Practice Dashboard</h2>
+                    <p>Track your daily karate practice and build lasting habits</p>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <!-- Today Practice Card -->
+                    <div class="habit-card today-practice">
+                        <div class="card-header">
+                            <h3><i class="fas fa-calendar-check"></i> Today's Practice</h3>
+                        </div>
+                        <div class="card-content">
+                            <button id="todayPracticeBtn" class="today-button">
+                                <i class="fas fa-check"></i>
+                                <span>Mark Today Complete</span>
+                            </button>
+                            <div id="todayStatus" class="today-status">
+                                <span class="status-text">Ready to practice!</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Streak Badge -->
+                    <div class="habit-card streak-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-fire"></i> Streak</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="streak-display">
+                                <div class="streak-number" id="currentStreak">0</div>
+                                <div class="streak-label">Days</div>
+                            </div>
+                            <div class="streak-stats">
+                                <div class="stat">
+                                    <span class="stat-value" id="longestStreak">0</span>
+                                    <span class="stat-label">Longest</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-value" id="totalPractice">0</span>
+                                    <span class="stat-label">Total</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Monthly Phrase -->
+                    <div class="habit-card phrase-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-quote-left"></i> Monthly Wisdom</h3>
+                        </div>
+                        <div class="card-content" id="monthlyPhrase">
+                            <div class="phrase-loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                Loading...
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Calendar -->
+                    <div class="habit-card calendar-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-calendar-alt"></i> This Month</h3>
+                            <button class="view-full-calendar" onclick="showFullCalendar()">
+                                View Full Calendar
+                            </button>
+                        </div>
+                        <div class="card-content">
+                            <div id="miniCalendar" class="mini-calendar">
+                                <!-- ミニカレンダーが表示されます -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <section id="editor" class="video-editor">
             <div class="container">
