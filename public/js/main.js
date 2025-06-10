@@ -15,6 +15,7 @@ class KarateVideoService {
         this.setupEventListeners();
         this.setupVideoControls();
         this.setupSmoothScrolling();
+        this.setupVideoLibrary();
     }
 
     // サンプル動画データを読み込み（実際のCC-BY動画のメタデータ）
@@ -385,6 +386,168 @@ class KarateVideoService {
                 }
             }, 300);
         }, 3000);
+    }
+
+    // Video Library Setup
+    setupVideoLibrary() {
+        this.loadVideosFromAPI();
+        this.setupVideoLibraryEvents();
+    }
+
+    // Load videos from API
+    async loadVideosFromAPI() {
+        const videoGrid = document.getElementById('videoGrid');
+        if (!videoGrid) return;
+
+        try {
+            videoGrid.innerHTML = '<div class="loading-message"><i class="fas fa-spinner fa-spin"></i> Loading videos...</div>';
+            
+            const response = await fetch('/api/videos');
+            const result = await response.json();
+            
+            if (result.success) {
+                this.apiVideos = result.data;
+                this.displayVideos(result.data);
+            } else {
+                videoGrid.innerHTML = '<div class="no-videos-message">動画の読み込みに失敗しました</div>';
+            }
+        } catch (error) {
+            console.error('Error loading videos:', error);
+            videoGrid.innerHTML = '<div class="no-videos-message">動画の読み込み中にエラーが発生しました</div>';
+        }
+    }
+
+    // Display videos in grid
+    displayVideos(videos) {
+        const videoGrid = document.getElementById('videoGrid');
+        if (!videoGrid) return;
+
+        if (videos.length === 0) {
+            videoGrid.innerHTML = '<div class="no-videos-message">表示する動画がありません</div>';
+            return;
+        }
+
+        videoGrid.innerHTML = videos.map(video => `
+            <div class="video-card" data-video-id="${video.id}">
+                <div class="video-thumbnail" onclick="karateService.playVideoFromAPI(${video.id})">
+                    <button class="play-overlay">
+                        <i class="fas fa-play"></i>
+                    </button>
+                </div>
+                <div class="video-info">
+                    <h3 class="video-title">${this.escapeHtml(video.title)}</h3>
+                    <p class="video-description">${this.escapeHtml(video.description)}</p>
+                    <div class="video-meta">
+                        <span class="video-category ${video.category}">${this.getCategoryName(video.category)}</span>
+                        <span class="video-duration">${video.duration || '不明'}</span>
+                    </div>
+                    <div class="video-attribution">
+                        CC-BY: ${this.escapeHtml(video.attribution)}
+                    </div>
+                    <div class="video-views">
+                        <i class="fas fa-eye"></i> ${video.views.toLocaleString()} views
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Setup video library event listeners
+    setupVideoLibraryEvents() {
+        // Category filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                const category = e.target.dataset.category;
+                this.filterVideosByCategory(category);
+            });
+        });
+
+        // Search input
+        const searchInput = document.getElementById('videoSearch');
+        if (searchInput) {
+            let searchTimeout;
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    this.searchVideos(e.target.value);
+                }, 300);
+            });
+        }
+    }
+
+    // Filter videos by category
+    filterVideosByCategory(category) {
+        if (!this.apiVideos) return;
+
+        const filteredVideos = category === 'all' 
+            ? this.apiVideos 
+            : this.apiVideos.filter(video => video.category === category);
+        
+        this.displayVideos(filteredVideos);
+    }
+
+    // Search videos
+    searchVideos(query) {
+        if (!this.apiVideos) return;
+
+        if (!query.trim()) {
+            this.displayVideos(this.apiVideos);
+            return;
+        }
+
+        const searchTerm = query.toLowerCase();
+        const filteredVideos = this.apiVideos.filter(video => 
+            video.title.toLowerCase().includes(searchTerm) ||
+            video.description.toLowerCase().includes(searchTerm) ||
+            video.attribution.toLowerCase().includes(searchTerm)
+        );
+        
+        this.displayVideos(filteredVideos);
+    }
+
+    // Play video from API
+    async playVideoFromAPI(videoId) {
+        try {
+            // Increment view count
+            await fetch(`/api/videos/${videoId}`, {
+                method: 'GET'
+            });
+
+            // For now, show notification (later implement actual video player)
+            const video = this.apiVideos.find(v => v.id === videoId);
+            if (video) {
+                this.showNotification(`再生中: ${video.title}`, 'info');
+                // TODO: Implement actual video playback
+                // this.loadVideoPlayer(video);
+            }
+        } catch (error) {
+            console.error('Error playing video:', error);
+            this.showNotification('動画の再生に失敗しました', 'error');
+        }
+    }
+
+    // Utility functions
+    escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    getCategoryName(category) {
+        const names = {
+            'kata': 'Kata',
+            'kumite': 'Kumite',
+            'kihon': 'Kihon'
+        };
+        return names[category] || category;
     }
 }
 

@@ -139,6 +139,37 @@
             </div>
         </section>
 
+        <section id="library" class="library">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Video Library</h2>
+                    <p>Professional karate training videos with CC-BY licensing</p>
+                </div>
+                
+                <!-- Category Filter -->
+                <div class="category-filter">
+                    <button class="filter-btn active" data-category="all">All Videos</button>
+                    <button class="filter-btn" data-category="kata">Kata (Forms)</button>
+                    <button class="filter-btn" data-category="kumite">Kumite (Sparring)</button>
+                    <button class="filter-btn" data-category="kihon">Kihon (Basics)</button>
+                </div>
+
+                <!-- Search -->
+                <div class="search-container">
+                    <input type="text" id="videoSearch" placeholder="Search videos..." class="search-input">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+
+                <!-- Video Grid -->
+                <div class="video-grid" id="videoGrid">
+                    <div class="loading-message">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Loading videos...
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="about" class="about">
             <div class="container">
                 <div class="section-header">

@@ -986,17 +986,98 @@
             document.getElementById(`${sectionName}-section`).classList.add('active');
         }
 
-        // Demo upload functionality
-        function handleDemoUpload(event) {
+        // Real upload functionality
+        async function handleDemoUpload(event) {
             event.preventDefault();
-            showNotification('Demo upload completed! In the full version, this would process the video with FFmpeg.', 'success');
+            
+            const form = event.target;
+            const formData = new FormData();
+            
+            // Get file input
+            const fileInput = document.getElementById('demoFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showNotification('動画ファイルを選択してください', 'error');
+                return;
+            }
+            
+            // Get form values
+            const title = document.getElementById('videoTitle').value;
+            const description = document.getElementById('videoDescription').value;
+            const category = document.getElementById('videoCategory').value;
+            const license = document.getElementById('videoLicense').value;
+            const attribution = document.getElementById('videoAttribution').value;
+            const attributionUrl = document.getElementById('videoAttributionUrl').value;
+            const tags = document.getElementById('videoTags').value;
+            
+            // Validate required fields
+            if (!title || !category || !license || !attribution) {
+                showNotification('必須項目をすべて入力してください', 'error');
+                return;
+            }
+            
+            // Build FormData
+            formData.append('video', file);
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('category', category);
+            formData.append('license', license);
+            formData.append('attribution', attribution);
+            formData.append('attributionUrl', attributionUrl);
+            formData.append('tags', tags);
+            
+            // Show loading
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> アップロード中...';
+            submitButton.disabled = true;
+            
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification('動画がアップロードされました！', 'success');
+                    form.reset();
+                    fileInput.value = '';
+                    
+                    // Refresh video list if on videos section
+                    if (document.getElementById('videos-section').classList.contains('active')) {
+                        loadVideos();
+                    }
+                    
+                    // Update stats
+                    loadStats();
+                    
+                } else {
+                    showNotification(result.message || 'アップロードに失敗しました', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                showNotification('アップロード中にエラーが発生しました', 'error');
+            }
+            
+            // Restore button
+            submitButton.innerHTML = originalText;
+            submitButton.disabled = false;
         }
 
-        // File upload demo
+        // File upload handler
         document.getElementById('demoFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
-                showNotification(`File selected: ${file.name} (${formatFileSize(file.size)})`, 'info');
+                showNotification(`ファイル選択: ${file.name} (${formatFileSize(file.size)})`, 'info');
+                
+                // Update upload area display
+                const uploadArea = document.querySelector('.file-upload-area');
+                const uploadText = uploadArea.querySelector('.upload-text');
+                uploadText.textContent = `選択済み: ${file.name}`;
             }
         });
 
@@ -1052,18 +1133,199 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
+        // Load videos from API
+        async function loadVideos() {
+            try {
+                const response = await fetch('/api/videos');
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayVideos(result.data);
+                } else {
+                    showNotification('動画の読み込みに失敗しました', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading videos:', error);
+                showNotification('動画の読み込み中にエラーが発生しました', 'error');
+            }
+        }
+
+        // Display videos in the table
+        function displayVideos(videos) {
+            const tbody = document.querySelector('#videos-section .videos-table tbody');
+            
+            if (videos.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            動画がアップロードされていません
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = videos.map(video => `
+                <tr>
+                    <td>
+                        <div class="video-thumbnail">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <strong>${escapeHtml(video.title)}</strong>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                                ${escapeHtml(video.attribution)}
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="category-badge ${video.category}">${getCategoryName(video.category)}</span></td>
+                    <td>${video.duration || '不明'}</td>
+                    <td>${video.views.toLocaleString()}</td>
+                    <td><span class="status-badge active">Active</span></td>
+                    <td>
+                        <div class="video-actions">
+                            <button class="action-btn edit" onclick="editVideo(${video.id})" title="編集">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" onclick="deleteVideo(${video.id})" title="削除">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Load statistics from API
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayStats(result.data);
+                } else {
+                    showNotification('統計情報の読み込みに失敗しました', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                showNotification('統計情報の読み込み中にエラーが発生しました', 'error');
+            }
+        }
+
+        // Display statistics
+        function displayStats(stats) {
+            const statCards = document.querySelectorAll('.stat-card');
+            
+            if (statCards.length >= 4) {
+                statCards[0].querySelector('.stat-number').textContent = stats.totalVideos;
+                statCards[1].querySelector('.stat-number').textContent = stats.totalViews.toLocaleString();
+                statCards[2].querySelector('.stat-number').textContent = '15.3K'; // Mock active users
+                statCards[3].querySelector('.stat-number').textContent = stats.avgViewsPerVideo;
+            }
+        }
+
+        // Edit video function
+        async function editVideo(videoId) {
+            const newTitle = prompt('新しいタイトルを入力してください:');
+            if (!newTitle) return;
+            
+            try {
+                const response = await fetch(`/api/videos/${videoId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title: newTitle })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification('動画が更新されました', 'success');
+                    loadVideos();
+                } else {
+                    showNotification(result.message || '更新に失敗しました', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating video:', error);
+                showNotification('更新中にエラーが発生しました', 'error');
+            }
+        }
+
+        // Delete video function
+        async function deleteVideo(videoId) {
+            if (!confirm('この動画を削除しますか？この操作は取り消せません。')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/videos/${videoId}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification('動画が削除されました', 'success');
+                    loadVideos();
+                    loadStats();
+                } else {
+                    showNotification(result.message || '削除に失敗しました', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting video:', error);
+                showNotification('削除中にエラーが発生しました', 'error');
+            }
+        }
+
+        // Utility functions
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function getCategoryName(category) {
+            const names = {
+                'kata': 'Kata',
+                'kumite': 'Kumite', 
+                'kihon': 'Kihon'
+            };
+            return names[category] || category;
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load initial data
+            loadStats();
+            
+            // Load videos when switching to videos section
+            document.querySelectorAll('.nav-link[data-section="videos"], .admin-btn[data-section="videos"]').forEach(link => {
+                link.addEventListener('click', function() {
+                    setTimeout(() => loadVideos(), 100);
+                });
+            });
+        });
+
         // Initialize
-        console.log('🥋 KarateMaster Admin Demo Loaded');
-        console.log('Features demonstrated:');
-        console.log('- Professional admin interface');
-        console.log('- Video upload form with validation');
-        console.log('- Content management system');
-        console.log('- License management');
-        console.log('- Statistics dashboard');
+        console.log('🥋 KarateMaster Admin System Loaded');
+        console.log('Features:');
+        console.log('- Real video upload with API integration');
+        console.log('- Dynamic video management');
+        console.log('- Live statistics dashboard');
+        console.log('- Admin authentication');
         
         // Show welcome notification
         setTimeout(() => {
-            showNotification('Welcome to KarateMaster Admin Demo! This showcases the complete admin interface.', 'info');
+            showNotification('KarateMaster管理システムへようこそ！', 'info');
         }, 1000);
     </script>
 </body>
