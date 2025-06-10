@@ -1128,3 +1128,305 @@ document.addEventListener('click', (e) => {
         dropdown.classList.remove('show');
     }
 });
+
+// Calendar functionality
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+let selectedDay = null;
+let selectedEmotion = null;
+let emotionData = {
+    // Sample data for December 2024
+    '2024-12-2': { emotion: 'meh', comment: '' },
+    '2024-12-3': { emotion: 'good', comment: '' }, 
+    '2024-12-5': { emotion: 'bad', comment: '' },
+    '2024-12-6': { emotion: 'rad', comment: '' },
+    '2024-12-9': { emotion: 'meh', comment: '' },
+    '2024-12-10': { emotion: 'good', comment: '' },
+    '2024-12-12': { emotion: 'bad', comment: '' },
+    '2024-12-13': { emotion: 'rad', comment: '' },
+    '2024-12-17': { emotion: 'good', comment: '' },
+    '2024-12-19': { emotion: 'bad', comment: '' },
+    '2024-12-20': { emotion: 'rad', comment: '' }
+};
+
+const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+function generateCalendar(month, year) {
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+    
+    const calendarDays = document.getElementById('calendarDays');
+    if (!calendarDays) return;
+    
+    calendarDays.innerHTML = '';
+    
+    // Previous month's trailing days
+    for (let i = firstDay - 1; i >= 0; i--) {
+        const day = daysInPrevMonth - i;
+        const dayElement = createDayElement(day, true);
+        calendarDays.appendChild(dayElement);
+    }
+    
+    // Current month's days
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayElement = createDayElement(day, false);
+        calendarDays.appendChild(dayElement);
+    }
+    
+    // Next month's leading days
+    const totalCells = calendarDays.children.length;
+    const remainingCells = 42 - totalCells; // 6 rows × 7 days
+    for (let day = 1; day <= remainingCells; day++) {
+        const dayElement = createDayElement(day, true);
+        calendarDays.appendChild(dayElement);
+    }
+    
+    // Update month display
+    const monthDisplay = document.getElementById('monthDisplay');
+    if (monthDisplay) {
+        monthDisplay.textContent = `${monthNames[month]} ${year}`;
+    }
+}
+
+function createDayElement(day, isOtherMonth) {
+    const dayElement = document.createElement('div');
+    dayElement.className = 'calendar-day';
+    dayElement.textContent = day;
+    
+    if (isOtherMonth) {
+        dayElement.classList.add('other-month');
+    } else {
+        // Check if this day has an emotion
+        const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
+        const emotionEntry = emotionData[dateKey];
+        
+        if (emotionEntry) {
+            dayElement.classList.add('has-emotion');
+            const indicator = document.createElement('div');
+            indicator.className = `emotion-indicator ${emotionEntry.emotion}`;
+            dayElement.appendChild(indicator);
+        }
+        
+        // Add click handler for current month days
+        dayElement.addEventListener('click', () => {
+            if (!isOtherMonth) {
+                selectedDay = day;
+                showEmotionModal();
+            }
+        });
+    }
+    
+    return dayElement;
+}
+
+function changeMonth(direction) {
+    currentMonth += direction;
+    
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    } else if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
+    
+    // Add slide animation class
+    const calendarGrid = document.querySelector('.calendar-grid');
+    if (calendarGrid) {
+        calendarGrid.style.transform = `translateX(${direction > 0 ? '100%' : '-100%'})`;
+        calendarGrid.style.opacity = '0';
+        
+        setTimeout(() => {
+            generateCalendar(currentMonth, currentYear);
+            calendarGrid.style.transform = `translateX(${direction > 0 ? '-100%' : '100%'})`;
+            
+            setTimeout(() => {
+                calendarGrid.style.transition = 'all 0.3s ease';
+                calendarGrid.style.transform = 'translateX(0)';
+                calendarGrid.style.opacity = '1';
+                
+                setTimeout(() => {
+                    calendarGrid.style.transition = '';
+                }, 300);
+            }, 50);
+        }, 150);
+    }
+}
+
+function showEmotionModal() {
+    const modal = document.getElementById('emotionModal');
+    if (!modal) return;
+    
+    // Reset modal state
+    selectedEmotion = null;
+    const commentTextarea = document.getElementById('emotionComment');
+    const saveBtn = document.getElementById('saveEmotionBtn');
+    
+    if (commentTextarea) commentTextarea.value = '';
+    if (saveBtn) saveBtn.disabled = true;
+    
+    // Reset emotion button states
+    document.querySelectorAll('.emotion-btn').forEach(btn => {
+        btn.className = 'emotion-btn';
+    });
+    
+    // Load existing data if available
+    const dateKey = `${currentYear}-${currentMonth + 1}-${selectedDay}`;
+    const existingData = emotionData[dateKey];
+    if (existingData) {
+        selectedEmotion = existingData.emotion;
+        if (commentTextarea) commentTextarea.value = existingData.comment || '';
+        const emotionBtn = document.querySelector(`[data-emotion="${existingData.emotion}"]`);
+        if (emotionBtn) emotionBtn.classList.add(`selected-${existingData.emotion}`);
+        if (saveBtn) saveBtn.disabled = false;
+    }
+    
+    modal.classList.add('active');
+    
+    // Close modal when clicking outside
+    const modalClickHandler = (e) => {
+        if (e.target === modal) {
+            closeEmotionModal();
+            modal.removeEventListener('click', modalClickHandler);
+        }
+    };
+    modal.addEventListener('click', modalClickHandler);
+}
+
+function closeEmotionModal() {
+    const modal = document.getElementById('emotionModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+    selectedEmotion = null;
+}
+
+function selectEmotionButton(emotion) {
+    selectedEmotion = emotion;
+    
+    // Reset all buttons
+    document.querySelectorAll('.emotion-btn').forEach(btn => {
+        btn.className = 'emotion-btn';
+    });
+    
+    // Highlight selected button
+    const selectedBtn = document.querySelector(`[data-emotion="${emotion}"]`);
+    if (selectedBtn) {
+        selectedBtn.classList.add(`selected-${emotion}`);
+    }
+    
+    // Enable save button
+    const saveBtn = document.getElementById('saveEmotionBtn');
+    if (saveBtn) {
+        saveBtn.disabled = false;
+    }
+}
+
+function saveEmotion() {
+    if (selectedDay && selectedEmotion) {
+        const dateKey = `${currentYear}-${currentMonth + 1}-${selectedDay}`;
+        const commentTextarea = document.getElementById('emotionComment');
+        const comment = commentTextarea ? commentTextarea.value : '';
+        
+        emotionData[dateKey] = {
+            emotion: selectedEmotion,
+            comment: comment
+        };
+        
+        // Update calendar display
+        generateCalendar(currentMonth, currentYear);
+        
+        // Update statistics
+        updateCalendarStats();
+        
+        // Close modal
+        closeEmotionModal();
+        
+        // Show notification if available
+        if (window.karateService && window.karateService.showNotification) {
+            window.karateService.showNotification(`${selectedDay}日の練習記録を保存しました`, 'success');
+        }
+    }
+}
+
+function skipEmotion() {
+    closeEmotionModal();
+}
+
+function updateCalendarStats() {
+    const emotions = Object.values(emotionData);
+    const totalDays = emotions.length;
+    
+    if (totalDays === 0) return;
+    
+    // Calculate completion rate for current month
+    const thisMonthEntries = Object.keys(emotionData).filter(date => {
+        const [year, month] = date.split('-');
+        return parseInt(year) === currentYear && parseInt(month) === currentMonth + 1;
+    });
+    
+    const daysInCurrentMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const completionRate = Math.round((thisMonthEntries.length / daysInCurrentMonth) * 100);
+    
+    // Calculate streaks
+    let currentStreak = 0;
+    let longestStreak = 0;
+    
+    const today = new Date();
+    
+    // Calculate current streak (backwards from today)
+    for (let i = 0; i >= -30; i--) {
+        const checkDate = new Date(today);
+        checkDate.setDate(checkDate.getDate() + i);
+        const checkKey = `${checkDate.getFullYear()}-${checkDate.getMonth() + 1}-${checkDate.getDate()}`;
+        
+        if (emotionData[checkKey]) {
+            if (i === 0) currentStreak = 1;
+            else if (currentStreak > 0) currentStreak++;
+        } else {
+            if (i === 0) currentStreak = 0;
+            break;
+        }
+    }
+    
+    // Calculate longest streak
+    const sortedDates = Object.keys(emotionData).sort();
+    let tempStreak = 0;
+    for (let date of sortedDates) {
+        tempStreak++;
+        longestStreak = Math.max(longestStreak, tempStreak);
+    }
+    
+    // Update stats display
+    const statCards = document.querySelectorAll('.calendar-stat-card');
+    if (statCards.length >= 4) {
+        const currentStreakEl = statCards[0].querySelector('.calendar-stat-number');
+        const longestStreakEl = statCards[1].querySelector('.calendar-stat-number');
+        const completionRateEl = statCards[2].querySelector('.calendar-stat-number');
+        const totalDaysEl = statCards[3].querySelector('.calendar-stat-number');
+        
+        if (currentStreakEl) currentStreakEl.textContent = currentStreak;
+        if (longestStreakEl) longestStreakEl.textContent = longestStreak;
+        if (completionRateEl) completionRateEl.textContent = `${completionRate}%`;
+        if (totalDaysEl) totalDaysEl.textContent = totalDays;
+    }
+}
+
+// Initialize calendar when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize calendar if calendar section exists
+    if (document.getElementById('calendarDays')) {
+        generateCalendar(currentMonth, currentYear);
+        updateCalendarStats();
+    }
+});
+
+// Make functions globally available
+window.changeMonth = changeMonth;
+window.selectEmotionButton = selectEmotionButton;
+window.saveEmotion = saveEmotion;
+window.skipEmotion = skipEmotion;
