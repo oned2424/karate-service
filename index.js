@@ -125,7 +125,7 @@ app.get('/admin/', requireAuth, (req, res) => {
 
 // ログインページ
 app.get('/login.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'login.html'));
+    res.sendFile(path.join(__dirname, 'public/login.html'));
 });
 
 // ログイン処理
