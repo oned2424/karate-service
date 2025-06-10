@@ -1140,6 +1140,154 @@ body {
     }
 }
 
+/* Today's Practice Emotion Display */
+.today-emotion-display {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: rgba(30, 58, 138, 0.05);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.today-emotion-icon {
+    font-size: 24px;
+}
+
+.today-emotion-label {
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+/* Mini Calendar Styles */
+.mini-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 1rem;
+}
+
+.mini-stat-card {
+    background: rgba(30, 58, 138, 0.05);
+    padding: 8px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.mini-stat-number {
+    font-size: 18px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.mini-stat-label {
+    color: #9E9E9E;
+    font-size: 8px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.mini-calendar-container {
+    margin-top: 1rem;
+}
+
+.mini-month-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.mini-month-btn {
+    background: none;
+    border: none;
+    color: #00BCD4;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+}
+
+.mini-month-btn:hover {
+    background: rgba(0, 188, 212, 0.1);
+}
+
+.mini-month-display {
+    font-size: 12px;
+    color: #333333;
+    font-weight: 500;
+}
+
+.mini-calendar-grid {
+    width: 100%;
+}
+
+.mini-calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: 4px;
+}
+
+.mini-day-header {
+    text-align: center;
+    color: #9E9E9E;
+    font-size: 9px;
+    font-weight: 500;
+    padding: 3px;
+}
+
+.mini-calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.mini-calendar-day {
+    position: relative;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    color: #333333;
+}
+
+.mini-calendar-day:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.mini-calendar-day.other-month {
+    color: #E0E0E0;
+}
+
+.mini-calendar-day.has-emotion {
+    position: relative;
+}
+
+.mini-calendar-day .mini-emotion-indicator {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+}
+
+.mini-emotion-indicator.awful { background: #FF5252; }
+.mini-emotion-indicator.bad { background: #FF9800; }
+.mini-emotion-indicator.meh { background: #2196F3; }
+.mini-emotion-indicator.good { background: #4CAF50; }
+.mini-emotion-indicator.rad { background: #FFC107; }
+
 /* Calendar Styles */
 .calendar-section {
     padding: 6rem 0;

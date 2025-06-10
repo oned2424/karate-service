@@ -1134,6 +1134,7 @@ let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
 let selectedDay = null;
 let selectedEmotion = null;
+let isSelectingForToday = false;
 let emotionData = {
     // Sample data for December 2024
     '2024-12-2': { emotion: 'meh', comment: '' },
@@ -1337,11 +1338,18 @@ function saveEmotion() {
             comment: comment
         };
         
-        // Update calendar display
+        // Update calendar displays
         generateCalendar(currentMonth, currentYear);
+        generateMiniCalendar(miniCurrentMonth, miniCurrentYear);
         
         // Update statistics
         updateCalendarStats();
+        
+        // If this was for today, update Today's Practice display
+        if (isSelectingForToday) {
+            updateTodayDisplay();
+            isSelectingForToday = false;
+        }
         
         // Close modal
         closeEmotionModal();
@@ -1416,17 +1424,212 @@ function updateCalendarStats() {
     }
 }
 
+// Mini Calendar functionality
+let miniCurrentMonth = new Date().getMonth();
+let miniCurrentYear = new Date().getFullYear();
+
+function generateMiniCalendar(month, year) {
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+    
+    const miniCalendarDays = document.getElementById('miniCalendarDays');
+    if (!miniCalendarDays) return;
+    
+    miniCalendarDays.innerHTML = '';
+    
+    // Previous month's trailing days
+    for (let i = firstDay - 1; i >= 0; i--) {
+        const day = daysInPrevMonth - i;
+        const dayElement = createMiniDayElement(day, true);
+        miniCalendarDays.appendChild(dayElement);
+    }
+    
+    // Current month's days
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayElement = createMiniDayElement(day, false);
+        miniCalendarDays.appendChild(dayElement);
+    }
+    
+    // Next month's leading days
+    const totalCells = miniCalendarDays.children.length;
+    const remainingCells = 42 - totalCells; // 6 rows × 7 days
+    for (let day = 1; day <= remainingCells; day++) {
+        const dayElement = createMiniDayElement(day, true);
+        miniCalendarDays.appendChild(dayElement);
+    }
+    
+    // Update month display
+    const miniMonthDisplay = document.getElementById('miniMonthDisplay');
+    if (miniMonthDisplay) {
+        miniMonthDisplay.textContent = `${monthNames[month]} ${year}`;
+    }
+    
+    // Update mini stats
+    updateMiniStats();
+}
+
+function createMiniDayElement(day, isOtherMonth) {
+    const dayElement = document.createElement('div');
+    dayElement.className = 'mini-calendar-day';
+    dayElement.textContent = day;
+    
+    if (isOtherMonth) {
+        dayElement.classList.add('other-month');
+    } else {
+        // Check if this day has an emotion
+        const dateKey = `${miniCurrentYear}-${miniCurrentMonth + 1}-${day}`;
+        const emotionEntry = emotionData[dateKey];
+        
+        if (emotionEntry) {
+            dayElement.classList.add('has-emotion');
+            const indicator = document.createElement('div');
+            indicator.className = `mini-emotion-indicator ${emotionEntry.emotion}`;
+            dayElement.appendChild(indicator);
+        }
+        
+        // Add click handler to scroll to full calendar
+        dayElement.addEventListener('click', () => {
+            if (!isOtherMonth) {
+                selectedDay = day;
+                // Sync main calendar to mini calendar month
+                currentMonth = miniCurrentMonth;
+                currentYear = miniCurrentYear;
+                // Scroll to full calendar and open modal
+                document.querySelector('#calendar').scrollIntoView({behavior: 'smooth'});
+                setTimeout(() => {
+                    generateCalendar(currentMonth, currentYear);
+                    showEmotionModal();
+                }, 500);
+            }
+        });
+    }
+    
+    return dayElement;
+}
+
+function changeMiniMonth(direction) {
+    miniCurrentMonth += direction;
+    
+    if (miniCurrentMonth > 11) {
+        miniCurrentMonth = 0;
+        miniCurrentYear++;
+    } else if (miniCurrentMonth < 0) {
+        miniCurrentMonth = 11;
+        miniCurrentYear--;
+    }
+    
+    generateMiniCalendar(miniCurrentMonth, miniCurrentYear);
+}
+
+function updateMiniStats() {
+    const thisMonthEntries = Object.keys(emotionData).filter(date => {
+        const [year, month] = date.split('-');
+        return parseInt(year) === miniCurrentYear && parseInt(month) === miniCurrentMonth + 1;
+    });
+    
+    const daysInCurrentMonth = new Date(miniCurrentYear, miniCurrentMonth + 1, 0).getDate();
+    const completionRate = Math.round((thisMonthEntries.length / daysInCurrentMonth) * 100);
+    
+    // Calculate current streak
+    let currentStreak = 0;
+    const today = new Date();
+    
+    for (let i = 0; i >= -30; i--) {
+        const checkDate = new Date(today);
+        checkDate.setDate(checkDate.getDate() + i);
+        const checkKey = `${checkDate.getFullYear()}-${checkDate.getMonth() + 1}-${checkDate.getDate()}`;
+        
+        if (emotionData[checkKey]) {
+            if (i === 0) currentStreak = 1;
+            else if (currentStreak > 0) currentStreak++;
+        } else {
+            if (i === 0) currentStreak = 0;
+            break;
+        }
+    }
+    
+    // Update mini stats display
+    const miniStatCards = document.querySelectorAll('.mini-stat-card');
+    if (miniStatCards.length >= 2) {
+        const currentStreakEl = miniStatCards[0].querySelector('.mini-stat-number');
+        const completionRateEl = miniStatCards[1].querySelector('.mini-stat-number');
+        
+        if (currentStreakEl) currentStreakEl.textContent = currentStreak;
+        if (completionRateEl) completionRateEl.textContent = `${completionRate}%`;
+    }
+}
+
 // Initialize calendar when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize calendar if calendar section exists
+    // Initialize mini calendar
+    if (document.getElementById('miniCalendarDays')) {
+        generateMiniCalendar(miniCurrentMonth, miniCurrentYear);
+    }
+    
+    // Initialize full calendar if calendar section exists
     if (document.getElementById('calendarDays')) {
         generateCalendar(currentMonth, currentYear);
         updateCalendarStats();
     }
+    
+    // Initialize Today's Practice display
+    updateTodayDisplay();
 });
+
+// Today's Practice functions
+function openTodayEmotionModal() {
+    const today = new Date();
+    selectedDay = today.getDate();
+    currentMonth = today.getMonth();
+    currentYear = today.getFullYear();
+    miniCurrentMonth = today.getMonth();
+    miniCurrentYear = today.getFullYear();
+    isSelectingForToday = true;
+    
+    showEmotionModal();
+}
+
+function updateTodayDisplay() {
+    const today = new Date();
+    const todayKey = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+    const todayData = emotionData[todayKey];
+    
+    const todayBtn = document.getElementById('todayPracticeBtn');
+    const todayStatus = document.getElementById('todayStatus');
+    const todayEmotionDisplay = document.getElementById('todayEmotionDisplay');
+    const todayEmotionIcon = document.querySelector('.today-emotion-icon');
+    const todayEmotionLabel = document.querySelector('.today-emotion-label');
+    
+    if (todayData) {
+        // Hide button and status, show emotion display
+        if (todayBtn) todayBtn.style.display = 'none';
+        if (todayStatus) todayStatus.style.display = 'none';
+        if (todayEmotionDisplay) todayEmotionDisplay.style.display = 'flex';
+        
+        // Update emotion display
+        const emotionEmojis = {
+            'awful': '😟',
+            'bad': '😕', 
+            'meh': '😐',
+            'good': '😊',
+            'rad': '😄'
+        };
+        
+        if (todayEmotionIcon) todayEmotionIcon.textContent = emotionEmojis[todayData.emotion] || '😐';
+        if (todayEmotionLabel) todayEmotionLabel.textContent = `Today's feeling: ${todayData.emotion}`;
+    } else {
+        // Show button and status, hide emotion display
+        if (todayBtn) todayBtn.style.display = 'flex';
+        if (todayStatus) todayStatus.style.display = 'block';
+        if (todayEmotionDisplay) todayEmotionDisplay.style.display = 'none';
+    }
+}
 
 // Make functions globally available
 window.changeMonth = changeMonth;
+window.changeMiniMonth = changeMiniMonth;
 window.selectEmotionButton = selectEmotionButton;
 window.saveEmotion = saveEmotion;
 window.skipEmotion = skipEmotion;
+window.openTodayEmotionModal = openTodayEmotionModal;
