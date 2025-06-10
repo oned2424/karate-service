@@ -693,7 +693,7 @@ KarateVideoService.prototype.updateStreakDisplay = function() {
     const totalPracticeEl = document.getElementById('totalPractice');
     
     if (currentStreakEl) currentStreakEl.textContent = this.streakData.current;
-    if (longestStreakEl) longestStreakEl.textContent = this.streakData.longest;
+    if (longestStreakEl) longestStreakEl.textContent = this.isLoggedIn ? this.streakData.longest : 0;
     if (totalPracticeEl) totalPracticeEl.textContent = this.streakData.total;
 };
 
@@ -878,105 +878,28 @@ KarateVideoService.prototype.generateMiniCalendar = function(year, month, practi
     return calendarHTML;
 };
 
-// 練習後日記モーダルの設定
+// 練習後日記モーダルの設定 - 既存のemotionModalを使用
 KarateVideoService.prototype.setupJournalModal = function() {
-    // HTML に日記モーダルを追加
-    const modal = document.createElement('div');
-    modal.className = 'journal-modal';
-    modal.id = 'journalModal';
-    modal.innerHTML = `
-        <div class="journal-content">
-            <div class="journal-header">
-                <h3>How was your practice today?</h3>
-                <p>Reflect on your training session</p>
-            </div>
-            
-            <div class="mood-selector">
-                <button class="mood-option" data-mood="happy">😊</button>
-                <button class="mood-option" data-mood="neutral">😐</button>
-                <button class="mood-option" data-mood="tired">😫</button>
-            </div>
-            
-            <textarea class="journal-text" id="journalText" placeholder="What did you learn today? How did you feel? Any challenges or breakthroughs? (optional)" maxlength="140"></textarea>
-            
-            <div class="journal-actions">
-                <button class="journal-cancel" onclick="karateService.hideJournalModal()">Skip</button>
-                <button class="journal-save" onclick="karateService.saveJournal()">Save Reflection</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    
-    // ムード選択の設定
-    modal.querySelectorAll('.mood-option').forEach(btn => {
-        btn.addEventListener('click', () => {
-            modal.querySelectorAll('.mood-option').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-        });
-    });
-    
-    // モーダル外クリックで閉じる
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            this.hideJournalModal();
-        }
-    });
+    // 既存のemotionModalを使用するため、特別な設定は不要
+    // emotionModalは既にHTMLに定義済み
 };
 
-// 日記モーダル表示
+// 日記モーダル表示 - 既存のemotionModalを使用
 KarateVideoService.prototype.showJournalModal = function() {
-    const modal = document.getElementById('journalModal');
-    if (modal) {
-        modal.classList.add('active');
-        document.getElementById('journalText').focus();
-    }
+    // 既存のemotionModal関数を呼び出し
+    openTodayEmotionModal();
 };
 
-// 日記モーダル非表示
+// 日記モーダル非表示 - 既存のemotionModalを使用
 KarateVideoService.prototype.hideJournalModal = function() {
-    const modal = document.getElementById('journalModal');
-    if (modal) {
-        modal.classList.remove('active');
-        // フォームリセット
-        modal.querySelectorAll('.mood-option').forEach(btn => btn.classList.remove('selected'));
-        document.getElementById('journalText').value = '';
-    }
+    // 既存のemotionModal関数を呼び出し
+    closeEmotionModal();
 };
 
-// 日記保存
+// 日記保存 - 既存のsaveEmotion関数を使用
 KarateVideoService.prototype.saveJournal = async function() {
-    const modal = document.getElementById('journalModal');
-    const selectedMood = modal.querySelector('.mood-option.selected');
-    const journalText = document.getElementById('journalText').value;
-    
-    if (!selectedMood) {
-        this.showNotification('ムードを選択してください', 'error');
-        return;
-    }
-    
-    try {
-        const response = await fetch('/api/journal', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                mood: selectedMood.dataset.mood,
-                text: journalText,
-                videoId: this.currentVideo?.id || null
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            this.showNotification('練習の振り返りを保存しました！', 'success');
-            this.hideJournalModal();
-        } else {
-            this.showNotification(result.message, 'error');
-        }
-    } catch (error) {
-        console.error('Error saving journal:', error);
-        this.showNotification('保存に失敗しました', 'error');
-    }
+    // 既存のemotionModal保存機能を呼び出し
+    saveEmotion();
 };
 
 // フルカレンダー表示（将来の実装）
@@ -1346,9 +1269,15 @@ function saveEmotion() {
         updateCalendarStats();
         updateDashboardStats();
         
-        // If this was for today, update Today's Practice display
-        if (isSelectingForToday) {
+        // Check if this is today's date and update Today's Practice display
+        const today = new Date();
+        const todayKey = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+        if (dateKey === todayKey) {
             updateTodayDisplay();
+        }
+        
+        // If this was for today, reset the flag
+        if (isSelectingForToday) {
             isSelectingForToday = false;
         }
         
@@ -1368,13 +1297,32 @@ function skipEmotion() {
 
 function updateCalendarStats() {
     const emotions = Object.values(emotionData);
-    const totalDays = emotions.length;
     
     // Calculate completion rate for current month
     const thisMonthEntries = Object.keys(emotionData).filter(date => {
         const [year, month] = date.split('-');
         return parseInt(year) === currentYear && parseInt(month) === currentMonth + 1;
     });
+    
+    // Calculate TOTAL COMPLETIONS as entries from month start to today
+    const today = new Date();
+    const monthStart = new Date(currentYear, currentMonth, 1);
+    
+    // Count completions from month start to today (only if viewing current month)
+    let totalCompletions;
+    if (currentYear === today.getFullYear() && currentMonth === today.getMonth()) {
+        // Current month: count from month start to today
+        const dayOfMonth = today.getDate();
+        totalCompletions = Object.keys(emotionData).filter(date => {
+            const [year, month, day] = date.split('-').map(Number);
+            return year === currentYear && 
+                   month === currentMonth + 1 && 
+                   day >= 1 && day <= dayOfMonth;
+        }).length;
+    } else {
+        // Other month: count all entries for that month
+        totalCompletions = thisMonthEntries.length;
+    }
     
     const daysInCurrentMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const completionRate = thisMonthEntries.length > 0 ? Math.round((thisMonthEntries.length / daysInCurrentMonth) * 100) : 0;
@@ -1430,10 +1378,13 @@ function updateCalendarStats() {
     const fullCompletionRateEl = document.getElementById('fullCompletionRate');
     const fullTotalDaysEl = document.getElementById('fullTotalDays');
     
+    // Check if user is logged in for longest streak display
+    const isLoggedIn = window.karateService && window.karateService.isLoggedIn;
+    
     if (fullCurrentStreakEl) fullCurrentStreakEl.textContent = currentStreak;
-    if (fullLongestStreakEl) fullLongestStreakEl.textContent = longestStreak;
+    if (fullLongestStreakEl) fullLongestStreakEl.textContent = isLoggedIn ? longestStreak : 0;
     if (fullCompletionRateEl) fullCompletionRateEl.textContent = `${completionRate}%`;
-    if (fullTotalDaysEl) fullTotalDaysEl.textContent = totalDays;
+    if (fullTotalDaysEl) fullTotalDaysEl.textContent = totalCompletions;
 }
 
 // Mini Calendar functionality
