@@ -397,23 +397,36 @@ class KarateVideoService {
     // Load videos from API
     async loadVideosFromAPI() {
         const videoGrid = document.getElementById('videoGrid');
-        if (!videoGrid) return;
+        if (!videoGrid) {
+            console.error('videoGrid element not found');
+            return;
+        }
 
         try {
+            console.log('Loading videos from API...');
             videoGrid.innerHTML = '<div class="loading-message"><i class="fas fa-spinner fa-spin"></i> Loading videos...</div>';
             
             const response = await fetch('/api/videos');
+            console.log('API response status:', response.status);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const result = await response.json();
+            console.log('API result:', result);
             
             if (result.success) {
                 this.apiVideos = result.data;
+                console.log('Loaded videos:', this.apiVideos.length);
                 this.displayVideos(result.data);
             } else {
+                console.error('API returned success:false');
                 videoGrid.innerHTML = '<div class="no-videos-message">動画の読み込みに失敗しました</div>';
             }
         } catch (error) {
             console.error('Error loading videos:', error);
-            videoGrid.innerHTML = '<div class="no-videos-message">動画の読み込み中にエラーが発生しました</div>';
+            videoGrid.innerHTML = `<div class="no-videos-message">動画の読み込み中にエラーが発生しました: ${error.message}</div>`;
         }
     }
 
