@@ -1344,7 +1344,7 @@ function saveEmotion() {
         
         // Update statistics
         updateCalendarStats();
-        updateMiniStats();
+        updateDashboardStats();
         
         // If this was for today, update Today's Practice display
         if (isSelectingForToday) {
@@ -1534,18 +1534,19 @@ function changeMiniMonth(direction) {
     generateMiniCalendar(miniCurrentMonth, miniCurrentYear);
 }
 
-function updateMiniStats() {
+function updateDashboardStats() {
     const thisMonthEntries = Object.keys(emotionData).filter(date => {
         const [year, month] = date.split('-');
-        return parseInt(year) === miniCurrentYear && parseInt(month) === miniCurrentMonth + 1;
+        const today = new Date();
+        return parseInt(year) === today.getFullYear() && parseInt(month) === today.getMonth() + 1;
     });
     
-    const daysInCurrentMonth = new Date(miniCurrentYear, miniCurrentMonth + 1, 0).getDate();
+    const today = new Date();
+    const daysInCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
     const completionRate = thisMonthEntries.length > 0 ? Math.round((thisMonthEntries.length / daysInCurrentMonth) * 100) : 0;
     
     // Calculate current streak
     let currentStreak = 0;
-    const today = new Date();
     
     for (let i = 0; i >= -30; i--) {
         const checkDate = new Date(today);
@@ -1561,12 +1562,12 @@ function updateMiniStats() {
         }
     }
     
-    // Update mini stats display using IDs
-    const miniCurrentStreakEl = document.getElementById('miniCurrentStreak');
-    const miniCompletionRateEl = document.getElementById('miniCompletionRate');
+    // Update dashboard calendar stats
+    const dashCurrentStreakEl = document.getElementById('dashCurrentStreak');
+    const dashCompletionRateEl = document.getElementById('dashCompletionRate');
     
-    if (miniCurrentStreakEl) miniCurrentStreakEl.textContent = currentStreak;
-    if (miniCompletionRateEl) miniCompletionRateEl.textContent = `${completionRate}%`;
+    if (dashCurrentStreakEl) dashCurrentStreakEl.textContent = currentStreak;
+    if (dashCompletionRateEl) dashCompletionRateEl.textContent = `${completionRate}%`;
 }
 
 // Initialize calendar when page loads
@@ -1587,7 +1588,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize statistics
     updateCalendarStats();
-    updateMiniStats();
+    updateDashboardStats();
 });
 
 // Today's Practice functions

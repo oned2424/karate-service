@@ -766,20 +766,32 @@ body {
 }
 
 /* Calendar Card */
+.calendar-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1.5rem;
+}
+
 .view-full-calendar {
-    background: none;
-    border: 1px solid var(--border);
-    color: var(--primary-color);
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-size: 0.875rem;
+    width: 100%;
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .view-full-calendar:hover {
-    background: var(--primary-color);
-    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(30, 58, 138, 0.3);
 }
 
 .mini-calendar {
