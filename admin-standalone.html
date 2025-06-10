@@ -686,11 +686,29 @@
             margin: auto;
         }
 
-        .calendar-day.emotion-rad { background: #FF5252; }
-        .calendar-day.emotion-good { background: #4CAF50; }
-        .calendar-day.emotion-meh { background: #2196F3; }
-        .calendar-day.emotion-bad { background: #FF9800; }
-        .calendar-day.emotion-awful { background: #FF5252; }
+        .calendar-day.has-emotion {
+            position: relative;
+            color: #333333;
+            background: none;
+            width: auto;
+            height: auto;
+            margin: 0;
+        }
+
+        .calendar-day .emotion-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .emotion-indicator.awful { background: #FF5252; }
+        .emotion-indicator.bad { background: #FF9800; }
+        .emotion-indicator.meh { background: #2196F3; }
+        .emotion-indicator.good { background: #4CAF50; }
+        .emotion-indicator.rad { background: #FFC107; }
 
         .emotion-legend {
             background: white;
@@ -743,53 +761,136 @@
         }
 
         .emotion-modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 24px;
             max-width: 400px;
             width: 90%;
         }
 
         .emotion-modal-title {
-            font-size: 1.25rem;
+            font-size: 20px;
             font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 1.5rem;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .emotion-modal-subtitle {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 24px;
+            text-align: left;
         }
 
         .emotion-selector {
             display: flex;
-            justify-content: space-around;
-            gap: 1rem;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
         .emotion-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 1rem;
-            border: 2px solid transparent;
-            border-radius: 8px;
-            background: none;
+            width: 48px;
+            height: 48px;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            background: transparent;
             cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 60px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
         }
 
         .emotion-btn:hover {
-            border-color: #ddd;
-            background: rgba(0, 0, 0, 0.05);
+            transform: scale(1.1);
         }
 
-        .emotion-btn .emotion-icon {
-            font-size: 32px;
-            margin-bottom: 0.5rem;
+        .emotion-btn.selected-awful {
+            background: #FFE5E5;
+            border-color: #FF5252;
         }
 
-        .emotion-btn .emotion-label {
-            font-size: 12px;
-            color: #9E9E9E;
+        .emotion-btn.selected-bad {
+            background: #FFF3E0;
+            border-color: #FF9800;
+        }
+
+        .emotion-btn.selected-meh {
+            background: #E3F2FD;
+            border-color: #2196F3;
+        }
+
+        .emotion-btn.selected-good {
+            background: #E8F5E9;
+            border-color: #4CAF50;
+        }
+
+        .emotion-btn.selected-rad {
+            background: #FFF9C4;
+            border-color: #FFC107;
+        }
+
+        .emotion-textarea {
+            width: 100%;
+            height: 100px;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            resize: vertical;
+            font-family: inherit;
+            margin-top: 20px;
+        }
+
+        .emotion-textarea:focus {
+            outline: none;
+            border-color: #1976D2;
+        }
+
+        .emotion-modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .emotion-skip-btn {
+            background: transparent;
+            color: #666666;
+            border: 1px solid #E0E0E0;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .emotion-skip-btn:hover {
+            background: #F5F5F5;
+        }
+
+        .emotion-save-btn {
+            background: #1976D2;
+            color: #FFFFFF;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .emotion-save-btn:hover {
+            background: #1565C0;
+        }
+
+        .emotion-save-btn:disabled {
+            background: #CCCCCC;
+            cursor: not-allowed;
         }
 
         /* Responsive Calendar */
@@ -1347,28 +1448,26 @@
     <!-- Emotion Selection Modal -->
     <div id="emotionModal" class="emotion-modal">
         <div class="emotion-modal-content">
-            <h3 class="emotion-modal-title">How was your day?</h3>
+            <h3 class="emotion-modal-title">How was your practice today?</h3>
+            <p class="emotion-modal-subtitle">Reflect on your training session</p>
+            
             <div class="emotion-selector">
-                <button class="emotion-btn" onclick="selectEmotion('rad')">
-                    <div class="emotion-icon" style="color: #FF5252;">😄</div>
-                    <div class="emotion-label">rad</div>
-                </button>
-                <button class="emotion-btn" onclick="selectEmotion('good')">
-                    <div class="emotion-icon" style="color: #4CAF50;">😊</div>
-                    <div class="emotion-label">good</div>
-                </button>
-                <button class="emotion-btn" onclick="selectEmotion('meh')">
-                    <div class="emotion-icon" style="color: #2196F3;">😐</div>
-                    <div class="emotion-label">meh</div>
-                </button>
-                <button class="emotion-btn" onclick="selectEmotion('bad')">
-                    <div class="emotion-icon" style="color: #FF9800;">😟</div>
-                    <div class="emotion-label">bad</div>
-                </button>
-                <button class="emotion-btn" onclick="selectEmotion('awful')">
-                    <div class="emotion-icon" style="color: #FF5252;">😢</div>
-                    <div class="emotion-label">awful</div>
-                </button>
+                <button class="emotion-btn" data-emotion="awful" onclick="selectEmotionButton('awful')">😟</button>
+                <button class="emotion-btn" data-emotion="bad" onclick="selectEmotionButton('bad')">😕</button>
+                <button class="emotion-btn" data-emotion="meh" onclick="selectEmotionButton('meh')">😐</button>
+                <button class="emotion-btn" data-emotion="good" onclick="selectEmotionButton('good')">😊</button>
+                <button class="emotion-btn" data-emotion="rad" onclick="selectEmotionButton('rad')">😄</button>
+            </div>
+            
+            <textarea 
+                class="emotion-textarea" 
+                placeholder="What did you learn today? How did you feel? Any challenges or breakthroughs? (optional)"
+                id="emotionComment"
+            ></textarea>
+            
+            <div class="emotion-modal-buttons">
+                <button class="emotion-skip-btn" onclick="skipEmotion()">Skip</button>
+                <button class="emotion-save-btn" onclick="saveEmotion()" id="saveEmotionBtn" disabled>Save Reflection</button>
             </div>
         </div>
     </div>
@@ -1785,22 +1884,23 @@
         });
 
         // Calendar functionality
-        let currentMonth = 11; // December (0-indexed)
-        let currentYear = 2024;
+        let currentMonth = new Date().getMonth(); // Current month
+        let currentYear = new Date().getFullYear(); // Current year
         let selectedDay = null;
+        let selectedEmotion = null;
         let emotionData = {
             // Sample data for December 2024
-            '2024-12-2': 'meh',
-            '2024-12-3': 'good', 
-            '2024-12-5': 'bad',
-            '2024-12-6': 'rad',
-            '2024-12-9': 'meh',
-            '2024-12-10': 'good',
-            '2024-12-12': 'bad',
-            '2024-12-13': 'rad',
-            '2024-12-17': 'good',
-            '2024-12-19': 'bad',
-            '2024-12-20': 'rad'
+            '2024-12-2': { emotion: 'meh', comment: '' },
+            '2024-12-3': { emotion: 'good', comment: '' }, 
+            '2024-12-5': { emotion: 'bad', comment: '' },
+            '2024-12-6': { emotion: 'rad', comment: '' },
+            '2024-12-9': { emotion: 'meh', comment: '' },
+            '2024-12-10': { emotion: 'good', comment: '' },
+            '2024-12-12': { emotion: 'bad', comment: '' },
+            '2024-12-13': { emotion: 'rad', comment: '' },
+            '2024-12-17': { emotion: 'good', comment: '' },
+            '2024-12-19': { emotion: 'bad', comment: '' },
+            '2024-12-20': { emotion: 'rad', comment: '' }
         };
 
         const monthNames = [
@@ -1852,10 +1952,13 @@
             } else {
                 // Check if this day has an emotion
                 const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
-                const emotion = emotionData[dateKey];
+                const emotionEntry = emotionData[dateKey];
                 
-                if (emotion) {
-                    dayElement.classList.add('has-emotion', `emotion-${emotion}`);
+                if (emotionEntry) {
+                    dayElement.classList.add('has-emotion');
+                    const indicator = document.createElement('div');
+                    indicator.className = `emotion-indicator ${emotionEntry.emotion}`;
+                    dayElement.appendChild(indicator);
                 }
                 
                 // Add click handler for current month days
@@ -1904,6 +2007,27 @@
 
         function showEmotionModal() {
             const modal = document.getElementById('emotionModal');
+            
+            // Reset modal state
+            selectedEmotion = null;
+            document.getElementById('emotionComment').value = '';
+            document.getElementById('saveEmotionBtn').disabled = true;
+            
+            // Reset emotion button states
+            document.querySelectorAll('.emotion-btn').forEach(btn => {
+                btn.className = 'emotion-btn';
+            });
+            
+            // Load existing data if available
+            const dateKey = `${currentYear}-${currentMonth + 1}-${selectedDay}`;
+            const existingData = emotionData[dateKey];
+            if (existingData) {
+                selectedEmotion = existingData.emotion;
+                document.getElementById('emotionComment').value = existingData.comment || '';
+                document.querySelector(`[data-emotion="${existingData.emotion}"]`).classList.add(`selected-${existingData.emotion}`);
+                document.getElementById('saveEmotionBtn').disabled = false;
+            }
+            
             modal.classList.add('active');
             
             // Close modal when clicking outside
@@ -1917,12 +2041,33 @@
         function closeEmotionModal() {
             const modal = document.getElementById('emotionModal');
             modal.classList.remove('active');
+            selectedEmotion = null;
         }
 
-        function selectEmotion(emotion) {
-            if (selectedDay) {
+        function selectEmotionButton(emotion) {
+            selectedEmotion = emotion;
+            
+            // Reset all buttons
+            document.querySelectorAll('.emotion-btn').forEach(btn => {
+                btn.className = 'emotion-btn';
+            });
+            
+            // Highlight selected button
+            document.querySelector(`[data-emotion="${emotion}"]`).classList.add(`selected-${emotion}`);
+            
+            // Enable save button
+            document.getElementById('saveEmotionBtn').disabled = false;
+        }
+
+        function saveEmotion() {
+            if (selectedDay && selectedEmotion) {
                 const dateKey = `${currentYear}-${currentMonth + 1}-${selectedDay}`;
-                emotionData[dateKey] = emotion;
+                const comment = document.getElementById('emotionComment').value;
+                
+                emotionData[dateKey] = {
+                    emotion: selectedEmotion,
+                    comment: comment
+                };
                 
                 // Update calendar display
                 generateCalendar(currentMonth, currentYear);
@@ -1930,12 +2075,16 @@
                 // Update statistics
                 updateCalendarStats();
                 
-                // Close modal with animation
+                // Close modal
                 closeEmotionModal();
                 
                 // Show notification
-                showNotification(`${selectedDay}日の気分を「${emotion}」に設定しました`, 'success');
+                showNotification(`${selectedDay}日の練習記録を保存しました`, 'success');
             }
+        }
+
+        function skipEmotion() {
+            closeEmotionModal();
         }
 
         function updateCalendarStats() {
@@ -1944,17 +2093,50 @@
             
             if (totalDays === 0) return;
             
-            // Calculate completion rate (assuming this month has entries)
+            // Calculate completion rate for current month
             const thisMonthEntries = Object.keys(emotionData).filter(date => {
                 const [year, month] = date.split('-');
                 return parseInt(year) === currentYear && parseInt(month) === currentMonth + 1;
             });
             
-            const completionRate = Math.round((thisMonthEntries.length / new Date(currentYear, currentMonth + 1, 0).getDate()) * 100);
+            const daysInCurrentMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const completionRate = Math.round((thisMonthEntries.length / daysInCurrentMonth) * 100);
+            
+            // Calculate streaks
+            let currentStreak = 0;
+            let longestStreak = 0;
+            let tempStreak = 0;
+            
+            const today = new Date();
+            const todayKey = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+            
+            // Calculate current streak (backwards from today)
+            for (let i = 0; i >= -30; i--) {
+                const checkDate = new Date(today);
+                checkDate.setDate(checkDate.getDate() + i);
+                const checkKey = `${checkDate.getFullYear()}-${checkDate.getMonth() + 1}-${checkDate.getDate()}`;
+                
+                if (emotionData[checkKey]) {
+                    if (i === 0) currentStreak = 1;
+                    else if (currentStreak > 0) currentStreak++;
+                } else {
+                    if (i === 0) currentStreak = 0;
+                    break;
+                }
+            }
+            
+            // Calculate longest streak
+            const sortedDates = Object.keys(emotionData).sort();
+            for (let date of sortedDates) {
+                tempStreak++;
+                longestStreak = Math.max(longestStreak, tempStreak);
+            }
             
             // Update stats display
             const statCards = document.querySelectorAll('.calendar-stat-card');
-            if (statCards.length >= 3) {
+            if (statCards.length >= 4) {
+                statCards[0].querySelector('.calendar-stat-number').textContent = currentStreak;
+                statCards[1].querySelector('.calendar-stat-number').textContent = longestStreak;
                 statCards[2].querySelector('.calendar-stat-number').textContent = `${completionRate}%`;
                 statCards[3].querySelector('.calendar-stat-number').textContent = totalDays;
             }
