@@ -160,65 +160,62 @@
                     </div>
                 </div>
                 
-                
                 <!-- Calendar Section -->
                 <section id="calendar" class="calendar-section">
-                    <div class="container">
-                        <div class="section-header">
-                            <h2>Practice Calendar</h2>
-                            <p>Track your daily training progress</p>
+                    <div class="section-header">
+                        <h2>Practice Calendar</h2>
+                        <p>Track your daily training progress</p>
+                    </div>
+
+                    <!-- Statistics Cards -->
+                    <div class="calendar-stats-grid">
+                        <div class="calendar-stat-card">
+                            <span class="calendar-stat-number" style="color: #FF9800;" id="fullCurrentStreak">0</span>
+                            <span class="calendar-stat-label">CURRENT STREAK</span>
+                        </div>
+                        <div class="calendar-stat-card">
+                            <span class="calendar-stat-number" style="color: #FF9800;" id="fullLongestStreak">0</span>
+                            <span class="calendar-stat-label">LONGEST STREAK</span>
+                        </div>
+                        <div class="calendar-stat-card">
+                            <span class="calendar-stat-number" style="color: #4CAF50;" id="fullCompletionRate">0%</span>
+                            <span class="calendar-stat-label">COMPLETION RATE</span>
+                        </div>
+                        <div class="calendar-stat-card">
+                            <span class="calendar-stat-number" style="color: #333333;" id="fullTotalDays">0</span>
+                            <span class="calendar-stat-label">TOTAL COMPLETIONS</span>
+                        </div>
+                    </div>
+
+                    <!-- Calendar Container -->
+                    <div class="calendar-container">
+                        <!-- Month Navigation -->
+                        <div class="month-nav">
+                            <button class="month-nav-btn" onclick="changeMonth(-1)">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="month-display" id="monthDisplay">December 2024</span>
+                            <button class="month-nav-btn" onclick="changeMonth(1)">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
                         </div>
 
-                        <!-- Statistics Cards -->
-                        <div class="calendar-stats-grid">
-                            <div class="calendar-stat-card">
-                                <span class="calendar-stat-number" style="color: #FF9800;" id="fullCurrentStreak">0</span>
-                                <span class="calendar-stat-label">CURRENT STREAK</span>
+                        <!-- Calendar Grid -->
+                        <div class="calendar-grid">
+                            <!-- Days of week header -->
+                            <div class="calendar-header">
+                                <div class="day-header">S</div>
+                                <div class="day-header">M</div>
+                                <div class="day-header">T</div>
+                                <div class="day-header">W</div>
+                                <div class="day-header">T</div>
+                                <div class="day-header">F</div>
+                                <div class="day-header">S</div>
                             </div>
-                            <div class="calendar-stat-card">
-                                <span class="calendar-stat-number" style="color: #FF9800;" id="fullLongestStreak">0</span>
-                                <span class="calendar-stat-label">LONGEST STREAK</span>
-                            </div>
-                            <div class="calendar-stat-card">
-                                <span class="calendar-stat-number" style="color: #4CAF50;" id="fullCompletionRate">0%</span>
-                                <span class="calendar-stat-label">COMPLETION RATE</span>
-                            </div>
-                            <div class="calendar-stat-card">
-                                <span class="calendar-stat-number" style="color: #333333;" id="fullTotalDays">0</span>
-                                <span class="calendar-stat-label">TOTAL COMPLETIONS</span>
-                            </div>
-                        </div>
-
-                        <!-- Calendar Container -->
-                        <div class="calendar-container">
-                            <!-- Month Navigation -->
-                            <div class="month-nav">
-                                <button class="month-nav-btn" onclick="changeMonth(-1)">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <span class="month-display" id="monthDisplay">December 2024</span>
-                                <button class="month-nav-btn" onclick="changeMonth(1)">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-
-                            <!-- Calendar Grid -->
-                            <div class="calendar-grid">
-                                <!-- Days of week header -->
-                                <div class="calendar-header">
-                                    <div class="day-header">S</div>
-                                    <div class="day-header">M</div>
-                                    <div class="day-header">T</div>
-                                    <div class="day-header">W</div>
-                                    <div class="day-header">T</div>
-                                    <div class="day-header">F</div>
-                                    <div class="day-header">S</div>
-                                </div>
-                                
-                                <!-- Calendar days -->
-                                <div class="calendar-days" id="calendarDays">
-                                    <!-- Days will be generated by JavaScript -->
-                                </div>
+                            
+                            <!-- Calendar days -->
+                            <div class="calendar-days" id="calendarDays">
+                                <!-- Days will be generated by JavaScript -->
                             </div>
                         </div>
                     </div>
