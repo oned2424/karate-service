@@ -1027,18 +1027,7 @@ let selectedDay = null;
 let selectedEmotion = null;
 let isSelectingForToday = false;
 let emotionData = {
-    // Sample data for December 2024
-    '2024-12-2': { emotion: 'meh', comment: '' },
-    '2024-12-3': { emotion: 'good', comment: '' }, 
-    '2024-12-5': { emotion: 'bad', comment: '' },
-    '2024-12-6': { emotion: 'rad', comment: '' },
-    '2024-12-9': { emotion: 'meh', comment: '' },
-    '2024-12-10': { emotion: 'good', comment: '' },
-    '2024-12-12': { emotion: 'bad', comment: '' },
-    '2024-12-13': { emotion: 'rad', comment: '' },
-    '2024-12-17': { emotion: 'good', comment: '' },
-    '2024-12-19': { emotion: 'bad', comment: '' },
-    '2024-12-20': { emotion: 'rad', comment: '' }
+    // Empty by default - data will be added when users practice
 };
 
 const monthNames = [
@@ -1244,9 +1233,9 @@ function saveEmotion() {
             updateTodayDisplay();
             
             // If this is today's practice, record it on the server
-            if (window.karateService) {
-                recordTodayPractice();
-            }
+            // if (window.karateService) {
+            //     recordTodayPractice();
+            // }
         }
         
         // If this was for today, reset the flag
