@@ -882,8 +882,57 @@ body {
     z-index: -9999 !important;
 }
 
-/* Additional safety: hide any div containing 3 specific emojis */
-div:has-text("😊"):has-text("😐"):has-text("😫") {
+/* 🔥 ULTRA AGGRESSIVE CSS: 3つの絵文字モーダル完全撲滅システム */
+
+/* 3つの絵文字パターンを含む全ての要素を完全非表示 */
+*:has-text("😊"):has-text("😐"):has-text("😫"),
+*:contains("😊😐😫"),
+*:contains("😊"):contains("😐"):contains("😫") {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    left: -99999px !important;
+    top: -99999px !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    z-index: -99999 !important;
+    transform: scale(0) !important;
+    clip: rect(0,0,0,0) !important;
+}
+
+/* 3つのボタンを持つモーダルシステムも完全ブロック */
+.modal:has(button:nth-child(3):last-child),
+.popup:has(button:nth-child(3):last-child),
+[role="dialog"]:has(button:nth-child(3):last-child),
+.emotion-modal:has(.emotion-btn:nth-child(3):last-child) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    left: -99999px !important;
+    top: -99999px !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    z-index: -9999 !important;
+    pointer-events: none !important;
+}
+
+/* Block any modal/overlay containing all three emojis */
+.modal:has-text("😊"):has-text("😐"):has-text("😫"),
+.overlay:has-text("😊"):has-text("😐"):has-text("😫"),
+.popup:has-text("😊"):has-text("😐"):has-text("😫"),
+[role="dialog"]:has-text("😊"):has-text("😐"):has-text("😫") {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* Additional blocking for any container with the pattern */
+div[style*="block"]:has-text("😊"):has-text("😐"):has-text("😫"),
+div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
     display: none !important;
 }
 

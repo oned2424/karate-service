@@ -620,26 +620,121 @@ function showLibrary() {
 
 // Initialize calendar when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    // Simple modal prevention - only target known problematic elements
-    const cleanupUnwantedModals = () => {
-        // Remove any 3-emoji modals (😊😐😫 pattern)
-        document.querySelectorAll('div').forEach(element => {
+    // 🔥 ULTRA AGGRESSIVE: 3つの絵文字モーダル（😊😐😫）完全撲滅システム
+    const DESTROY_THREE_EMOJI_MODALS = () => {
+        console.log('🔥 ULTRA AGGRESSIVE cleanup running...');
+        
+        // 1. 即座に3つの絵文字パターン（😊😐😫）を持つ全ての要素を削除
+        document.querySelectorAll('*').forEach(element => {
             if (element.textContent && 
                 element.textContent.includes('😊') && 
                 element.textContent.includes('😐') && 
-                element.textContent.includes('😫')) {
+                element.textContent.includes('😫') &&
+                element.id !== 'emotionModal') { // 正しい5つ絵文字モーダルは保護
+                console.log('🚫 DESTROYED 3-emoji element:', element);
                 element.remove();
             }
         });
         
-        // Remove journal-related modals
-        document.querySelectorAll('#journalModal, .journal-modal, [id*="journal"], [class*="journal"]').forEach(el => {
+        // 2. journal関連の完全撲滅
+        document.querySelectorAll('#journalModal, .journal-modal, [id*="journal"], [class*="journal"], .mood-selector, .journal-content, [data-journal], .mood-option').forEach(el => {
+            console.log('🚫 DESTROYED journal element:', el);
             el.remove();
         });
+        
+        // 3. 正確に3つの絵文字ボタンを持つモーダルを破壊
+        document.querySelectorAll('*').forEach(element => {
+            const emojiButtons = element.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"], [data-mood], .mood-option');
+            if (emojiButtons && emojiButtons.length === 3) {
+                console.log('🚫 DESTROYED 3-button modal:', element);
+                element.remove();
+            }
+        });
+        
+        // 4. 重複するemotion modalを削除（最初の1つ以外）
+        const emotionModals = document.querySelectorAll('.emotion-modal');
+        if (emotionModals.length > 1) {
+            for (let i = 1; i < emotionModals.length; i++) {
+                console.log('🚫 DESTROYED duplicate emotion modal:', emotionModals[i]);
+                emotionModals[i].remove();
+            }
+        }
+        
+        // 5. 固定位置の不審なオーバーレイを削除
+        document.querySelectorAll('div[style*="position: fixed"], div[style*="z-index"]').forEach(element => {
+            if (element.textContent && 
+                element.textContent.includes('😊') && 
+                element.textContent.includes('😐') && 
+                element.textContent.includes('😫')) {
+                console.log('🚫 DESTROYED fixed position 3-emoji overlay:', element);
+                element.remove();
+            }
+        });
+        
+        // 4. 重複したemotion modalの削除（正しいものは1つだけ残す）
+        const allEmotionModals = document.querySelectorAll('.emotion-modal');
+        if (allEmotionModals.length > 1) {
+            for (let i = 1; i < allEmotionModals.length; i++) {
+                console.log('🚫 重複emotion modalを削除:', allEmotionModals[i]);
+                allEmotionModals[i].remove();
+            }
+        }
     };
     
-    // Check for unwanted modals periodically (but not aggressively)
-    setInterval(cleanupUnwantedModals, 2000);
+    // 🔥 ULTRA AGGRESSIVEシステム実行
+    DESTROY_THREE_EMOJI_MODALS();
+    
+    // 100ms間隔で連続実行（最強レベル）
+    setInterval(DESTROY_THREE_EMOJI_MODALS, 100);
+    
+    // 🔄 DOM監視システム - 新しい3つ絵文字モーダルを即座に破壊
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === 1) { // Element node
+                    // 即座に3つ絵文字パターンを検出・破壊
+                    if (node.textContent && 
+                        node.textContent.includes('😊') && 
+                        node.textContent.includes('😐') && 
+                        node.textContent.includes('😫')) {
+                        console.log('🚫 INSTANT DESTROY 3-emoji node:', node);
+                        node.remove();
+                        return;
+                    }
+                    
+                    // journal関連を即座に破壊
+                    if (node.id === 'journalModal' || 
+                        node.classList.contains('journal-modal') ||
+                        node.classList.contains('mood-selector')) {
+                        console.log('🚫 INSTANT DESTROY journal node:', node);
+                        node.remove();
+                        return;
+                    }
+                    
+                    // 3つ絵文字ボタンを持つモーダルも即座に破壊
+                    const emojiButtons = node.querySelectorAll && node.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
+                    if (emojiButtons && emojiButtons.length === 3) {
+                        console.log('🚫 INSTANT DESTROY 3-button modal:', node);
+                        node.remove();
+                        return;
+                    }
+                }
+            });
+        });
+        
+        // 監視後も念のため撲滅システム実行
+        setTimeout(DESTROY_THREE_EMOJI_MODALS, 1);
+    });
+    
+    observer.observe(document.body, { 
+        childList: true, 
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'id']
+    });
+    
+    // 定期的なクリーンアップ（安全網）
+    setInterval(preventUnwantedModals, 1000);
     
     // KarateVideoServiceの初期化
     window.karateService = new KarateVideoService();
@@ -771,8 +866,18 @@ KarateVideoService.prototype.setupTodayPracticeButton = function() {
     this.todayPracticeClickHandler = () => {
         if (this.todayCompleted) return;
         
+        // 🚫 CRITICAL: ボタンクリック時に3つの絵文字モーダルを予防的削除
+        if (window.preventUnwantedModals) {
+            window.preventUnwantedModals();
+        }
+        
         // 直接感情選択モーダルを開く
         openTodayEmotionModal();
+        
+        // 🚫 少し遅延して再度削除（安全網）
+        setTimeout(() => {
+            if (window.preventUnwantedModals) window.preventUnwantedModals();
+        }, 200);
     };
     
     // イベントリスナーを追加
@@ -1310,6 +1415,11 @@ function skipEmotion() {
 
 // Today's practice recording function
 async function recordTodayPractice() {
+    // 🚫 CRITICAL: API実行前に3つの絵文字モーダルを予防的削除
+    if (window.preventUnwantedModals) {
+        window.preventUnwantedModals();
+    }
+    
     try {
         const response = await fetch('/api/practice/today', {
             method: 'POST',
@@ -1318,12 +1428,31 @@ async function recordTodayPractice() {
         
         const result = await response.json();
         
+        // 🚫 CRITICAL: API応答後に即座に3つの絵文字モーダルを削除
+        if (window.preventUnwantedModals) {
+            window.preventUnwantedModals();
+        }
+        
         if (result.success) {
             window.karateService.todayCompleted = true;
             window.karateService.streakData = result.data.streak;
             window.karateService.updateTodayButton();
             window.karateService.updateStreakDisplay();
             window.karateService.showNotification('🎉 ' + result.message, 'success');
+            
+            // 🚫 CRITICAL: 成功後の時間差削除で確実に阻止
+            setTimeout(() => {
+                if (window.preventUnwantedModals) window.preventUnwantedModals();
+            }, 100);
+            setTimeout(() => {
+                if (window.preventUnwantedModals) window.preventUnwantedModals();
+            }, 500);
+            setTimeout(() => {
+                if (window.preventUnwantedModals) window.preventUnwantedModals();
+            }, 1000);
+            setTimeout(() => {
+                if (window.preventUnwantedModals) window.preventUnwantedModals();
+            }, 2000);
         } else {
             window.karateService.showNotification(result.message, 'error');
         }
@@ -1331,6 +1460,11 @@ async function recordTodayPractice() {
     } catch (error) {
         console.error('Error recording practice:', error);
         window.karateService.showNotification('記録に失敗しました', 'error');
+        
+        // エラー時も削除
+        if (window.preventUnwantedModals) {
+            window.preventUnwantedModals();
+        }
     }
 }
 
@@ -1631,6 +1765,36 @@ function updateTodayDisplay() {
         if (todayEmotionDisplay) todayEmotionDisplay.style.display = 'none';
     }
 }
+
+// Define the missing preventUnwantedModals function
+function preventUnwantedModals() {
+    // Remove any journal modals immediately
+    document.querySelectorAll('#journalModal, .journal-modal, [id*="journal"], [class*="journal"]').forEach(el => {
+        el.remove();
+    });
+    
+    // Remove any 3-emoji modals (😊😐😫)
+    document.querySelectorAll('*').forEach(element => {
+        if (element.textContent && 
+            element.textContent.includes('😊') && 
+            element.textContent.includes('😐') && 
+            element.textContent.includes('😫') &&
+            element.id !== 'emotionModal') {
+            element.remove();
+        }
+    });
+    
+    // Remove any modals with exactly 3 emotion buttons
+    document.querySelectorAll('*').forEach(element => {
+        const emojiButtons = element.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
+        if (emojiButtons && emojiButtons.length === 3) {
+            element.remove();
+        }
+    });
+}
+
+// Make the function globally available
+window.preventUnwantedModals = preventUnwantedModals;
 
 // Make functions globally available
 window.changeMonth = changeMonth;

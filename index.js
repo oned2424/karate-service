@@ -100,14 +100,14 @@ let nextVideoId = 3;
 // ユーザー認証システム用データ構造
 let users = []; // ユーザーアカウント { id, username, email, password, displayName, createdAt, lastLogin }
 let userPracticeRecords = {}; // ユーザー別練習記録 { userId: [records] }
-let userJournalEntries = {}; // ユーザー別日記エントリ { userId: [entries] }
+// 🚫 userJournalEntries removed to eliminate 3-emoji modal issue
 let userSettings = {}; // ユーザー別設定 { userId: settings }
 
 let nextUserId = 1;
 
 // 習慣化パッケージ用データ構造（グローバル - 後方互換性のため残す）
 let practiceRecords = []; // 練習記録 { id, date, completed, timestamp }
-let journalEntries = []; // 日記エントリ { id, date, mood, text, videoId?, timestamp }
+// 🚫 journalEntries removed to eliminate 3-emoji modal issue
 let globalUserSettings = { // グローバル設定（ゲストユーザー用）
     notifications: {
         enabled: true,
@@ -138,7 +138,7 @@ let monthlyPhrases = [
 ];
 
 let nextPracticeId = 1;
-let nextJournalId = 1;
+// 🚫 nextJournalId removed to eliminate 3-emoji modal issue
 
 // 管理者認証ミドルウェア
 function requireAuth(req, res, next) {
@@ -294,7 +294,7 @@ app.post('/api/user/register', (req, res) => {
     
     // ユーザー専用データ初期化
     userPracticeRecords[newUser.id] = [];
-    userJournalEntries[newUser.id] = [];
+    // 🚫 userJournalEntries removed to eliminate 3-emoji modal issue
     userSettings[newUser.id] = createDefaultUserSettings();
     
     // セッション設定（自動ログイン）
@@ -649,7 +649,10 @@ app.post('/api/practice/today', optionalUser, (req, res) => {
             data: {
                 record: newRecord,
                 streak: streak
-            }
+            },
+            // CRITICAL: Explicitly prevent any modal triggers
+            preventModal: true,
+            skipJournal: true
         });
     } else {
         // ゲストユーザー（グローバル記録）
@@ -662,7 +665,10 @@ app.post('/api/practice/today', optionalUser, (req, res) => {
             data: {
                 record: newRecord,
                 streak: globalUserSettings.streak
-            }
+            },
+            // CRITICAL: Explicitly prevent any modal triggers
+            preventModal: true,
+            skipJournal: true
         });
     }
 });
@@ -705,59 +711,7 @@ app.get('/api/practice/calendar', optionalUser, (req, res) => {
     });
 });
 
-// API: 練習後日記保存
-app.post('/api/journal', optionalUser, (req, res) => {
-    const { mood, text, videoId } = req.body;
-    const userId = req.userId;
-    const today = new Date().toISOString().split('T')[0];
-    
-    if (!mood || !['happy', 'neutral', 'tired'].includes(mood)) {
-        return res.status(400).json({
-            success: false,
-            message: '有効なムードを選択してください'
-        });
-    }
-    
-    const newEntry = {
-        id: nextJournalId++,
-        date: today,
-        mood: mood,
-        text: text || '',
-        videoId: videoId || null,
-        timestamp: new Date().toISOString(),
-        userId: userId || null
-    };
-    
-    // ユーザー別記録に追加
-    if (userId) {
-        if (!userJournalEntries[userId]) {
-            userJournalEntries[userId] = [];
-        }
-        userJournalEntries[userId].push(newEntry);
-    } else {
-        // ゲストユーザー（グローバル記録）
-        journalEntries.push(newEntry);
-    }
-    
-    res.json({
-        success: true,
-        message: '練習日記を保存しました',
-        data: newEntry
-    });
-});
-
-// API: 日記履歴取得
-app.get('/api/journal', (req, res) => {
-    const { limit = 10 } = req.query;
-    const recentEntries = journalEntries
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-        .slice(0, parseInt(limit));
-    
-    res.json({
-        success: true,
-        data: recentEntries
-    });
-});
+// 🚫 Journal API removed to eliminate 3-emoji modal issue
 
 // API: 月替わりフレーズ取得
 app.get('/api/phrase/current', (req, res) => {
