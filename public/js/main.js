@@ -620,9 +620,9 @@ function showLibrary() {
 
 // Initialize calendar when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    // 超強化された3つの絵文字モーダル削除システム
+    // 最強化された3つの絵文字モーダル削除システム - journalModal完全排除
     const superCleanup = () => {
-        // 1. 重複emotion modalの削除
+        // 1. 重複emotion modalの削除（正常な5つ絵文字モーダル以外）
         const allEmotionModals = document.querySelectorAll('.emotion-modal');
         if (allEmotionModals.length > 1) {
             for (let i = 1; i < allEmotionModals.length; i++) {
@@ -630,38 +630,54 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // 2. journal系の完全削除
+        // 2. journalModal系の完全削除（最優先）
         const journalElements = document.querySelectorAll(
             '#journalModal, ' +
             '.journal-modal, ' +
-            '[data-emotion-count="3"], ' +
-            '.mood-selector, ' +
             '.journal-content, ' +
+            '.mood-selector, ' +
+            '.journal-header, ' +
+            '.journal-text, ' +
+            '.journal-actions, ' +
+            '.journal-cancel, ' +
+            '.journal-save, ' +
+            '.mood-option, ' +
+            '[data-emotion-count="3"], ' +
             '[id*="journal"], ' +
             '[class*="journal"], ' +
             '[class*="mood"], ' +
             '[onclick*="mood"]'
         );
-        journalElements.forEach(element => element.remove());
+        journalElements.forEach(element => {
+            console.log('journal系要素を削除:', element);
+            element.remove();
+        });
         
-        // 3. 3つの絵文字モーダルの特定と削除
-        document.querySelectorAll('[class*="modal"], [class*="popup"], [role="dialog"]').forEach(modal => {
-            const emojiButtons = modal.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
-            if (emojiButtons && emojiButtons.length === 3) {
-                console.log('3つの絵文字モーダルを削除:', modal);
-                modal.remove();
+        // 3. 3つの絵文字ボタンを持つモーダルの削除
+        document.querySelectorAll('div').forEach(element => {
+            // 3つのmood-optionボタンを持つ要素を特定
+            const moodButtons = element.querySelectorAll('.mood-option, [data-mood]');
+            if (moodButtons.length === 3) {
+                console.log('3つのmood-optionを持つ要素を削除:', element);
+                element.remove();
                 return;
             }
             
-            // 特定の絵文字パターンを含むモーダルを削除
-            if (modal.textContent) {
-                const hasThreeSpecificEmojis = modal.textContent.includes('😊') && 
-                                               modal.textContent.includes('😐') && 
-                                               modal.textContent.includes('😫');
-                if (hasThreeSpecificEmojis) {
-                    console.log('特定パターンの3つの絵文字モーダルを削除:', modal);
-                    modal.remove();
-                }
+            // journal-modalクラスを持つ要素
+            if (element.classList.contains('journal-modal')) {
+                console.log('journal-modalクラスを持つ要素を削除:', element);
+                element.remove();
+                return;
+            }
+            
+            // 特定の絵文字パターン（😊😐😫）を含む要素
+            if (element.textContent && 
+                element.textContent.includes('😊') && 
+                element.textContent.includes('😐') && 
+                element.textContent.includes('😫')) {
+                console.log('3つの特定絵文字パターンを含む要素を削除:', element);
+                element.remove();
+                return;
             }
         });
         
@@ -671,53 +687,76 @@ document.addEventListener('DOMContentLoaded', function() {
             '[data-journal]', 
             '.mood-button',
             '.journal-button',
-            '.three-emoji-modal'
+            '.three-emoji-modal',
+            '.mood-option'
         ];
         badSelectors.forEach(selector => {
-            document.querySelectorAll(selector).forEach(el => el.remove());
+            document.querySelectorAll(selector).forEach(el => {
+                console.log(`${selector}セレクターの要素を削除:`, el);
+                el.remove();
+            });
         });
     };
     
     // 初期クリーンアップ
     superCleanup();
     
-    // 継続的な監視とクリーンアップ
+    // 継続的な監視とクリーンアップ - journalModal検出強化
     const observer = new MutationObserver((mutations) => {
         let shouldCleanup = false;
         
         mutations.forEach((mutation) => {
             mutation.addedNodes.forEach((node) => {
                 if (node.nodeType === 1) { // Element node
-                    // journal関連の即座削除
+                    // journalModal関連の即座削除（最優先）
                     if (node.id === 'journalModal' || 
                         node.classList.contains('journal-modal') ||
+                        node.classList.contains('journal-content') ||
+                        node.classList.contains('mood-selector') ||
                         node.getAttribute && node.getAttribute('data-emotion-count') === '3') {
-                        console.log('journal系モーダルを即座に削除:', node);
+                        console.log('journalModal系を即座に削除:', node);
                         node.remove();
                         return;
                     }
                     
-                    // mood-selector関連の削除
-                    if (node.querySelector && node.querySelector('.mood-selector, .journal-content')) {
-                        console.log('mood-selector含むモーダルを削除:', node);
+                    // mood-selector、journal-content関連の削除
+                    if (node.querySelector && (
+                        node.querySelector('.mood-selector') || 
+                        node.querySelector('.journal-content') ||
+                        node.querySelector('.journal-modal') ||
+                        node.querySelector('.mood-option') ||
+                        node.querySelector('[data-mood]')
+                    )) {
+                        console.log('journal/mood関連要素を含むモーダルを削除:', node);
                         node.remove();
                         return;
                     }
                     
-                    // 3つの絵文字モーダル検出
-                    const emojiButtons = node.querySelectorAll && node.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
-                    if (emojiButtons && emojiButtons.length === 3) {
-                        console.log('3つの絵文字モーダルを即座に削除:', node);
+                    // 3つのmood-optionボタンを持つ要素の検出
+                    const moodButtons = node.querySelectorAll && node.querySelectorAll('.mood-option, [data-mood]');
+                    if (moodButtons && moodButtons.length === 3) {
+                        console.log('3つのmood-optionを持つ要素を即座に削除:', node);
                         node.remove();
                         return;
                     }
                     
-                    // 特定の絵文字パターンチェック
+                    // 特定の絵文字パターンチェック（😊😐😫）
                     if (node.textContent && 
                         node.textContent.includes('😊') && 
                         node.textContent.includes('😐') && 
                         node.textContent.includes('😫')) {
-                        console.log('特定パターンのモーダルを削除:', node);
+                        console.log('3つの特定絵文字パターン（😊😐😫）を含む要素を削除:', node);
+                        node.remove();
+                        return;
+                    }
+                    
+                    // journalModalを作成する可能性がある要素
+                    if (node.tagName === 'DIV' && (
+                        node.className.includes('modal') || 
+                        node.className.includes('journal') ||
+                        node.className.includes('mood')
+                    )) {
+                        console.log('journal/mood系のdivを予防削除:', node);
                         node.remove();
                         return;
                     }
@@ -728,8 +767,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         if (shouldCleanup) {
-            // 少し遅延してクリーンアップ
-            setTimeout(superCleanup, 10);
+            // 即座にクリーンアップ
+            setTimeout(superCleanup, 1);
         }
     });
     
