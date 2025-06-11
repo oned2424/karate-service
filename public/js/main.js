@@ -693,7 +693,11 @@ KarateVideoService.prototype.updateStreakDisplay = function() {
     const totalPracticeEl = document.getElementById('totalPractice');
     
     if (currentStreakEl) currentStreakEl.textContent = this.streakData.current;
-    if (longestStreakEl) longestStreakEl.textContent = this.isLoggedIn === true ? this.streakData.longest : 0;
+    // 強化されたログイン状態チェック - ログインしていない場合は必ず0を表示
+    if (longestStreakEl) {
+        const isLoggedIn = this.isLoggedIn === true && this.currentUser !== null;
+        longestStreakEl.textContent = isLoggedIn ? this.streakData.longest : 0;
+    }
     if (totalPracticeEl) totalPracticeEl.textContent = this.streakData.total;
 };
 
@@ -718,16 +722,39 @@ KarateVideoService.prototype.setupTodayPracticeButton = function() {
     const todayBtn = document.getElementById('todayPracticeBtn');
     if (!todayBtn) return;
     
-    todayBtn.addEventListener('click', () => {
+    // 既存のイベントリスナーを削除（重複防止）
+    todayBtn.removeEventListener('click', this.todayPracticeClickHandler);
+    
+    // 新しいクリックハンドラーを定義
+    this.todayPracticeClickHandler = () => {
         if (this.todayCompleted) return;
         
-        // Delete any 3-emoji modals that might appear
-        const threeEmojiModals = document.querySelectorAll('[data-emotion-count="3"], .mood-selector, .journal-modal');
-        threeEmojiModals.forEach(modal => modal.remove());
+        // 強化された重複モーダル削除
+        const allModals = document.querySelectorAll(
+            '.emotion-modal:not(#emotionModal), ' +
+            '[data-emotion-count="3"], ' +
+            '.mood-selector, ' +
+            '.journal-modal, ' +
+            '[id*="journal"], ' +
+            '[class*="journal"]'
+        );
+        allModals.forEach(modal => modal.remove());
+        
+        // 3つの絵文字モーダルを徹底削除
+        const threeEmojiModals = document.querySelectorAll('[class*="modal"], [class*="popup"]');
+        threeEmojiModals.forEach(modal => {
+            const emojiButtons = modal.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
+            if (emojiButtons && emojiButtons.length === 3) {
+                modal.remove();
+            }
+        });
         
         // 直接感情選択モーダルを開く
         openTodayEmotionModal();
-    });
+    };
+    
+    // イベントリスナーを追加
+    todayBtn.addEventListener('click', this.todayPracticeClickHandler);
 };
 
 // Today ボタンの状態更新
@@ -1218,16 +1245,14 @@ function saveEmotion() {
         const today = new Date();
         const todayKey = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
         if (dateKey === todayKey) {
-            updateTodayDisplay();
-            
             // If this is today's practice, record it on the server
             if (window.karateService) {
                 recordTodayPractice();
             }
         }
         
-        // IMPORTANT: Always update Today's display when emotion is saved
-        // to ensure calendar changes sync with Today's Practice display
+        // CRITICAL: ALWAYS update Today's display to ensure calendar changes sync
+        // This fixes the issue where calendar edits don't update Today's Practice display
         updateTodayDisplay();
         
         // If this was for today, reset the flag
@@ -1353,8 +1378,10 @@ function updateCalendarStats() {
     const fullCompletionRateEl = document.getElementById('fullCompletionRate');
     const fullTotalDaysEl = document.getElementById('fullTotalDays');
     
-    // Check if user is logged in for longest streak display (強化されたチェック)
-    const isLoggedIn = window.karateService && window.karateService.isLoggedIn === true;
+    // CRITICAL: 強化されたログイン状態チェック - ゲストユーザーは必ずLONGEST STREAK = 0
+    const isLoggedIn = window.karateService && 
+                      window.karateService.isLoggedIn === true && 
+                      window.karateService.currentUser !== null;
     
     if (fullCurrentStreakEl) fullCurrentStreakEl.textContent = currentStreak;
     if (fullLongestStreakEl) fullLongestStreakEl.textContent = isLoggedIn ? longestStreak : 0;
