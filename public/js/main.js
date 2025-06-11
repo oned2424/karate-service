@@ -1507,6 +1507,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const journalModals = document.querySelectorAll('#journalModal, .journal-modal');
     journalModals.forEach(modal => modal.remove());
     
+    // Also check for modals with mood-selector or journal-content
+    const moodModals = document.querySelectorAll('.mood-selector, .journal-content');
+    moodModals.forEach(element => {
+        const modal = element.closest('.journal-modal, [id*="journal"], [class*="journal"]');
+        if (modal) modal.remove();
+    });
+    
+    // Continuously monitor and remove journal modals
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === 1) { // Element node
+                    if (node.id === 'journalModal' || 
+                        node.classList.contains('journal-modal') ||
+                        node.querySelector && node.querySelector('.mood-selector, .journal-content')) {
+                        node.remove();
+                    }
+                }
+            });
+        });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    
     // Initialize mini calendar
     if (document.getElementById('miniCalendarDays')) {
         generateMiniCalendar(miniCurrentMonth, miniCurrentYear);
