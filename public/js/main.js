@@ -620,181 +620,26 @@ function showLibrary() {
 
 // Initialize calendar when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    // 最強化された3つの絵文字モーダル削除システム - journalModal完全排除
-    const superCleanup = () => {
-        // 1. 重複emotion modalの削除（正常な5つ絵文字モーダル以外）
-        const allEmotionModals = document.querySelectorAll('.emotion-modal');
-        if (allEmotionModals.length > 1) {
-            for (let i = 1; i < allEmotionModals.length; i++) {
-                allEmotionModals[i].remove();
-            }
-        }
-        
-        // 2. journalModal系の完全削除（最優先）
-        const journalElements = document.querySelectorAll(
-            '#journalModal, ' +
-            '.journal-modal, ' +
-            '.journal-content, ' +
-            '.mood-selector, ' +
-            '.journal-header, ' +
-            '.journal-text, ' +
-            '.journal-actions, ' +
-            '.journal-cancel, ' +
-            '.journal-save, ' +
-            '.mood-option, ' +
-            '[data-emotion-count="3"], ' +
-            '[id*="journal"], ' +
-            '[class*="journal"], ' +
-            '[class*="mood"], ' +
-            '[onclick*="mood"]'
-        );
-        journalElements.forEach(element => {
-            console.log('journal系要素を削除:', element);
-            element.remove();
-        });
-        
-        // 3. 3つの絵文字ボタンを持つモーダルの削除
+    // Simple modal prevention - only target known problematic elements
+    const cleanupUnwantedModals = () => {
+        // Remove any 3-emoji modals (😊😐😫 pattern)
         document.querySelectorAll('div').forEach(element => {
-            // 3つのmood-optionボタンを持つ要素を特定
-            const moodButtons = element.querySelectorAll('.mood-option, [data-mood]');
-            if (moodButtons.length === 3) {
-                console.log('3つのmood-optionを持つ要素を削除:', element);
-                element.remove();
-                return;
-            }
-            
-            // journal-modalクラスを持つ要素
-            if (element.classList.contains('journal-modal')) {
-                console.log('journal-modalクラスを持つ要素を削除:', element);
-                element.remove();
-                return;
-            }
-            
-            // 特定の絵文字パターン（😊😐😫）を含む要素
             if (element.textContent && 
                 element.textContent.includes('😊') && 
                 element.textContent.includes('😐') && 
                 element.textContent.includes('😫')) {
-                console.log('3つの特定絵文字パターンを含む要素を削除:', element);
                 element.remove();
-                return;
             }
         });
         
-        // 4. DOM内の不正なモーダル関連要素を削除
-        const badSelectors = [
-            '[data-mood]',
-            '[data-journal]', 
-            '.mood-button',
-            '.journal-button',
-            '.three-emoji-modal',
-            '.mood-option'
-        ];
-        badSelectors.forEach(selector => {
-            document.querySelectorAll(selector).forEach(el => {
-                console.log(`${selector}セレクターの要素を削除:`, el);
-                el.remove();
-            });
+        // Remove journal-related modals
+        document.querySelectorAll('#journalModal, .journal-modal, [id*="journal"], [class*="journal"]').forEach(el => {
+            el.remove();
         });
     };
     
-    // 初期クリーンアップ
-    superCleanup();
-    
-    // CRITICAL: fetch API監視でjournal API呼び出しを完全阻止
-    const originalFetch = window.fetch;
-    window.fetch = function(...args) {
-        const url = args[0];
-        if (typeof url === 'string' && url.includes('/api/journal')) {
-            console.log('journal API呼び出しを初期段階で阻止:', url);
-            return Promise.resolve(new Response('{"success": false, "message": "journal disabled"}', {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' }
-            }));
-        }
-        return originalFetch.apply(this, args);
-    };
-    
-    // 継続的な監視とクリーンアップ - journalModal検出強化
-    const observer = new MutationObserver((mutations) => {
-        let shouldCleanup = false;
-        
-        mutations.forEach((mutation) => {
-            mutation.addedNodes.forEach((node) => {
-                if (node.nodeType === 1) { // Element node
-                    // journalModal関連の即座削除（最優先）
-                    if (node.id === 'journalModal' || 
-                        node.classList.contains('journal-modal') ||
-                        node.classList.contains('journal-content') ||
-                        node.classList.contains('mood-selector') ||
-                        node.getAttribute && node.getAttribute('data-emotion-count') === '3') {
-                        console.log('journalModal系を即座に削除:', node);
-                        node.remove();
-                        return;
-                    }
-                    
-                    // mood-selector、journal-content関連の削除
-                    if (node.querySelector && (
-                        node.querySelector('.mood-selector') || 
-                        node.querySelector('.journal-content') ||
-                        node.querySelector('.journal-modal') ||
-                        node.querySelector('.mood-option') ||
-                        node.querySelector('[data-mood]')
-                    )) {
-                        console.log('journal/mood関連要素を含むモーダルを削除:', node);
-                        node.remove();
-                        return;
-                    }
-                    
-                    // 3つのmood-optionボタンを持つ要素の検出
-                    const moodButtons = node.querySelectorAll && node.querySelectorAll('.mood-option, [data-mood]');
-                    if (moodButtons && moodButtons.length === 3) {
-                        console.log('3つのmood-optionを持つ要素を即座に削除:', node);
-                        node.remove();
-                        return;
-                    }
-                    
-                    // 特定の絵文字パターンチェック（😊😐😫）
-                    if (node.textContent && 
-                        node.textContent.includes('😊') && 
-                        node.textContent.includes('😐') && 
-                        node.textContent.includes('😫')) {
-                        console.log('3つの特定絵文字パターン（😊😐😫）を含む要素を削除:', node);
-                        node.remove();
-                        return;
-                    }
-                    
-                    // journalModalを作成する可能性がある要素
-                    if (node.tagName === 'DIV' && (
-                        node.className.includes('modal') || 
-                        node.className.includes('journal') ||
-                        node.className.includes('mood')
-                    )) {
-                        console.log('journal/mood系のdivを予防削除:', node);
-                        node.remove();
-                        return;
-                    }
-                    
-                    shouldCleanup = true;
-                }
-            });
-        });
-        
-        if (shouldCleanup) {
-            // 即座にクリーンアップ
-            setTimeout(superCleanup, 1);
-        }
-    });
-    
-    observer.observe(document.body, { 
-        childList: true, 
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['class', 'id']
-    });
-    
-    // 定期的なクリーンアップ（安全網）
-    setInterval(superCleanup, 2000);
+    // Check for unwanted modals periodically (but not aggressively)
+    setInterval(cleanupUnwantedModals, 2000);
     
     // KarateVideoServiceの初期化
     window.karateService = new KarateVideoService();
@@ -887,13 +732,15 @@ KarateVideoService.prototype.updateStreakDisplay = function() {
     const longestStreakEl = document.getElementById('longestStreak');
     const totalPracticeEl = document.getElementById('totalPractice');
     
-    if (currentStreakEl) currentStreakEl.textContent = this.streakData.current;
-    // 強化されたログイン状態チェック - ログインしていない場合は必ず0を表示
+    // 強化されたログイン状態チェック - ゲストユーザーには適切な値を表示
+    const isLoggedIn = this.isLoggedIn === true && this.currentUser !== null;
+    
+    if (currentStreakEl) currentStreakEl.textContent = isLoggedIn ? this.streakData.current : 0;
+    // LONGEST STREAK - ゲストユーザーは必ず0を表示
     if (longestStreakEl) {
-        const isLoggedIn = this.isLoggedIn === true && this.currentUser !== null;
         longestStreakEl.textContent = isLoggedIn ? this.streakData.longest : 0;
     }
-    if (totalPracticeEl) totalPracticeEl.textContent = this.streakData.total;
+    if (totalPracticeEl) totalPracticeEl.textContent = isLoggedIn ? this.streakData.total : 0;
 };
 
 // 今日の練習状況チェック
@@ -923,26 +770,6 @@ KarateVideoService.prototype.setupTodayPracticeButton = function() {
     // 新しいクリックハンドラーを定義
     this.todayPracticeClickHandler = () => {
         if (this.todayCompleted) return;
-        
-        // 強化された重複モーダル削除
-        const allModals = document.querySelectorAll(
-            '.emotion-modal:not(#emotionModal), ' +
-            '[data-emotion-count="3"], ' +
-            '.mood-selector, ' +
-            '.journal-modal, ' +
-            '[id*="journal"], ' +
-            '[class*="journal"]'
-        );
-        allModals.forEach(modal => modal.remove());
-        
-        // 3つの絵文字モーダルを徹底削除
-        const threeEmojiModals = document.querySelectorAll('[class*="modal"], [class*="popup"]');
-        threeEmojiModals.forEach(modal => {
-            const emojiButtons = modal.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
-            if (emojiButtons && emojiButtons.length === 3) {
-                modal.remove();
-            }
-        });
         
         // 直接感情選択モーダルを開く
         openTodayEmotionModal();
@@ -1423,6 +1250,12 @@ function saveEmotion() {
         const commentTextarea = document.getElementById('emotionComment');
         const comment = commentTextarea ? commentTextarea.value : '';
         
+        // Debug logging for emotion data creation
+        console.log('SAVING EMOTION:');
+        console.log('Selected day:', selectedDay);
+        console.log('Current year:', currentYear, 'Current month (0-indexed):', currentMonth);
+        console.log('Generated date key:', dateKey);
+        
         emotionData[dateKey] = {
             emotion: selectedEmotion,
             comment: comment
@@ -1450,6 +1283,12 @@ function saveEmotion() {
         // This fixes the issue where calendar edits don't update Today's Practice display
         updateTodayDisplay();
         
+        // Also update karate service state for today's completion
+        if (dateKey === todayKey && window.karateService) {
+            window.karateService.todayCompleted = true;
+            window.karateService.updateTodayButton();
+        }
+        
         // If this was for today, reset the flag
         if (isSelectingForToday) {
             isSelectingForToday = false;
@@ -1471,43 +1310,6 @@ function skipEmotion() {
 
 // Today's practice recording function
 async function recordTodayPractice() {
-    // CRITICAL: 3つの絵文字モーダル完全阻止 - 実行前
-    const preCleanup = () => {
-        // 徹底的な3つの絵文字モーダル削除
-        const badModals = document.querySelectorAll(
-            '#journalModal, ' +
-            '.journal-modal, ' +
-            '[data-emotion-count="3"], ' +
-            '.mood-selector, ' +
-            '.journal-content, ' +
-            '[id*="journal"], ' +
-            '[class*="journal"], ' +
-            '[class*="mood"], ' +
-            '[onclick*="mood"]'
-        );
-        badModals.forEach(modal => modal.remove());
-        
-        // 3つの絵文字を持つ任意のモーダルを削除
-        document.querySelectorAll('[class*="modal"], [class*="popup"], [role="dialog"]').forEach(modal => {
-            const emojiButtons = modal.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
-            if (emojiButtons && emojiButtons.length === 3) {
-                modal.remove();
-            }
-            
-            // 特定の絵文字パターン (😊😐😫) を含むモーダルを削除
-            if (modal.textContent && (
-                modal.textContent.includes('😊') && 
-                modal.textContent.includes('😐') && 
-                modal.textContent.includes('😫')
-            )) {
-                modal.remove();
-            }
-        });
-    };
-    
-    // 実行前クリーンアップ
-    preCleanup();
-    
     try {
         const response = await fetch('/api/practice/today', {
             method: 'POST',
@@ -1516,50 +1318,19 @@ async function recordTodayPractice() {
         
         const result = await response.json();
         
-        // CRITICAL: 3つの絵文字モーダル完全阻止 - 実行後即座に
-        preCleanup();
-        
         if (result.success) {
             window.karateService.todayCompleted = true;
             window.karateService.streakData = result.data.streak;
             window.karateService.updateTodayButton();
             window.karateService.updateStreakDisplay();
             window.karateService.showNotification('🎉 ' + result.message, 'success');
-            
-            // CRITICAL: journalModal作成阻止 - すべてのjournal関連機能を無効化
-            // 全てのfetch API呼び出しを監視してjournalAPIを阻止
-            const originalFetch = window.fetch;
-            window.fetch = function(...args) {
-                const url = args[0];
-                if (typeof url === 'string' && url.includes('/api/journal')) {
-                    console.log('journal API呼び出しを阻止:', url);
-                    return Promise.resolve(new Response('{"success": false, "message": "journal disabled"}', {
-                        status: 200,
-                        headers: { 'Content-Type': 'application/json' }
-                    }));
-                }
-                return originalFetch.apply(this, args);
-            };
-            
-            // 成功後も追加でクリーンアップ
-            setTimeout(preCleanup, 100);
-            setTimeout(preCleanup, 500);
-            setTimeout(preCleanup, 1000);
-            setTimeout(preCleanup, 2000);
-            setTimeout(preCleanup, 3000);
         } else {
             window.karateService.showNotification(result.message, 'error');
         }
         
-        // 最終クリーンアップ
-        setTimeout(preCleanup, 2000);
-        
     } catch (error) {
         console.error('Error recording practice:', error);
         window.karateService.showNotification('記録に失敗しました', 'error');
-        
-        // エラー時もクリーンアップ
-        preCleanup();
     }
 }
 
@@ -1572,19 +1343,44 @@ function updateCalendarStats() {
         return parseInt(year) === currentYear && parseInt(month) === currentMonth + 1;
     });
     
-    // Calculate TOTAL COMPLETIONS as entries from month start to today ONLY
+    // Calculate TOTAL COMPLETIONS as actual practice entries from month start to today ONLY
     const today = new Date();
     let totalCompletions;
     
     if (currentYear === today.getFullYear() && currentMonth === today.getMonth()) {
-        // Current month: count from month start to today (inclusive)
+        // Current month: count actual practice entries from month start to today (inclusive)
         const dayOfMonth = today.getDate();
-        totalCompletions = Object.keys(emotionData).filter(date => {
+        const currentMonthEntries = Object.keys(emotionData).filter(date => {
             const [year, month, day] = date.split('-').map(Number);
-            return year === currentYear && 
-                   month === currentMonth + 1 && 
-                   day >= 1 && day <= dayOfMonth;
-        }).length;
+            
+            // Add validation to ensure valid date components
+            if (isNaN(year) || isNaN(month) || isNaN(day)) {
+                console.warn('Invalid date found in emotionData:', date);
+                return false;
+            }
+            
+            const isCurrentYear = year === currentYear;
+            const isCurrentMonth = month === currentMonth + 1;
+            const isValidDay = day >= 1 && day <= dayOfMonth;
+            
+            // Detailed logging only for debugging the off-by-one issue
+            if (!isValidDay && isCurrentYear && isCurrentMonth) {
+                console.log(`Date ${date} excluded: day ${day} not in range 1-${dayOfMonth}`);
+            }
+            
+            return isCurrentYear && isCurrentMonth && isValidDay;
+        });
+        
+        // Debug logging to help identify the issue
+        console.log('TOTAL COMPLETIONS DEBUG:');
+        console.log('Today:', today.toISOString().split('T')[0]);
+        console.log('Current year:', currentYear, 'Current month (0-indexed):', currentMonth);
+        console.log('Day of month:', dayOfMonth);
+        console.log('Looking for entries in month:', currentMonth + 1);
+        console.log('Current month entries found:', currentMonthEntries);
+        console.log('Total count:', currentMonthEntries.length);
+        
+        totalCompletions = currentMonthEntries.length;
     } else {
         // Other month: count all entries for that month
         totalCompletions = thisMonthEntries.length;
@@ -1647,10 +1443,10 @@ function updateCalendarStats() {
                       window.karateService.isLoggedIn === true && 
                       window.karateService.currentUser !== null;
     
-    if (fullCurrentStreakEl) fullCurrentStreakEl.textContent = currentStreak;
+    if (fullCurrentStreakEl) fullCurrentStreakEl.textContent = isLoggedIn ? currentStreak : 0;
     if (fullLongestStreakEl) fullLongestStreakEl.textContent = isLoggedIn ? longestStreak : 0;
-    if (fullCompletionRateEl) fullCompletionRateEl.textContent = `${completionRate}%`;
-    if (fullTotalDaysEl) fullTotalDaysEl.textContent = totalCompletions;
+    if (fullCompletionRateEl) fullCompletionRateEl.textContent = isLoggedIn ? `${completionRate}%` : '0%';
+    if (fullTotalDaysEl) fullTotalDaysEl.textContent = isLoggedIn ? totalCompletions : 0;
 }
 
 // Mini Calendar functionality
