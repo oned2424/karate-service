@@ -1749,11 +1749,11 @@ function updateTodayDisplay() {
         
         // Update emotion display
         const emotionEmojis = {
-            'awful': '😟',
-            'bad': '😕', 
-            'meh': '😐',
-            'good': '😊',
-            'rad': '😄'
+            'mood-1': '😄',
+            'mood-2': '😊', 
+            'mood-3': '😐',
+            'mood-4': '😕',
+            'mood-5': '😟'
         };
         
         if (todayEmotionIcon) todayEmotionIcon.textContent = emotionEmojis[todayData.emotion] || '😐';

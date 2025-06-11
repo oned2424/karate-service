@@ -704,11 +704,11 @@
             border-radius: 50%;
         }
 
-        .emotion-indicator.awful { background: #FF5252; }
-        .emotion-indicator.bad { background: #FF9800; }
-        .emotion-indicator.meh { background: #2196F3; }
-        .emotion-indicator.good { background: #4CAF50; }
-        .emotion-indicator.rad { background: #FFC107; }
+        .emotion-indicator.mood-1 { background: #f7e003; }
+        .emotion-indicator.mood-2 { background: #2b5996; }
+        .emotion-indicator.mood-3 { background: #286d53; }
+        .emotion-indicator.mood-4 { background: #703623; }
+        .emotion-indicator.mood-5 { background: #242424; }
 
         .emotion-legend {
             background: white;
@@ -808,29 +808,29 @@
             transform: scale(1.1);
         }
 
-        .emotion-btn.selected-awful {
-            background: #FFE5E5;
-            border-color: #FF5252;
+        .emotion-btn.selected-mood-1 {
+            background: rgba(247, 224, 3, 0.2);
+            border-color: #f7e003;
         }
 
-        .emotion-btn.selected-bad {
-            background: #FFF3E0;
-            border-color: #FF9800;
+        .emotion-btn.selected-mood-2 {
+            background: rgba(43, 89, 150, 0.2);
+            border-color: #2b5996;
         }
 
-        .emotion-btn.selected-meh {
-            background: #E3F2FD;
-            border-color: #2196F3;
+        .emotion-btn.selected-mood-3 {
+            background: rgba(40, 109, 83, 0.2);
+            border-color: #286d53;
         }
 
-        .emotion-btn.selected-good {
-            background: #E8F5E9;
-            border-color: #4CAF50;
+        .emotion-btn.selected-mood-4 {
+            background: rgba(112, 54, 35, 0.2);
+            border-color: #703623;
         }
 
-        .emotion-btn.selected-rad {
-            background: #FFF9C4;
-            border-color: #FFC107;
+        .emotion-btn.selected-mood-5 {
+            background: rgba(36, 36, 36, 0.2);
+            border-color: #242424;
         }
 
         .emotion-textarea {
@@ -1390,24 +1390,24 @@
                 <!-- Emotion Legend -->
                 <div class="emotion-legend">
                     <div class="emotion-item">
-                        <div class="emotion-icon" style="color: #FF5252;">😄</div>
-                        <span class="emotion-label">rad</span>
+                        <div class="emotion-icon" style="color: #f7e003;">😄</div>
+                        <span class="emotion-label">mood-1</span>
                     </div>
                     <div class="emotion-item">
-                        <div class="emotion-icon" style="color: #4CAF50;">😊</div>
-                        <span class="emotion-label">good</span>
+                        <div class="emotion-icon" style="color: #2b5996;">😊</div>
+                        <span class="emotion-label">mood-2</span>
                     </div>
                     <div class="emotion-item">
-                        <div class="emotion-icon" style="color: #2196F3;">😐</div>
-                        <span class="emotion-label">meh</span>
+                        <div class="emotion-icon" style="color: #286d53;">😐</div>
+                        <span class="emotion-label">mood-3</span>
                     </div>
                     <div class="emotion-item">
-                        <div class="emotion-icon" style="color: #FF9800;">😟</div>
-                        <span class="emotion-label">bad</span>
+                        <div class="emotion-icon" style="color: #703623;">😕</div>
+                        <span class="emotion-label">mood-4</span>
                     </div>
                     <div class="emotion-item">
-                        <div class="emotion-icon" style="color: #FF5252;">😢</div>
-                        <span class="emotion-label">awful</span>
+                        <div class="emotion-icon" style="color: #242424;">😟</div>
+                        <span class="emotion-label">mood-5</span>
                     </div>
                 </div>
             </section>
@@ -1452,11 +1452,11 @@
             <p class="emotion-modal-subtitle">Reflect on your training session</p>
             
             <div class="emotion-selector">
-                <button class="emotion-btn" data-emotion="awful" onclick="selectEmotionButton('awful')">😟</button>
-                <button class="emotion-btn" data-emotion="bad" onclick="selectEmotionButton('bad')">😕</button>
-                <button class="emotion-btn" data-emotion="meh" onclick="selectEmotionButton('meh')">😐</button>
-                <button class="emotion-btn" data-emotion="good" onclick="selectEmotionButton('good')">😊</button>
-                <button class="emotion-btn" data-emotion="rad" onclick="selectEmotionButton('rad')">😄</button>
+                <button class="emotion-btn" data-emotion="mood-1" onclick="selectEmotionButton('mood-1')">😄</button>
+                <button class="emotion-btn" data-emotion="mood-2" onclick="selectEmotionButton('mood-2')">😊</button>
+                <button class="emotion-btn" data-emotion="mood-3" onclick="selectEmotionButton('mood-3')">😐</button>
+                <button class="emotion-btn" data-emotion="mood-4" onclick="selectEmotionButton('mood-4')">😕</button>
+                <button class="emotion-btn" data-emotion="mood-5" onclick="selectEmotionButton('mood-5')">😟</button>
             </div>
             
             <textarea 
@@ -1890,17 +1890,17 @@
         let selectedEmotion = null;
         let emotionData = {
             // Sample data for December 2024
-            '2024-12-2': { emotion: 'meh', comment: '' },
-            '2024-12-3': { emotion: 'good', comment: '' }, 
-            '2024-12-5': { emotion: 'bad', comment: '' },
-            '2024-12-6': { emotion: 'rad', comment: '' },
-            '2024-12-9': { emotion: 'meh', comment: '' },
-            '2024-12-10': { emotion: 'good', comment: '' },
-            '2024-12-12': { emotion: 'bad', comment: '' },
-            '2024-12-13': { emotion: 'rad', comment: '' },
-            '2024-12-17': { emotion: 'good', comment: '' },
-            '2024-12-19': { emotion: 'bad', comment: '' },
-            '2024-12-20': { emotion: 'rad', comment: '' }
+            '2024-12-2': { emotion: 'mood-3', comment: '' },
+            '2024-12-3': { emotion: 'mood-2', comment: '' }, 
+            '2024-12-5': { emotion: 'mood-4', comment: '' },
+            '2024-12-6': { emotion: 'mood-1', comment: '' },
+            '2024-12-9': { emotion: 'mood-3', comment: '' },
+            '2024-12-10': { emotion: 'mood-2', comment: '' },
+            '2024-12-12': { emotion: 'mood-4', comment: '' },
+            '2024-12-13': { emotion: 'mood-1', comment: '' },
+            '2024-12-17': { emotion: 'mood-2', comment: '' },
+            '2024-12-19': { emotion: 'mood-4', comment: '' },
+            '2024-12-20': { emotion: 'mood-1', comment: '' }
         };
 
         const monthNames = [
