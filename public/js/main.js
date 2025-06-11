@@ -618,8 +618,132 @@ function showLibrary() {
     });
 }
 
-// DOMの読み込み完了時にサービスを初期化
-document.addEventListener('DOMContentLoaded', () => {
+// Initialize calendar when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // 超強化された3つの絵文字モーダル削除システム
+    const superCleanup = () => {
+        // 1. 重複emotion modalの削除
+        const allEmotionModals = document.querySelectorAll('.emotion-modal');
+        if (allEmotionModals.length > 1) {
+            for (let i = 1; i < allEmotionModals.length; i++) {
+                allEmotionModals[i].remove();
+            }
+        }
+        
+        // 2. journal系の完全削除
+        const journalElements = document.querySelectorAll(
+            '#journalModal, ' +
+            '.journal-modal, ' +
+            '[data-emotion-count="3"], ' +
+            '.mood-selector, ' +
+            '.journal-content, ' +
+            '[id*="journal"], ' +
+            '[class*="journal"], ' +
+            '[class*="mood"], ' +
+            '[onclick*="mood"]'
+        );
+        journalElements.forEach(element => element.remove());
+        
+        // 3. 3つの絵文字モーダルの特定と削除
+        document.querySelectorAll('[class*="modal"], [class*="popup"], [role="dialog"]').forEach(modal => {
+            const emojiButtons = modal.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
+            if (emojiButtons && emojiButtons.length === 3) {
+                console.log('3つの絵文字モーダルを削除:', modal);
+                modal.remove();
+                return;
+            }
+            
+            // 特定の絵文字パターンを含むモーダルを削除
+            if (modal.textContent) {
+                const hasThreeSpecificEmojis = modal.textContent.includes('😊') && 
+                                               modal.textContent.includes('😐') && 
+                                               modal.textContent.includes('😫');
+                if (hasThreeSpecificEmojis) {
+                    console.log('特定パターンの3つの絵文字モーダルを削除:', modal);
+                    modal.remove();
+                }
+            }
+        });
+        
+        // 4. DOM内の不正なモーダル関連要素を削除
+        const badSelectors = [
+            '[data-mood]',
+            '[data-journal]', 
+            '.mood-button',
+            '.journal-button',
+            '.three-emoji-modal'
+        ];
+        badSelectors.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => el.remove());
+        });
+    };
+    
+    // 初期クリーンアップ
+    superCleanup();
+    
+    // 継続的な監視とクリーンアップ
+    const observer = new MutationObserver((mutations) => {
+        let shouldCleanup = false;
+        
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === 1) { // Element node
+                    // journal関連の即座削除
+                    if (node.id === 'journalModal' || 
+                        node.classList.contains('journal-modal') ||
+                        node.getAttribute && node.getAttribute('data-emotion-count') === '3') {
+                        console.log('journal系モーダルを即座に削除:', node);
+                        node.remove();
+                        return;
+                    }
+                    
+                    // mood-selector関連の削除
+                    if (node.querySelector && node.querySelector('.mood-selector, .journal-content')) {
+                        console.log('mood-selector含むモーダルを削除:', node);
+                        node.remove();
+                        return;
+                    }
+                    
+                    // 3つの絵文字モーダル検出
+                    const emojiButtons = node.querySelectorAll && node.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
+                    if (emojiButtons && emojiButtons.length === 3) {
+                        console.log('3つの絵文字モーダルを即座に削除:', node);
+                        node.remove();
+                        return;
+                    }
+                    
+                    // 特定の絵文字パターンチェック
+                    if (node.textContent && 
+                        node.textContent.includes('😊') && 
+                        node.textContent.includes('😐') && 
+                        node.textContent.includes('😫')) {
+                        console.log('特定パターンのモーダルを削除:', node);
+                        node.remove();
+                        return;
+                    }
+                    
+                    shouldCleanup = true;
+                }
+            });
+        });
+        
+        if (shouldCleanup) {
+            // 少し遅延してクリーンアップ
+            setTimeout(superCleanup, 10);
+        }
+    });
+    
+    observer.observe(document.body, { 
+        childList: true, 
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'id']
+    });
+    
+    // 定期的なクリーンアップ（安全網）
+    setInterval(superCleanup, 2000);
+    
+    // KarateVideoServiceの初期化
     window.karateService = new KarateVideoService();
     
     // ナビゲーションのスクロールエフェクト
@@ -640,7 +764,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rootMargin: '0px 0px -50px 0px'
     };
 
-    const observer = new IntersectionObserver((entries) => {
+    const fadeInObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.style.opacity = '1';
@@ -653,8 +777,26 @@ document.addEventListener('DOMContentLoaded', () => {
         element.style.opacity = '0';
         element.style.transform = 'translateY(30px)';
         element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(element);
+        fadeInObserver.observe(element);
     });
+    
+    // Initialize mini calendar
+    if (document.getElementById('miniCalendarDays')) {
+        generateMiniCalendar(miniCurrentMonth, miniCurrentYear);
+    }
+    
+    // Initialize full calendar if calendar section exists
+    if (document.getElementById('calendarDays')) {
+        generateCalendar(currentMonth, currentYear);
+        updateCalendarStats();
+    }
+    
+    // Initialize Today's Practice display
+    updateTodayDisplay();
+    
+    // Initialize statistics
+    updateCalendarStats();
+    updateDashboardStats();
 });
 
 // ==== 習慣化パッケージ機能 ====
@@ -1276,6 +1418,43 @@ function skipEmotion() {
 
 // Today's practice recording function
 async function recordTodayPractice() {
+    // CRITICAL: 3つの絵文字モーダル完全阻止 - 実行前
+    const preCleanup = () => {
+        // 徹底的な3つの絵文字モーダル削除
+        const badModals = document.querySelectorAll(
+            '#journalModal, ' +
+            '.journal-modal, ' +
+            '[data-emotion-count="3"], ' +
+            '.mood-selector, ' +
+            '.journal-content, ' +
+            '[id*="journal"], ' +
+            '[class*="journal"], ' +
+            '[class*="mood"], ' +
+            '[onclick*="mood"]'
+        );
+        badModals.forEach(modal => modal.remove());
+        
+        // 3つの絵文字を持つ任意のモーダルを削除
+        document.querySelectorAll('[class*="modal"], [class*="popup"], [role="dialog"]').forEach(modal => {
+            const emojiButtons = modal.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
+            if (emojiButtons && emojiButtons.length === 3) {
+                modal.remove();
+            }
+            
+            // 特定の絵文字パターン (😊😐😫) を含むモーダルを削除
+            if (modal.textContent && (
+                modal.textContent.includes('😊') && 
+                modal.textContent.includes('😐') && 
+                modal.textContent.includes('😫')
+            )) {
+                modal.remove();
+            }
+        });
+    };
+    
+    // 実行前クリーンアップ
+    preCleanup();
+    
     try {
         const response = await fetch('/api/practice/today', {
             method: 'POST',
@@ -1284,18 +1463,33 @@ async function recordTodayPractice() {
         
         const result = await response.json();
         
+        // CRITICAL: 3つの絵文字モーダル完全阻止 - 実行後即座に
+        preCleanup();
+        
         if (result.success) {
             window.karateService.todayCompleted = true;
             window.karateService.streakData = result.data.streak;
             window.karateService.updateTodayButton();
             window.karateService.updateStreakDisplay();
             window.karateService.showNotification('🎉 ' + result.message, 'success');
+            
+            // 成功後も追加でクリーンアップ
+            setTimeout(preCleanup, 100);
+            setTimeout(preCleanup, 500);
+            setTimeout(preCleanup, 1000);
         } else {
             window.karateService.showNotification(result.message, 'error');
         }
+        
+        // 最終クリーンアップ
+        setTimeout(preCleanup, 2000);
+        
     } catch (error) {
         console.error('Error recording practice:', error);
         window.karateService.showNotification('記録に失敗しました', 'error');
+        
+        // エラー時もクリーンアップ
+        preCleanup();
     }
 }
 
@@ -1522,85 +1716,6 @@ function updateDashboardStats() {
     if (dashCurrentStreakEl) dashCurrentStreakEl.textContent = currentStreak;
     if (dashCompletionRateEl) dashCompletionRateEl.textContent = `${completionRate}%`;
 }
-
-// Initialize calendar when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Enhanced cleanup for 3-emoji modal issue
-    const cleanupBadModals = () => {
-        // Remove duplicate emotion modals
-        const allEmotionModals = document.querySelectorAll('.emotion-modal');
-        if (allEmotionModals.length > 1) {
-            for (let i = 1; i < allEmotionModals.length; i++) {
-                allEmotionModals[i].remove();
-            }
-        }
-        
-        // Remove any journal modals that might be causing the 3-emoji modal issue
-        const journalModals = document.querySelectorAll('#journalModal, .journal-modal, [data-emotion-count="3"]');
-        journalModals.forEach(modal => modal.remove());
-        
-        // Check for modals with mood-selector or journal-content
-        const moodModals = document.querySelectorAll('.mood-selector, .journal-content');
-        moodModals.forEach(element => {
-            const modal = element.closest('.journal-modal, [id*="journal"], [class*="journal"]');
-            if (modal) modal.remove();
-        });
-        
-        // Look for any modals with exactly 3 emoji buttons
-        const possibleBadModals = document.querySelectorAll('[class*="modal"], [class*="popup"]');
-        possibleBadModals.forEach(modal => {
-            const emojiButtons = modal.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
-            if (emojiButtons && emojiButtons.length === 3) {
-                modal.remove();
-            }
-        });
-    };
-    
-    // Initial cleanup
-    cleanupBadModals();
-    
-    // Continuously monitor and remove journal modals
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            mutation.addedNodes.forEach((node) => {
-                if (node.nodeType === 1) { // Element node
-                    if (node.id === 'journalModal' || 
-                        node.classList.contains('journal-modal') ||
-                        node.getAttribute && node.getAttribute('data-emotion-count') === '3' ||
-                        (node.querySelector && node.querySelector('.mood-selector, .journal-content'))) {
-                        node.remove();
-                        return;
-                    }
-                    
-                    // Check for 3-emoji modals
-                    const emojiButtons = node.querySelectorAll && node.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
-                    if (emojiButtons && emojiButtons.length === 3) {
-                        node.remove();
-                    }
-                }
-            });
-        });
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-    
-    // Initialize mini calendar
-    if (document.getElementById('miniCalendarDays')) {
-        generateMiniCalendar(miniCurrentMonth, miniCurrentYear);
-    }
-    
-    // Initialize full calendar if calendar section exists
-    if (document.getElementById('calendarDays')) {
-        generateCalendar(currentMonth, currentYear);
-        updateCalendarStats();
-    }
-    
-    // Initialize Today's Practice display
-    updateTodayDisplay();
-    
-    // Initialize statistics
-    updateCalendarStats();
-    updateDashboardStats();
-});
 
 // Today's Practice functions
 function openTodayEmotionModal() {
