@@ -693,7 +693,7 @@ KarateVideoService.prototype.updateStreakDisplay = function() {
     const totalPracticeEl = document.getElementById('totalPractice');
     
     if (currentStreakEl) currentStreakEl.textContent = this.streakData.current;
-    if (longestStreakEl) longestStreakEl.textContent = this.isLoggedIn ? this.streakData.longest : 0;
+    if (longestStreakEl) longestStreakEl.textContent = this.isLoggedIn === true ? this.streakData.longest : 0;
     if (totalPracticeEl) totalPracticeEl.textContent = this.streakData.total;
 };
 
@@ -720,6 +720,10 @@ KarateVideoService.prototype.setupTodayPracticeButton = function() {
     
     todayBtn.addEventListener('click', () => {
         if (this.todayCompleted) return;
+        
+        // Delete any 3-emoji modals that might appear
+        const threeEmojiModals = document.querySelectorAll('[data-emotion-count="3"], .mood-selector, .journal-modal');
+        threeEmojiModals.forEach(modal => modal.remove());
         
         // 直接感情選択モーダルを開く
         openTodayEmotionModal();
@@ -1222,6 +1226,10 @@ function saveEmotion() {
             }
         }
         
+        // IMPORTANT: Always update Today's display when emotion is saved
+        // to ensure calendar changes sync with Today's Practice display
+        updateTodayDisplay();
+        
         // If this was for today, reset the flag
         if (isSelectingForToday) {
             isSelectingForToday = false;
@@ -1275,12 +1283,10 @@ function updateCalendarStats() {
         return parseInt(year) === currentYear && parseInt(month) === currentMonth + 1;
     });
     
-    // Calculate TOTAL COMPLETIONS as entries from month start to today
+    // Calculate TOTAL COMPLETIONS as entries from month start to today ONLY
     const today = new Date();
-    const monthStart = new Date(currentYear, currentMonth, 1);
-    
-    // Count completions from month start to today (only if viewing current month)
     let totalCompletions;
+    
     if (currentYear === today.getFullYear() && currentMonth === today.getMonth()) {
         // Current month: count from month start to today (inclusive)
         const dayOfMonth = today.getDate();
@@ -1301,8 +1307,6 @@ function updateCalendarStats() {
     // Calculate streaks
     let currentStreak = 0;
     let longestStreak = 0;
-    
-    const today = new Date();
     
     // Calculate current streak (backwards from today)
     for (let i = 0; i >= -30; i--) {
@@ -1349,8 +1353,8 @@ function updateCalendarStats() {
     const fullCompletionRateEl = document.getElementById('fullCompletionRate');
     const fullTotalDaysEl = document.getElementById('fullTotalDays');
     
-    // Check if user is logged in for longest streak display
-    const isLoggedIn = window.karateService && window.karateService.isLoggedIn;
+    // Check if user is logged in for longest streak display (強化されたチェック)
+    const isLoggedIn = window.karateService && window.karateService.isLoggedIn === true;
     
     if (fullCurrentStreakEl) fullCurrentStreakEl.textContent = currentStreak;
     if (fullLongestStreakEl) fullLongestStreakEl.textContent = isLoggedIn ? longestStreak : 0;
@@ -1494,25 +1498,39 @@ function updateDashboardStats() {
 
 // Initialize calendar when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    // Clean up any duplicate emotion modals and journal modals (prevent 3-emoji modal issue)
-    const allEmotionModals = document.querySelectorAll('.emotion-modal');
-    if (allEmotionModals.length > 1) {
-        // Keep only the first one and remove others
-        for (let i = 1; i < allEmotionModals.length; i++) {
-            allEmotionModals[i].remove();
+    // Enhanced cleanup for 3-emoji modal issue
+    const cleanupBadModals = () => {
+        // Remove duplicate emotion modals
+        const allEmotionModals = document.querySelectorAll('.emotion-modal');
+        if (allEmotionModals.length > 1) {
+            for (let i = 1; i < allEmotionModals.length; i++) {
+                allEmotionModals[i].remove();
+            }
         }
-    }
+        
+        // Remove any journal modals that might be causing the 3-emoji modal issue
+        const journalModals = document.querySelectorAll('#journalModal, .journal-modal, [data-emotion-count="3"]');
+        journalModals.forEach(modal => modal.remove());
+        
+        // Check for modals with mood-selector or journal-content
+        const moodModals = document.querySelectorAll('.mood-selector, .journal-content');
+        moodModals.forEach(element => {
+            const modal = element.closest('.journal-modal, [id*="journal"], [class*="journal"]');
+            if (modal) modal.remove();
+        });
+        
+        // Look for any modals with exactly 3 emoji buttons
+        const possibleBadModals = document.querySelectorAll('[class*="modal"], [class*="popup"]');
+        possibleBadModals.forEach(modal => {
+            const emojiButtons = modal.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
+            if (emojiButtons && emojiButtons.length === 3) {
+                modal.remove();
+            }
+        });
+    };
     
-    // Remove any journal modals that might be causing the 3-emoji modal issue
-    const journalModals = document.querySelectorAll('#journalModal, .journal-modal');
-    journalModals.forEach(modal => modal.remove());
-    
-    // Also check for modals with mood-selector or journal-content
-    const moodModals = document.querySelectorAll('.mood-selector, .journal-content');
-    moodModals.forEach(element => {
-        const modal = element.closest('.journal-modal, [id*="journal"], [class*="journal"]');
-        if (modal) modal.remove();
-    });
+    // Initial cleanup
+    cleanupBadModals();
     
     // Continuously monitor and remove journal modals
     const observer = new MutationObserver((mutations) => {
@@ -1521,7 +1539,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (node.nodeType === 1) { // Element node
                     if (node.id === 'journalModal' || 
                         node.classList.contains('journal-modal') ||
-                        node.querySelector && node.querySelector('.mood-selector, .journal-content')) {
+                        node.getAttribute && node.getAttribute('data-emotion-count') === '3' ||
+                        (node.querySelector && node.querySelector('.mood-selector, .journal-content'))) {
+                        node.remove();
+                        return;
+                    }
+                    
+                    // Check for 3-emoji modals
+                    const emojiButtons = node.querySelectorAll && node.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
+                    if (emojiButtons && emojiButtons.length === 3) {
                         node.remove();
                     }
                 }
