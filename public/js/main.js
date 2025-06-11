@@ -701,6 +701,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // 初期クリーンアップ
     superCleanup();
     
+    // CRITICAL: fetch API監視でjournal API呼び出しを完全阻止
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+        const url = args[0];
+        if (typeof url === 'string' && url.includes('/api/journal')) {
+            console.log('journal API呼び出しを初期段階で阻止:', url);
+            return Promise.resolve(new Response('{"success": false, "message": "journal disabled"}', {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' }
+            }));
+        }
+        return originalFetch.apply(this, args);
+    };
+    
     // 継続的な監視とクリーンアップ - journalModal検出強化
     const observer = new MutationObserver((mutations) => {
         let shouldCleanup = false;
@@ -1512,10 +1526,27 @@ async function recordTodayPractice() {
             window.karateService.updateStreakDisplay();
             window.karateService.showNotification('🎉 ' + result.message, 'success');
             
+            // CRITICAL: journalModal作成阻止 - すべてのjournal関連機能を無効化
+            // 全てのfetch API呼び出しを監視してjournalAPIを阻止
+            const originalFetch = window.fetch;
+            window.fetch = function(...args) {
+                const url = args[0];
+                if (typeof url === 'string' && url.includes('/api/journal')) {
+                    console.log('journal API呼び出しを阻止:', url);
+                    return Promise.resolve(new Response('{"success": false, "message": "journal disabled"}', {
+                        status: 200,
+                        headers: { 'Content-Type': 'application/json' }
+                    }));
+                }
+                return originalFetch.apply(this, args);
+            };
+            
             // 成功後も追加でクリーンアップ
             setTimeout(preCleanup, 100);
             setTimeout(preCleanup, 500);
             setTimeout(preCleanup, 1000);
+            setTimeout(preCleanup, 2000);
+            setTimeout(preCleanup, 3000);
         } else {
             window.karateService.showNotification(result.message, 'error');
         }
