@@ -852,23 +852,7 @@ KarateVideoService.prototype.setupJournalModal = function() {
     // emotionModalは既にHTMLに定義済み
 };
 
-// 日記モーダル表示 - 既存のemotionModalを使用
-KarateVideoService.prototype.showJournalModal = function() {
-    // 既存のemotionModal関数を呼び出し
-    openTodayEmotionModal();
-};
-
-// 日記モーダル非表示 - 既存のemotionModalを使用
-KarateVideoService.prototype.hideJournalModal = function() {
-    // 既存のemotionModal関数を呼び出し
-    closeEmotionModal();
-};
-
-// 日記保存 - 既存のsaveEmotion関数を使用
-KarateVideoService.prototype.saveJournal = async function() {
-    // 既存のemotionModal保存機能を呼び出し
-    saveEmotion();
-};
+// Journal modal functions removed to fix 3-emoji modal issue
 
 // フルカレンダー表示（将来の実装）
 function showFullCalendar() {
@@ -1233,9 +1217,9 @@ function saveEmotion() {
             updateTodayDisplay();
             
             // If this is today's practice, record it on the server
-            // if (window.karateService) {
-            //     recordTodayPractice();
-            // }
+            if (window.karateService) {
+                recordTodayPractice();
+            }
         }
         
         // If this was for today, reset the flag
@@ -1510,7 +1494,7 @@ function updateDashboardStats() {
 
 // Initialize calendar when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    // Clean up any duplicate emotion modals (prevent 3-emoji modal issue)
+    // Clean up any duplicate emotion modals and journal modals (prevent 3-emoji modal issue)
     const allEmotionModals = document.querySelectorAll('.emotion-modal');
     if (allEmotionModals.length > 1) {
         // Keep only the first one and remove others
@@ -1518,6 +1502,10 @@ document.addEventListener('DOMContentLoaded', function() {
             allEmotionModals[i].remove();
         }
     }
+    
+    // Remove any journal modals that might be causing the 3-emoji modal issue
+    const journalModals = document.querySelectorAll('#journalModal, .journal-modal');
+    journalModals.forEach(modal => modal.remove());
     
     // Initialize mini calendar
     if (document.getElementById('miniCalendarDays')) {
