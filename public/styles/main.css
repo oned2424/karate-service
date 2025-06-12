@@ -1540,40 +1540,20 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
 }
 
 /* 統一された選択状態スタイル - 薄いグレー背景 */
-.emotion-btn.selected-mood-1 {
-    background: rgba(128, 128, 128, 0.2);
-    border: 2px solid #999;
-    transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.emotion-btn.selected-mood-2 {
-    background: rgba(128, 128, 128, 0.2);
-    border: 2px solid #999;
-    transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.emotion-btn.selected-mood-3 {
-    background: rgba(128, 128, 128, 0.2);
-    border: 2px solid #999;
-    transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.emotion-btn.selected-mood-4 {
-    background: rgba(128, 128, 128, 0.2);
-    border: 2px solid #999;
-    transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
+.emotion-btn.selected-mood-1,
+.emotion-btn.selected-mood-2,
+.emotion-btn.selected-mood-3,
+.emotion-btn.selected-mood-4,
 .emotion-btn.selected-mood-5 {
-    background: rgba(128, 128, 128, 0.2);
-    border: 2px solid #999;
-    transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    background: rgba(128, 128, 128, 0.2) !important;
+    border: 2px solid #999 !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
+
 
 .emotion-textarea {
     width: 100%;

@@ -642,8 +642,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // 2. journal関連の完全撲滅
-        document.querySelectorAll('#journalModal, .journal-modal, [id*="journal"], [class*="journal"], .mood-selector, .journal-content, [data-journal], .mood-option').forEach(el => {
+        // 2. journal関連の完全撲滅（emotion-btnは保護）
+        document.querySelectorAll('#journalModal, .journal-modal, [id*="journal"], [class*="journal"], .mood-selector, .journal-content, [data-journal]').forEach(el => {
+            // emotion-btnクラスを持つ要素は保護
+            if (el.classList.contains('emotion-btn')) return;
+            if (el.closest('#emotionModal')) return; // emotionModal内の要素も保護
+            // selected-mood-* クラスを持つ要素も保護
+            if (el.className && el.className.includes('selected-mood-')) return;
+            
             console.log('🚫 DESTROYED journal element:', el);
             el.remove();
         });
