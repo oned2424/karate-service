@@ -642,8 +642,11 @@ document.addEventListener('DOMContentLoaded', function() {
             el.remove();
         });
         
-        // 3. 正確に3つの絵文字ボタンを持つモーダルを破壊
+        // 3. 正確に3つの絵文字ボタンを持つモーダルを破壊（メインのemotionModalは保護）
         document.querySelectorAll('*').forEach(element => {
+            if (element.id === 'emotionModal') return; // メインのemotionModalを保護
+            if (element.closest('#emotionModal')) return; // メインのemotionModalの子要素も保護
+            
             const emojiButtons = element.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"], [data-mood], .mood-option');
             if (emojiButtons && emojiButtons.length === 3) {
                 console.log('🚫 DESTROYED 3-button modal:', element);
@@ -711,7 +714,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         return;
                     }
                     
-                    // 3つ絵文字ボタンを持つモーダルも即座に破壊
+                    // 3つ絵文字ボタンを持つモーダルも即座に破壊（メインのemotionModalは保護）
+                    if (node.id === 'emotionModal') return; // メインのemotionModalを保護
+                    if (node.closest && node.closest('#emotionModal')) return; // メインのemotionModalの子要素も保護
+                    
                     const emojiButtons = node.querySelectorAll && node.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
                     if (emojiButtons && emojiButtons.length === 3) {
                         console.log('🚫 INSTANT DESTROY 3-button modal:', node);
@@ -1844,6 +1850,7 @@ function preventUnwantedModals() {
     // Remove any modals with exactly 3 emotion buttons, but protect the main 5-emotion modal
     document.querySelectorAll('*').forEach(element => {
         if (element.id === 'emotionModal') return; // Skip the main emotion modal entirely
+        if (element.closest('#emotionModal')) return; // Skip any child elements of the main emotion modal
         
         const emojiButtons = element.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
         if (emojiButtons && emojiButtons.length === 3) {
