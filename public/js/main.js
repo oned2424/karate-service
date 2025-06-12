@@ -1291,7 +1291,12 @@ function changeMonth(direction) {
 
 function showEmotionModal() {
     const modal = document.getElementById('emotionModal');
-    if (!modal) return;
+    if (!modal) {
+        console.error('Emotion modal not found!');
+        return;
+    }
+    
+    console.log('showEmotionModal called');
     
     // Reset modal state
     selectedEmotion = null;
@@ -1301,8 +1306,17 @@ function showEmotionModal() {
     if (commentTextarea) commentTextarea.value = '';
     if (saveBtn) saveBtn.disabled = true;
     
+    // CRITICAL: Only work with buttons inside the main emotion modal
+    const modalButtons = modal.querySelectorAll('.emotion-btn');
+    console.log(`Found ${modalButtons.length} buttons in emotion modal`);
+    
+    // Log all button states before reset
+    modalButtons.forEach((btn, index) => {
+        console.log(`Modal Button ${index}: data-emotion="${btn.getAttribute('data-emotion')}", textContent="${btn.textContent}", onclick="${btn.getAttribute('onclick')}"`);
+    });
+    
     // Reset emotion button states - remove only selected-* classes but preserve emotion-btn
-    document.querySelectorAll('.emotion-btn').forEach(btn => {
+    modalButtons.forEach(btn => {
         // Remove all selected-* classes
         btn.classList.remove('selected-mood-1', 'selected-mood-2', 'selected-mood-3', 'selected-mood-4', 'selected-mood-5');
         // Make sure emotion-btn class is always present
@@ -1317,8 +1331,11 @@ function showEmotionModal() {
     if (existingData) {
         selectedEmotion = existingData.emotion;
         if (commentTextarea) commentTextarea.value = existingData.comment || '';
-        const emotionBtn = document.querySelector(`[data-emotion="${existingData.emotion}"]`);
-        if (emotionBtn) emotionBtn.classList.add(`selected-${existingData.emotion}`);
+        const emotionBtn = modal.querySelector(`[data-emotion="${existingData.emotion}"]`);
+        if (emotionBtn) {
+            console.log(`Loading existing emotion: ${existingData.emotion}`);
+            emotionBtn.classList.add(`selected-${existingData.emotion}`);
+        }
         if (saveBtn) saveBtn.disabled = false;
     }
     
@@ -1345,20 +1362,44 @@ function closeEmotionModal() {
 function selectEmotionButton(emotion) {
     selectedEmotion = emotion;
     
+    console.log(`selectEmotionButton called with: ${emotion}`);
+    
+    // CRITICAL: Only work with buttons inside the main emotion modal
+    const emotionModal = document.getElementById('emotionModal');
+    if (!emotionModal) {
+        console.error('Emotion modal not found!');
+        return;
+    }
+    
     // Reset all buttons - remove only selected-* classes but preserve emotion-btn
-    document.querySelectorAll('.emotion-btn').forEach(btn => {
+    const modalButtons = emotionModal.querySelectorAll('.emotion-btn');
+    console.log(`Found ${modalButtons.length} emotion buttons in modal`);
+    
+    modalButtons.forEach((btn, index) => {
+        // Log button state before modification
+        console.log(`Button ${index}: data-emotion="${btn.getAttribute('data-emotion')}", textContent="${btn.textContent}"`);
+        
         // Remove all selected-* classes
         btn.classList.remove('selected-mood-1', 'selected-mood-2', 'selected-mood-3', 'selected-mood-4', 'selected-mood-5');
         // Make sure emotion-btn class is always present
         if (!btn.classList.contains('emotion-btn')) {
             btn.classList.add('emotion-btn');
         }
+        
+        // Verify button integrity - ensure data-emotion attribute hasn't changed
+        const expectedDataEmotion = btn.getAttribute('data-emotion');
+        if (!expectedDataEmotion) {
+            console.error(`Button ${index} missing data-emotion attribute!`);
+        }
     });
     
-    // Highlight selected button
-    const selectedBtn = document.querySelector(`[data-emotion="${emotion}"]`);
+    // Highlight selected button - only within the main modal
+    const selectedBtn = emotionModal.querySelector(`[data-emotion="${emotion}"]`);
     if (selectedBtn) {
+        console.log(`Selecting button with data-emotion="${emotion}", textContent="${selectedBtn.textContent}"`);
         selectedBtn.classList.add(`selected-${emotion}`);
+    } else {
+        console.error(`Could not find button with data-emotion="${emotion}" in main modal!`);
     }
     
     // Enable save button
@@ -1789,22 +1830,27 @@ function updateTodayDisplay() {
 function preventUnwantedModals() {
     // Remove any journal modals immediately
     document.querySelectorAll('#journalModal, .journal-modal, [id*="journal"], [class*="journal"]').forEach(el => {
-        el.remove();
+        if (el.id !== 'emotionModal') { // Protect the main emotion modal
+            el.remove();
+        }
     });
     
-    // Remove any 3-emoji modals (😊😐😫)
+    // Remove any 3-emoji modals (😊😐😫) but NEVER touch the main 5-emotion modal
     document.querySelectorAll('*').forEach(element => {
+        if (element.id === 'emotionModal') return; // Skip the main emotion modal entirely
+        
         if (element.textContent && 
             element.textContent.includes('😊') && 
             element.textContent.includes('😐') && 
-            element.textContent.includes('😫') &&
-            element.id !== 'emotionModal') {
+            element.textContent.includes('😫')) {
             element.remove();
         }
     });
     
-    // Remove any modals with exactly 3 emotion buttons
+    // Remove any modals with exactly 3 emotion buttons, but protect the main 5-emotion modal
     document.querySelectorAll('*').forEach(element => {
+        if (element.id === 'emotionModal') return; // Skip the main emotion modal entirely
+        
         const emojiButtons = element.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"]');
         if (emojiButtons && emojiButtons.length === 3) {
             element.remove();
