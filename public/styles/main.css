@@ -1534,7 +1534,9 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
 }
 
 .emotion-btn:hover {
-    transform: scale(1.1);
+    transform: scale(1.15);
+    border-color: #999;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .emotion-btn.selected-mood-1 {

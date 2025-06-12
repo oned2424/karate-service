@@ -622,6 +622,12 @@ function showLibrary() {
 document.addEventListener('DOMContentLoaded', function() {
     // 🔥 ULTRA AGGRESSIVE: 3つの絵文字モーダル（😊😐😫）完全撲滅システム
     const DESTROY_THREE_EMOJI_MODALS = () => {
+        // 🔒 CRITICAL: 感情選択処理中は実行を停止
+        if (window.isEmotionSelectionInProgress || isEmotionSelectionInProgress) {
+            console.log('⏸️ Cleanup paused: emotion selection in progress');
+            return;
+        }
+        
         console.log('🔥 ULTRA AGGRESSIVE cleanup running...');
         
         // 1. 即座に3つの絵文字パターン（😊😐😫）を持つ全ての要素を削除
@@ -642,14 +648,29 @@ document.addEventListener('DOMContentLoaded', function() {
             el.remove();
         });
         
-        // 3. 正確に3つの絵文字ボタンを持つモーダルを破壊（メインのemotionModalは保護）
+        // 3. 正確に3つの絵文字ボタンを持つモーダルを破壊（メインのemotionModalは完全保護）
         document.querySelectorAll('*').forEach(element => {
+            // 複数の保護レイヤー
             if (element.id === 'emotionModal') return; // メインのemotionModalを保護
             if (element.closest('#emotionModal')) return; // メインのemotionModalの子要素も保護
+            if (element.classList.contains('emotion-selector')) return; // emotion-selectorコンテナを保護
+            if (element.classList.contains('emotion-modal-content')) return; // emotion-modal-contentを保護
             
             const emojiButtons = element.querySelectorAll('button[data-emotion], .emotion-btn, [onclick*="emotion"], [data-mood], .mood-option');
+            
+            // 5つのボタンを持つ要素は絶対に削除しない（メインモーダル保護）
+            if (emojiButtons && emojiButtons.length === 5) {
+                console.log('🛡️ PROTECTED 5-button element from deletion:', element);
+                return;
+            }
+            
             if (emojiButtons && emojiButtons.length === 3) {
                 console.log('🚫 DESTROYED 3-button modal:', element);
+                console.log('🔍 Buttons in destroyed element:', Array.from(emojiButtons).map(btn => ({
+                    dataEmotion: btn.getAttribute('data-emotion'),
+                    textContent: btn.textContent,
+                    onclick: btn.getAttribute('onclick')
+                })));
                 element.remove();
             }
         });
@@ -1352,7 +1373,15 @@ function closeEmotionModal() {
     selectedEmotion = null;
 }
 
+// 🔒 感情選択処理中フラグ（クリーンアップシステム制御用）
+let isEmotionSelectionInProgress = false;
+window.isEmotionSelectionInProgress = false;
+
 function selectEmotionButton(emotion) {
+    // 🔒 CRITICAL: 感情選択処理中はクリーンアップシステムを停止
+    isEmotionSelectionInProgress = true;
+    window.isEmotionSelectionInProgress = true;
+    
     selectedEmotion = emotion;
     
     console.log('selectEmotionButton called with:', emotion);
@@ -1368,9 +1397,26 @@ function selectEmotionButton(emotion) {
     const modalButtons = emotionModal.querySelectorAll('.emotion-btn');
     console.log(`Found ${modalButtons.length} emotion buttons in modal`);
     
+    // DEBUGGING: Log all current buttons and their properties
+    modalButtons.forEach((btn, index) => {
+        console.log(`BEFORE - Button ${index}:`, {
+            dataEmotion: btn.getAttribute('data-emotion'),
+            textContent: btn.textContent,
+            classList: Array.from(btn.classList),
+            onclick: btn.getAttribute('onclick'),
+            parentElement: btn.parentElement?.tagName
+        });
+    });
+    
     if (modalButtons.length !== 5) {
         console.error(`CRITICAL: Expected 5 emotion buttons, found ${modalButtons.length}. Possible modal conflict!`);
-        return;
+        console.error('Available buttons:', Array.from(modalButtons).map(btn => ({
+            dataEmotion: btn.getAttribute('data-emotion'),
+            textContent: btn.textContent
+        })));
+        
+        // Don't return early - continue with whatever buttons we have for debugging
+        console.warn('Continuing with available buttons for debugging...');
     }
     
     modalButtons.forEach((btn, index) => {
@@ -1407,6 +1453,13 @@ function selectEmotionButton(emotion) {
     if (saveBtn) {
         saveBtn.disabled = false;
     }
+    
+    // 🔓 CRITICAL: 感情選択処理完了、クリーンアップシステム再開許可
+    setTimeout(() => {
+        isEmotionSelectionInProgress = false;
+        window.isEmotionSelectionInProgress = false;
+        console.log('🔓 Emotion selection completed, cleanup system re-enabled');
+    }, 500); // 500ms後に安全に再開
 }
 
 function saveEmotion() {
