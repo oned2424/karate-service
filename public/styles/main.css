@@ -867,8 +867,7 @@ body {
 [data-journal],
 [data-emotion-count="3"],
 [id*="journal"],
-[class*="journal"],
-[class*="mood"] {
+[class*="journal"] {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
