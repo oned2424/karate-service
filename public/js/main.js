@@ -1301,11 +1301,14 @@ function showEmotionModal() {
     if (commentTextarea) commentTextarea.value = '';
     if (saveBtn) saveBtn.disabled = true;
     
-    // Reset emotion button states - remove only selected-* classes
+    // Reset emotion button states - remove only selected-* classes but preserve emotion-btn
     document.querySelectorAll('.emotion-btn').forEach(btn => {
-        btn.className = 'emotion-btn'; // Keep base class
-        // Remove any selected-* classes
+        // Remove all selected-* classes
         btn.classList.remove('selected-mood-1', 'selected-mood-2', 'selected-mood-3', 'selected-mood-4', 'selected-mood-5');
+        // Make sure emotion-btn class is always present
+        if (!btn.classList.contains('emotion-btn')) {
+            btn.classList.add('emotion-btn');
+        }
     });
     
     // Load existing data if available
@@ -1342,11 +1345,14 @@ function closeEmotionModal() {
 function selectEmotionButton(emotion) {
     selectedEmotion = emotion;
     
-    // Reset all buttons - remove only selected-* classes
+    // Reset all buttons - remove only selected-* classes but preserve emotion-btn
     document.querySelectorAll('.emotion-btn').forEach(btn => {
-        btn.className = 'emotion-btn'; // Keep base class
-        // Remove any selected-* classes
+        // Remove all selected-* classes
         btn.classList.remove('selected-mood-1', 'selected-mood-2', 'selected-mood-3', 'selected-mood-4', 'selected-mood-5');
+        // Make sure emotion-btn class is always present
+        if (!btn.classList.contains('emotion-btn')) {
+            btn.classList.add('emotion-btn');
+        }
     });
     
     // Highlight selected button
