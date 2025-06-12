@@ -1169,7 +1169,15 @@ let selectedDay = null;
 let selectedEmotion = null;
 let isSelectingForToday = false;
 let emotionData = {
-    // Empty by default - data will be added when users practice
+    // Sample data for testing - in production this would be loaded from server
+    '2024-12-2': { emotion: 'mood-3', comment: '' },
+    '2024-12-3': { emotion: 'mood-2', comment: '' }, 
+    '2024-12-5': { emotion: 'mood-4', comment: '' },
+    '2024-12-6': { emotion: 'mood-1', comment: '' },
+    '2024-12-9': { emotion: 'mood-3', comment: '' },
+    '2024-12-10': { emotion: 'mood-2', comment: '' },
+    '2024-12-12': { emotion: 'mood-4', comment: '' },
+    '2024-12-13': { emotion: 'mood-1', comment: '' }
 };
 
 const monthNames = [
@@ -1232,6 +1240,7 @@ function createDayElement(day, isOtherMonth) {
             const indicator = document.createElement('div');
             indicator.className = `emotion-indicator ${emotionEntry.emotion}`;
             dayElement.appendChild(indicator);
+            console.log(`Added emotion indicator for ${dateKey}: ${emotionEntry.emotion}`);
         }
         
         // Add click handler for current month days
