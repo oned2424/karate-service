@@ -1558,8 +1558,9 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
 }
 
 .emotion-btn.selected-mood-5 {
-    background: rgba(36, 36, 36, 0.2);
-    border-color: #242424;
+    background: rgba(100, 100, 100, 0.3);
+    border-color: #666666;
+    color: #000000;
 }
 
 .emotion-textarea {
