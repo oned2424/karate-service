@@ -1306,23 +1306,11 @@ function showEmotionModal() {
     if (commentTextarea) commentTextarea.value = '';
     if (saveBtn) saveBtn.disabled = true;
     
-    // CRITICAL: Only work with buttons inside the main emotion modal
+    // Reset emotion button states within the modal only
     const modalButtons = modal.querySelectorAll('.emotion-btn');
-    console.log(`Found ${modalButtons.length} buttons in emotion modal`);
-    
-    // Log all button states before reset
-    modalButtons.forEach((btn, index) => {
-        console.log(`Modal Button ${index}: data-emotion="${btn.getAttribute('data-emotion')}", textContent="${btn.textContent}", onclick="${btn.getAttribute('onclick')}"`);
-    });
-    
-    // Reset emotion button states - remove only selected-* classes but preserve emotion-btn
     modalButtons.forEach(btn => {
         // Remove all selected-* classes
         btn.classList.remove('selected-mood-1', 'selected-mood-2', 'selected-mood-3', 'selected-mood-4', 'selected-mood-5');
-        // Make sure emotion-btn class is always present
-        if (!btn.classList.contains('emotion-btn')) {
-            btn.classList.add('emotion-btn');
-        }
     });
     
     // Load existing data if available
@@ -1333,7 +1321,6 @@ function showEmotionModal() {
         if (commentTextarea) commentTextarea.value = existingData.comment || '';
         const emotionBtn = modal.querySelector(`[data-emotion="${existingData.emotion}"]`);
         if (emotionBtn) {
-            console.log(`Loading existing emotion: ${existingData.emotion}`);
             emotionBtn.classList.add(`selected-${existingData.emotion}`);
         }
         if (saveBtn) saveBtn.disabled = false;
@@ -1362,44 +1349,51 @@ function closeEmotionModal() {
 function selectEmotionButton(emotion) {
     selectedEmotion = emotion;
     
-    console.log(`selectEmotionButton called with: ${emotion}`);
+    console.log('selectEmotionButton called with:', emotion);
     
-    // CRITICAL: Only work with buttons inside the main emotion modal
+    // Only work with buttons inside the main emotion modal to prevent conflicts
     const emotionModal = document.getElementById('emotionModal');
     if (!emotionModal) {
-        console.error('Emotion modal not found!');
+        console.error('Main emotion modal not found');
         return;
     }
     
-    // Reset all buttons - remove only selected-* classes but preserve emotion-btn
+    // Ensure modal has exactly 5 emotion buttons to prevent conflicts
     const modalButtons = emotionModal.querySelectorAll('.emotion-btn');
     console.log(`Found ${modalButtons.length} emotion buttons in modal`);
+    
+    if (modalButtons.length !== 5) {
+        console.error(`CRITICAL: Expected 5 emotion buttons, found ${modalButtons.length}. Possible modal conflict!`);
+        return;
+    }
     
     modalButtons.forEach((btn, index) => {
         // Log button state before modification
         console.log(`Button ${index}: data-emotion="${btn.getAttribute('data-emotion')}", textContent="${btn.textContent}"`);
         
-        // Remove all selected-* classes
+        // Remove all selected-* classes but preserve emotion-btn class
         btn.classList.remove('selected-mood-1', 'selected-mood-2', 'selected-mood-3', 'selected-mood-4', 'selected-mood-5');
+        
         // Make sure emotion-btn class is always present
         if (!btn.classList.contains('emotion-btn')) {
             btn.classList.add('emotion-btn');
         }
         
-        // Verify button integrity - ensure data-emotion attribute hasn't changed
+        // Verify button integrity
         const expectedDataEmotion = btn.getAttribute('data-emotion');
         if (!expectedDataEmotion) {
             console.error(`Button ${index} missing data-emotion attribute!`);
         }
     });
     
-    // Highlight selected button - only within the main modal
+    // Highlight selected button within the modal only
     const selectedBtn = emotionModal.querySelector(`[data-emotion="${emotion}"]`);
     if (selectedBtn) {
         console.log(`Selecting button with data-emotion="${emotion}", textContent="${selectedBtn.textContent}"`);
         selectedBtn.classList.add(`selected-${emotion}`);
+        console.log('Selected button found and highlighted:', emotion);
     } else {
-        console.error(`Could not find button with data-emotion="${emotion}" in main modal!`);
+        console.error('Selected button not found in modal:', emotion);
     }
     
     // Enable save button
