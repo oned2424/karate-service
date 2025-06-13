@@ -1203,6 +1203,7 @@ let selectedEmotion = null;
 let isSelectingForToday = false;
 let emotionData = {
     // Sample data for testing - in production this would be loaded from server
+    // Legacy 2024 data
     '2024-12-2': { emotion: 'mood-3', comment: '' },
     '2024-12-3': { emotion: 'mood-2', comment: '' }, 
     '2024-12-5': { emotion: 'mood-4', comment: '' },
@@ -1210,7 +1211,16 @@ let emotionData = {
     '2024-12-9': { emotion: 'mood-3', comment: '' },
     '2024-12-10': { emotion: 'mood-2', comment: '' },
     '2024-12-12': { emotion: 'mood-4', comment: '' },
-    '2024-12-13': { emotion: 'mood-1', comment: '' }
+    '2024-12-13': { emotion: 'mood-1', comment: '' },
+    
+    // Current 2025 June data for testing
+    '2025-6-1': { emotion: 'mood-1', comment: '' },
+    '2025-6-3': { emotion: 'mood-2', comment: '' },
+    '2025-6-5': { emotion: 'mood-3', comment: '' },
+    '2025-6-7': { emotion: 'mood-4', comment: '' },
+    '2025-6-9': { emotion: 'mood-5', comment: '' },
+    '2025-6-11': { emotion: 'mood-1', comment: '' },
+    '2025-6-13': { emotion: 'mood-2', comment: '' }
 };
 
 const monthNames = [
@@ -1264,13 +1274,21 @@ function createDayElement(day, isOtherMonth) {
     if (isOtherMonth) {
         dayElement.classList.add('other-month');
     } else {
-        // Check if this day has an emotion
+        // 🔧 FIX: Enhanced debugging and consistent date key generation
         const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
+        console.log(`🔍 DEBUG createDayElement: Checking for emotion data`);
+        console.log(`  - Generated dateKey: "${dateKey}"`);
+        console.log(`  - Available emotion dates:`, Object.keys(emotionData));
+        
         const emotionEntry = emotionData[dateKey];
+        console.log(`  - Found emotion entry:`, emotionEntry);
         
         if (emotionEntry) {
             dayElement.classList.add('has-emotion', emotionEntry.emotion);
-            console.log(`Added emotion background for ${dateKey}: ${emotionEntry.emotion}`);
+            console.log(`✅ Added emotion background for ${dateKey}: ${emotionEntry.emotion}`);
+            console.log(`  - Element classes:`, Array.from(dayElement.classList));
+        } else {
+            console.log(`❌ No emotion found for ${dateKey}`);
         }
         
         // Add click handler for current month days
