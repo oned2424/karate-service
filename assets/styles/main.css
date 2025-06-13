@@ -1566,10 +1566,10 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
 }
 
 .emotion-btn.selected-mood-1 {
-    background: rgba(247, 224, 3, 0.4);
-    border: 3px solid #f7e003;
+    background: rgba(36, 36, 36, 0.4);
+    border: 3px solid #242424;
     transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(247, 224, 3, 0.4);
+    box-shadow: 0 4px 12px rgba(36, 36, 36, 0.4);
     position: relative;
 }
 
@@ -1578,8 +1578,8 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
     position: absolute;
     top: -5px;
     right: -5px;
-    background: #f7e003;
-    color: #333;
+    background: #242424;
+    color: #fff;
     border-radius: 50%;
     width: 18px;
     height: 18px;
@@ -1591,10 +1591,10 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
 }
 
 .emotion-btn.selected-mood-2 {
-    background: rgba(43, 89, 150, 0.4);
-    border: 3px solid #2b5996;
+    background: rgba(112, 54, 35, 0.4);
+    border: 3px solid #703623;
     transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(43, 89, 150, 0.4);
+    box-shadow: 0 4px 12px rgba(112, 54, 35, 0.4);
     position: relative;
 }
 
@@ -1603,7 +1603,7 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
     position: absolute;
     top: -5px;
     right: -5px;
-    background: #2b5996;
+    background: #703623;
     color: white;
     border-radius: 50%;
     width: 18px;
@@ -1641,10 +1641,10 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
 }
 
 .emotion-btn.selected-mood-4 {
-    background: rgba(112, 54, 35, 0.4);
-    border: 3px solid #703623;
+    background: rgba(43, 89, 150, 0.4);
+    border: 3px solid #2b5996;
     transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(112, 54, 35, 0.4);
+    box-shadow: 0 4px 12px rgba(43, 89, 150, 0.4);
     position: relative;
 }
 
@@ -1653,7 +1653,7 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
     position: absolute;
     top: -5px;
     right: -5px;
-    background: #703623;
+    background: #2b5996;
     color: white;
     border-radius: 50%;
     width: 18px;
@@ -1666,11 +1666,10 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
 }
 
 .emotion-btn.selected-mood-5 {
-    background: rgba(100, 100, 100, 0.5);
-    border: 3px solid #666666;
+    background: rgba(247, 224, 3, 0.4);
+    border: 3px solid #f7e003;
     transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(100, 100, 100, 0.4);
-    color: #000000;
+    box-shadow: 0 4px 12px rgba(247, 224, 3, 0.4);
     position: relative;
 }
 
@@ -1679,8 +1678,8 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
     position: absolute;
     top: -5px;
     right: -5px;
-    background: #666666;
-    color: white;
+    background: #f7e003;
+    color: #333;
     border-radius: 50%;
     width: 18px;
     height: 18px;

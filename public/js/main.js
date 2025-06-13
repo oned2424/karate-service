@@ -1202,25 +1202,7 @@ let selectedDay = null;
 let selectedEmotion = null;
 let isSelectingForToday = false;
 let emotionData = {
-    // Sample data for testing - in production this would be loaded from server
-    // Legacy 2024 data
-    '2024-12-2': { emotion: 'mood-3', comment: '' },
-    '2024-12-3': { emotion: 'mood-2', comment: '' }, 
-    '2024-12-5': { emotion: 'mood-4', comment: '' },
-    '2024-12-6': { emotion: 'mood-1', comment: '' },
-    '2024-12-9': { emotion: 'mood-3', comment: '' },
-    '2024-12-10': { emotion: 'mood-2', comment: '' },
-    '2024-12-12': { emotion: 'mood-4', comment: '' },
-    '2024-12-13': { emotion: 'mood-1', comment: '' },
-    
-    // Current 2025 June data for testing
-    '2025-6-1': { emotion: 'mood-1', comment: '' },
-    '2025-6-3': { emotion: 'mood-2', comment: '' },
-    '2025-6-5': { emotion: 'mood-3', comment: '' },
-    '2025-6-7': { emotion: 'mood-4', comment: '' },
-    '2025-6-9': { emotion: 'mood-5', comment: '' },
-    '2025-6-11': { emotion: 'mood-1', comment: '' },
-    '2025-6-13': { emotion: 'mood-2', comment: '' }
+    // Empty by default - data will be loaded from server or user input
 };
 
 const monthNames = [
@@ -1277,7 +1259,7 @@ function createDayElement(day, isOtherMonth) {
         // emotionDataに該当データがある日だけ色を付与
         const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
         const emotionEntry = emotionData[dateKey];
-        if (emotionEntry) {
+        if (emotionEntry && emotionEntry.emotion) {
             dayElement.classList.add('has-emotion', emotionEntry.emotion);
         }
         // クリックハンドラはそのまま
@@ -1762,7 +1744,7 @@ function createMiniDayElement(day, isOtherMonth) {
         const dateKey = `${miniCurrentYear}-${miniCurrentMonth + 1}-${day}`;
         const emotionEntry = emotionData[dateKey];
         
-        if (emotionEntry) {
+        if (emotionEntry && emotionEntry.emotion) {
             dayElement.classList.add('has-emotion', emotionEntry.emotion);
         }
         
