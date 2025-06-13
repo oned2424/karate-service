@@ -1202,7 +1202,7 @@ let selectedDay = null;
 let selectedEmotion = null;
 let isSelectingForToday = false;
 let emotionData = {
-    // Empty by default - data will be loaded from server or user input
+    // Empty by default - only user-registered entries will have colors
 };
 
 const monthNames = [
