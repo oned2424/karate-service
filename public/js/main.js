@@ -1269,11 +1269,8 @@ function createDayElement(day, isOtherMonth) {
         const emotionEntry = emotionData[dateKey];
         
         if (emotionEntry) {
-            dayElement.classList.add('has-emotion');
-            const indicator = document.createElement('div');
-            indicator.className = `emotion-indicator ${emotionEntry.emotion}`;
-            dayElement.appendChild(indicator);
-            console.log(`Added emotion indicator for ${dateKey}: ${emotionEntry.emotion}`);
+            dayElement.classList.add('has-emotion', emotionEntry.emotion);
+            console.log(`Added emotion background for ${dateKey}: ${emotionEntry.emotion}`);
         }
         
         // Add click handler for current month days
@@ -1760,10 +1757,7 @@ function createMiniDayElement(day, isOtherMonth) {
         const emotionEntry = emotionData[dateKey];
         
         if (emotionEntry) {
-            dayElement.classList.add('has-emotion');
-            const indicator = document.createElement('div');
-            indicator.className = `mini-emotion-indicator ${emotionEntry.emotion}`;
-            dayElement.appendChild(indicator);
+            dayElement.classList.add('has-emotion', emotionEntry.emotion);
         }
         
         // Add click handler to scroll to full calendar
