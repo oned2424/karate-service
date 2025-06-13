@@ -695,20 +695,43 @@
             margin: 0;
         }
 
-        .calendar-day .emotion-indicator {
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
+        /* emotion-indicator styles removed - now using full calendar-day background colors */
+        
+        /* Calendar day with emotion - full background color */
+        .calendar-day.has-emotion.mood-1 {
+            background: #f7e003 !important;
+            color: #333 !important;
+            font-weight: 600 !important;
+            border-radius: 50% !important;
         }
-
-        .emotion-indicator.mood-1 { background: #f7e003; }
-        .emotion-indicator.mood-2 { background: #2b5996; }
-        .emotion-indicator.mood-3 { background: #286d53; }
-        .emotion-indicator.mood-4 { background: #703623; }
-        .emotion-indicator.mood-5 { background: #242424; }
+        
+        .calendar-day.has-emotion.mood-2 {
+            background: #2b5996 !important;
+            color: white !important;
+            font-weight: 600 !important;
+            border-radius: 50% !important;
+        }
+        
+        .calendar-day.has-emotion.mood-3 {
+            background: #286d53 !important;
+            color: white !important;
+            font-weight: 600 !important;
+            border-radius: 50% !important;
+        }
+        
+        .calendar-day.has-emotion.mood-4 {
+            background: #703623 !important;
+            color: white !important;
+            font-weight: 600 !important;
+            border-radius: 50% !important;
+        }
+        
+        .calendar-day.has-emotion.mood-5 {
+            background: #242424 !important;
+            color: white !important;
+            font-weight: 600 !important;
+            border-radius: 50% !important;
+        }
 
         .emotion-legend {
             background: white;
@@ -1955,11 +1978,8 @@
                 const emotionEntry = emotionData[dateKey];
                 
                 if (emotionEntry) {
-                    dayElement.classList.add('has-emotion');
-                    const indicator = document.createElement('div');
-                    indicator.className = `emotion-indicator ${emotionEntry.emotion}`;
-                    dayElement.appendChild(indicator);
-                    console.log(`Added emotion indicator for ${dateKey}: ${emotionEntry.emotion}`);
+                    dayElement.classList.add('has-emotion', emotionEntry.emotion);
+                    console.log(`Added emotion background for ${dateKey}: ${emotionEntry.emotion}`);
                 }
                 
                 // Add click handler for current month days

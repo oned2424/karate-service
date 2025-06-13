@@ -1274,24 +1274,13 @@ function createDayElement(day, isOtherMonth) {
     if (isOtherMonth) {
         dayElement.classList.add('other-month');
     } else {
-        // 🔧 FIX: Enhanced debugging and consistent date key generation
+        // emotionDataに該当データがある日だけ色を付与
         const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
-        console.log(`🔍 DEBUG createDayElement: Checking for emotion data`);
-        console.log(`  - Generated dateKey: "${dateKey}"`);
-        console.log(`  - Available emotion dates:`, Object.keys(emotionData));
-        
         const emotionEntry = emotionData[dateKey];
-        console.log(`  - Found emotion entry:`, emotionEntry);
-        
         if (emotionEntry) {
             dayElement.classList.add('has-emotion', emotionEntry.emotion);
-            console.log(`✅ Added emotion background for ${dateKey}: ${emotionEntry.emotion}`);
-            console.log(`  - Element classes:`, Array.from(dayElement.classList));
-        } else {
-            console.log(`❌ No emotion found for ${dateKey}`);
         }
-        
-        // Add click handler for current month days
+        // クリックハンドラはそのまま
         dayElement.addEventListener('click', () => {
             if (!isOtherMonth) {
                 selectedDay = day;
@@ -1299,7 +1288,6 @@ function createDayElement(day, isOtherMonth) {
             }
         });
     }
-    
     return dayElement;
 }
 

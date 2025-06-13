@@ -1267,24 +1267,41 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
     color: #E0E0E0;
 }
 
-.mini-calendar-day.has-emotion {
-    position: relative;
+/* Mini calendar day with emotion - full background color */
+.mini-calendar-day.has-emotion.mood-1 {
+    background: #242424 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    border-radius: 50% !important;
 }
 
-.mini-calendar-day .mini-emotion-indicator {
-    position: absolute;
-    bottom: 1px;
-    right: 1px;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
+.mini-calendar-day.has-emotion.mood-2 {
+    background: #703623 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    border-radius: 50% !important;
 }
 
-.mini-emotion-indicator.mood-1 { background: #f7e003; }
-.mini-emotion-indicator.mood-2 { background: #2b5996; }
-.mini-emotion-indicator.mood-3 { background: #286d53; }
-.mini-emotion-indicator.mood-4 { background: #703623; }
-.mini-emotion-indicator.mood-5 { background: #242424; }
+.mini-calendar-day.has-emotion.mood-3 {
+    background: #286d53 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    border-radius: 50% !important;
+}
+
+.mini-calendar-day.has-emotion.mood-4 {
+    background: #2b5996 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    border-radius: 50% !important;
+}
+
+.mini-calendar-day.has-emotion.mood-5 {
+    background: #f7e003 !important;
+    color: #333 !important;
+    font-weight: 600 !important;
+    border-radius: 50% !important;
+}
 
 /* Calendar Styles */
 .calendar-section {
@@ -1411,29 +1428,41 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
     color: #E0E0E0;
 }
 
-.calendar-day.has-emotion {
-    position: relative;
-    color: #333333;
-    background: none;
-    width: auto;
-    height: auto;
-    margin: 0;
+/* Calendar day with emotion - full background color */
+.calendar-day.has-emotion.mood-1 {
+    background: #242424 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    border-radius: 50% !important;
 }
 
-.calendar-day .emotion-indicator {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+.calendar-day.has-emotion.mood-2 {
+    background: #703623 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    border-radius: 50% !important;
 }
 
-.emotion-indicator.mood-1 { background: #f7e003; }
-.emotion-indicator.mood-2 { background: #2b5996; }
-.emotion-indicator.mood-3 { background: #286d53; }
-.emotion-indicator.mood-4 { background: #703623; }
-.emotion-indicator.mood-5 { background: #242424; }
+.calendar-day.has-emotion.mood-3 {
+    background: #286d53 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    border-radius: 50% !important;
+}
+
+.calendar-day.has-emotion.mood-4 {
+    background: #2b5996 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    border-radius: 50% !important;
+}
+
+.calendar-day.has-emotion.mood-5 {
+    background: #f7e003 !important;
+    color: #333 !important;
+    font-weight: 600 !important;
+    border-radius: 50% !important;
+}
 
 .emotion-legend {
     background: white;

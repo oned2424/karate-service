@@ -1567,19 +1567,34 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* 統一された選択状態スタイル - 薄いグレー背景 */
+/* 🔧 FIX: 統一された選択状態スタイル - CSS競合を解決 */
 .emotion-btn.selected-mood-1,
 .emotion-btn.selected-mood-2,
 .emotion-btn.selected-mood-3,
 .emotion-btn.selected-mood-4,
 .emotion-btn.selected-mood-5 {
-    background: rgba(128, 128, 128, 0.2) !important;
-    border: 2px solid #999 !important;
-    transform: scale(1.05) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    background: rgba(30, 58, 138, 0.15) !important;
+    border: 2px solid var(--primary-color) !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3) !important;
     display: flex !important;
     visibility: visible !important;
     opacity: 1 !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* 🔧 FIX: selected-mood-*クラスが確実に表示されるよう強制 */
+.emotion-btn[class*="selected-mood-"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* 🔧 FIX: [class*="mood"]セレクターを修正して競合を回避 */
+[class*="mood"]:not([class*="selected-mood-"]) {
+    /* 既存のmoodスタイルはselected-mood-*以外にのみ適用 */
 }
 
 
