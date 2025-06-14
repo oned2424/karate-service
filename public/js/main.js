@@ -32,6 +32,9 @@ class KarateVideoService {
         
         // 習慣化パッケージ初期化（認証状態確認後）
         await this.initHabitDashboard();
+        
+        // 🔧 FIX: カレンダー初期化の確実な実行
+        await this.ensureCalendarInitialization();
     }
 
     // サンプル動画データを読み込み（開発中のサンプル動画）
@@ -924,33 +927,27 @@ document.addEventListener('DOMContentLoaded', function() {
         generateMiniCalendar(miniCurrentMonth, miniCurrentYear);
     }
     
-    // フルカレンダーの初期化はinitHabitDashboard()で実行される
-    
-    // Initialize Today's Practice display
-    updateTodayDisplay();
+    // 🔧 FIX: カレンダー初期化はensureCalendarInitializationで適切に処理される
 });
 
 // ==== 習慣化パッケージ機能 ====
 
 // 習慣化ダッシュボード初期化
 KarateVideoService.prototype.initHabitDashboard = async function() {
-    this.loadStreakData();
+    console.log('🔧 Initializing habit dashboard...');
+    
+    await this.loadStreakData();
     this.loadMonthlyPhrase();
     this.setupTodayPracticeButton();
     this.renderMiniCalendar();
     this.setupJournalModal();
     
-    // フルカレンダー用のemotionDataを読み込み
-    await this.loadFullCalendarData();
+    console.log('✅ Basic habit dashboard initialized');
 };
 
 // ストリークデータの読み込み
 KarateVideoService.prototype.loadStreakData = async function() {
-    // 認証状態が確定していない場合は待機
-    if (this.isLoggedIn === undefined) {
-        console.log('Auth status not yet determined, skipping streak data load');
-        return;
-    }
+    console.log('🔧 Loading streak data...');
     
     try {
         const response = await fetch('/api/practice/streak');
@@ -994,11 +991,7 @@ KarateVideoService.prototype.updateStreakDisplay = function() {
 
 // 今日の練習状況チェック
 KarateVideoService.prototype.checkTodayStatus = async function() {
-    // 認証状態が確定していない場合は待機
-    if (this.isLoggedIn === undefined) {
-        console.log('Auth status not yet determined, skipping today status check');
-        return;
-    }
+    console.log('🔧 Checking today status...');
     
     try {
         // 🔧 FIX: Use consistent local date format to match backend
@@ -1127,6 +1120,29 @@ KarateVideoService.prototype.renderMiniCalendar = async function() {
     }
 };
 
+// 🔧 FIX: カレンダー初期化の確実な実行
+KarateVideoService.prototype.ensureCalendarInitialization = async function() {
+    console.log('🔧 Ensuring calendar initialization...');
+    
+    // データロード
+    await this.loadFullCalendarData();
+    
+    // カレンダー表示の初期化
+    if (document.getElementById('calendarDays')) {
+        generateCalendar(currentMonth, currentYear);
+    }
+    
+    // 今日の状態確認と表示更新
+    await this.checkTodayStatus();
+    updateTodayDisplay();
+    
+    // 統計情報の更新
+    updateCalendarStats();
+    updateDashboardStats();
+    
+    console.log('✅ Calendar initialization completed');
+};
+
 // フルカレンダー用のemotionDataを読み込み
 KarateVideoService.prototype.loadFullCalendarData = async function() {
     // 🔧 FIX: 重複呼び出し防止
@@ -1135,11 +1151,8 @@ KarateVideoService.prototype.loadFullCalendarData = async function() {
         return;
     }
     
-    // 認証状態が確定していない場合は待機
-    if (this.isLoggedIn === undefined) {
-        console.log('Auth status not yet determined, skipping full calendar data load');
-        return;
-    }
+    // 🔧 FIX: 認証状態に関係なくデータロードを試行
+    console.log('🔧 Loading full calendar data regardless of auth status...');
     
     this._loadingCalendarData = true;
     
@@ -1945,15 +1958,18 @@ function updateCalendarStats() {
     const fullCompletionRateEl = document.getElementById('fullCompletionRate');
     const fullTotalDaysEl = document.getElementById('fullTotalDays');
     
-    // CRITICAL: 強化されたログイン状態チェック - ゲストユーザーは必ずLONGEST STREAK = 0
-    const isLoggedIn = window.karateService && 
-                      window.karateService.isLoggedIn === true && 
-                      window.karateService.currentUser !== null;
+    // 🔧 FIX: カレンダー統計はemotionDataに基づいて表示（ログイン状態に関係なく）
+    console.log('🔧 Updating calendar stats:', {
+        currentStreak,
+        longestStreak,
+        completionRate,
+        totalCompletions
+    });
     
-    if (fullCurrentStreakEl) fullCurrentStreakEl.textContent = isLoggedIn ? currentStreak : 0;
-    if (fullLongestStreakEl) fullLongestStreakEl.textContent = isLoggedIn ? longestStreak : 0;
-    if (fullCompletionRateEl) fullCompletionRateEl.textContent = isLoggedIn ? `${completionRate}%` : '0%';
-    if (fullTotalDaysEl) fullTotalDaysEl.textContent = isLoggedIn ? totalCompletions : 0;
+    if (fullCurrentStreakEl) fullCurrentStreakEl.textContent = currentStreak;
+    if (fullLongestStreakEl) fullLongestStreakEl.textContent = longestStreak;
+    if (fullCompletionRateEl) fullCompletionRateEl.textContent = `${completionRate}%`;
+    if (fullTotalDaysEl) fullTotalDaysEl.textContent = totalCompletions;
 }
 
 // Mini Calendar functionality
@@ -2106,6 +2122,13 @@ function updateTodayDisplay() {
     const today = new Date();
     const todayKey = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
     const todayData = emotionData[todayKey];
+    
+    console.log('🔍 updateTodayDisplay:', {
+        todayKey,
+        todayData,
+        emotionDataKeys: Object.keys(emotionData),
+        emotionDataSample: emotionData
+    });
     
     const todayBtn = document.getElementById('todayPracticeBtn');
     const todayStatus = document.getElementById('todayStatus');
