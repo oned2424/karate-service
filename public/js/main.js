@@ -1056,6 +1056,8 @@ function showFullCalendar() {
 KarateVideoService.prototype.initUserAuth = async function() {
     await this.checkAuthStatus();
     this.updateDashboardForUser();
+    // Ensure hero section visibility is properly set
+    this.updateAuthUI();
 };
 
 // 認証状態チェック
@@ -1082,14 +1084,25 @@ KarateVideoService.prototype.updateAuthUI = function() {
     const guestState = document.getElementById('guestState');
     const loggedInState = document.getElementById('loggedInState');
     const userName = document.getElementById('userName');
+    const heroSection = document.getElementById('home');
     
     if (this.isLoggedIn && this.currentUser) {
         guestState.style.display = 'none';
         loggedInState.style.display = 'block';
         userName.textContent = this.currentUser.displayName || this.currentUser.username;
+        
+        // Hide hero section when logged in
+        if (heroSection) {
+            heroSection.style.display = 'none';
+        }
     } else {
         guestState.style.display = 'block';
         loggedInState.style.display = 'none';
+        
+        // Show hero section when not logged in
+        if (heroSection) {
+            heroSection.style.display = 'flex';
+        }
     }
 };
 
@@ -2168,9 +2181,9 @@ function updatePageLanguage() {
     // Update dashboard
     updateElementText('.dashboard-header h2', t['dashboard-title']);
     updateElementText('.dashboard-header p', t['dashboard-subtitle']);
-    updateElementText('.today-practice h3', `<i class="fas fa-calendar-check"></i> ${t['today-practice']}`);
-    updateElementText('.streak-card h3', `<i class="fas fa-fire"></i> ${t['streak']}`);
-    updateElementText('.phrase-card h3', `<i class="fas fa-quote-left"></i> ${t['monthly-wisdom']}`);
+    updateElementHTML('.today-practice h3', `<i class="fas fa-calendar-check"></i> ${t['today-practice']}`);
+    updateElementHTML('.streak-card h3', `<i class="fas fa-fire"></i> ${t['streak']}`);
+    updateElementHTML('.phrase-card h3', `<i class="fas fa-quote-left"></i> ${t['monthly-wisdom']}`);
     
     // Update calendar section
     updateElementText('#calendar .section-header h2', t['calendar-title']);
@@ -2191,10 +2204,10 @@ function updatePageLanguage() {
     
     // Update editor section
     updateElementText('#editor h2', t['editor-title']);
-    updateElementText('#mirrorBtn', `<i class="fas fa-arrows-alt-h"></i> ${t['mirror']}`);
-    updateElementText('#slowBtn', `<i class="fas fa-turtle"></i> ${t['slow']}`);
-    updateElementText('#normalBtn', `<i class="fas fa-play"></i> ${t['normal']}`);
-    updateElementText('#subtitleBtn', `<i class="fas fa-closed-captioning"></i> ${t['subtitle-toggle']}`);
+    updateElementHTML('#mirrorBtn', `<i class="fas fa-arrows-alt-h"></i> ${t['mirror']}`);
+    updateElementHTML('#slowBtn', `<i class="fas fa-turtle"></i> ${t['slow']}`);
+    updateElementHTML('#normalBtn', `<i class="fas fa-play"></i> ${t['normal']}`);
+    updateElementHTML('#subtitleBtn', `<i class="fas fa-closed-captioning"></i> ${t['subtitle-toggle']}`);
     
     // Update about section
     updateElementText('#about .section-header h2', t['about-title']);
