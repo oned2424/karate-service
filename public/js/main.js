@@ -156,6 +156,8 @@ class KarateVideoService {
             
             // YouTube iframe用のコンテナを作成
             const videoPlayerContainer = playerVideo.parentElement;
+            // Apply mirror transform if mirroring is currently active
+            const mirrorTransform = this.isMirrored ? 'transform: scaleX(-1);' : '';
             videoPlayerContainer.innerHTML = `
                 <iframe 
                     id="youtubePlayer"
@@ -166,7 +168,7 @@ class KarateVideoService {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                     allowfullscreen
                     referrerpolicy="strict-origin-when-cross-origin"
-                    style="border-radius: 12px; box-shadow: 0 4px 6px var(--shadow);">
+                    style="border-radius: 12px; box-shadow: 0 4px 6px var(--shadow); ${mirrorTransform}">
                 </iframe>
                 <div class="sample-video-notice" style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1rem; margin-top: 1rem; text-align: center;">
                     <p style="color: #856404; margin: 0; font-size: 0.9rem;">
@@ -204,8 +206,25 @@ class KarateVideoService {
         // 鏡映し機能
         mirrorBtn?.addEventListener('click', () => {
             this.isMirrored = !this.isMirrored;
-            playerVideo.style.transform = this.isMirrored ? 'scaleX(-1)' : 'scaleX(1)';
+            
+            // Check if we have a YouTube iframe or regular video
+            const youtubePlayer = document.getElementById('youtubePlayer');
+            if (youtubePlayer) {
+                // Apply transform to YouTube iframe
+                youtubePlayer.style.transform = this.isMirrored ? 'scaleX(-1)' : 'scaleX(1)';
+            } else {
+                // Apply transform to regular video
+                playerVideo.style.transform = this.isMirrored ? 'scaleX(-1)' : 'scaleX(1)';
+            }
+            
             mirrorBtn.classList.toggle('active', this.isMirrored);
+            
+            // 🔧 ADD: Sync with editor panel mirror toggle
+            const mirrorToggle = document.getElementById('mirrorToggle');
+            if (mirrorToggle) {
+                mirrorToggle.checked = this.isMirrored;
+            }
+            
             this.showNotification(
                 this.isMirrored ? 'Mirror display enabled' : 'Mirror display disabled'
             );
@@ -250,6 +269,16 @@ class KarateVideoService {
         // ダウンロードボタン（実際の実装では動画編集とダウンロード機能が必要）
         document.getElementById('downloadBtn')?.addEventListener('click', () => {
             this.downloadEditedVideo();
+        });
+
+        // 🔧 ADD: Mirror toggle in editor panel
+        const mirrorToggle = document.getElementById('mirrorToggle');
+        mirrorToggle?.addEventListener('change', (e) => {
+            const shouldMirror = e.target.checked;
+            if (shouldMirror !== this.isMirrored) {
+                // Trigger the existing mirror button functionality
+                document.getElementById('mirrorBtn')?.click();
+            }
         });
     }
 
