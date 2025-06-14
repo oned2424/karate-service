@@ -835,10 +835,25 @@ app.get('/api/practice/calendar', optionalUser, (req, res) => {
     let filteredRecords = allRecords;
     
     if (year && month) {
-        const filterDate = `${year}-${month.padStart(2, '0')}`;
+        // 🔧 FIX: 両方の日付形式（ゼロパディングありとなし）をサポート
+        const filterDatePadded = `${year}-${month.padStart(2, '0')}`;
+        const filterDateNoPad = `${year}-${month}`;
+        
+        console.log('🔍 Filtering calendar data:', {
+            year,
+            month,
+            filterDatePadded,
+            filterDateNoPad,
+            allRecordsCount: allRecords.length,
+            allRecords: allRecords.map(r => ({ date: r.date, emotion: r.emotion }))
+        });
+        
         filteredRecords = allRecords.filter(record => 
-            record.date.startsWith(filterDate)
+            record.date.startsWith(filterDatePadded) || 
+            record.date.startsWith(filterDateNoPad)
         );
+        
+        console.log('🔍 Filtered records:', filteredRecords.length, filteredRecords);
     }
     
     res.json({
@@ -853,6 +868,29 @@ app.get('/api/practice/calendar', optionalUser, (req, res) => {
 });
 
 // 🚫 Journal API removed to eliminate 3-emoji modal issue
+
+// 🔧 DEBUG: データベース状況確認用API
+app.get('/api/debug/data', optionalUser, (req, res) => {
+    const userId = req.userId;
+    
+    const debugInfo = {
+        userId: userId,
+        isLoggedIn: !!userId,
+        userPracticeRecordsKeys: Object.keys(userPracticeRecords),
+        practiceRecordsCount: practiceRecords.length,
+        userRecordsCount: userId ? (userPracticeRecords[userId] || []).length : 0,
+        practiceRecords: practiceRecords,
+        userRecords: userId ? userPracticeRecords[userId] : null,
+        allUserRecords: userPracticeRecords
+    };
+    
+    console.log('🔍 Debug data info:', debugInfo);
+    
+    res.json({
+        success: true,
+        debug: debugInfo
+    });
+});
 
 // API: 月替わりフレーズ取得
 app.get('/api/phrase/current', (req, res) => {
