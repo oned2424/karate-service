@@ -1919,17 +1919,146 @@ function updateTodayDisplay() {
         if (todayStatus) todayStatus.style.display = 'none';
         if (todayEmotionDisplay) todayEmotionDisplay.style.display = 'flex';
         
-        // Update emotion display
-        const emotionEmojis = {
-            'mood-1': '😄',
-            'mood-2': '😊', 
-            'mood-3': '😐',
-            'mood-4': '😕',
-            'mood-5': '😟'
+        // Update emotion display with rich messages
+        const emotionData = {
+            'mood-1': {
+                emoji: '😄',
+                en: {
+                    title: 'Feeling great!',
+                    subtitles: [
+                        'A day of great progress',
+                        'The Path to Black Belt Opens',
+                        'The Summit is in Sight',
+                        'An Awakening Strike',
+                        'A Leap Forward',
+                        'Kata, Perfected'
+                    ]
+                },
+                ja: {
+                    title: '最高の気分！',
+                    subtitles: [
+                        '大きな進歩を感じた日',
+                        '黒帯への道、開ける',
+                        '頂が見えた',
+                        '覚醒の一撃',
+                        '飛躍的な進歩',
+                        '型、極まる'
+                    ]
+                }
+            },
+            'mood-2': {
+                emoji: '😊',
+                en: {
+                    title: 'Good vibes!',
+                    subtitles: [
+                        'A day of solid growth',
+                        'One Step Forward',
+                        'A Solid Feeling',
+                        'Sweat Never Lies',
+                        'The Next Belt in Sight',
+                        'The Way Forward is Clear'
+                    ]
+                },
+                ja: {
+                    title: '良い感じ！',
+                    subtitles: [
+                        '確かな成長を感じた日',
+                        '一歩前進',
+                        '確かな手応え',
+                        '汗は嘘をつかない',
+                        '次の帯が見える',
+                        '道が拓ける'
+                    ]
+                }
+            },
+            'mood-3': {
+                emoji: '😐',
+                en: {
+                    title: 'As usual.',
+                    subtitles: [
+                        'The day I practiced with a normal mind',
+                        'Midway on the Path',
+                        'Training Continues',
+                        'Solidifying the Foundation',
+                        'Step by Step',
+                        'A Calm Mind is the Way'
+                    ]
+                },
+                ja: {
+                    title: 'いつも通り。',
+                    subtitles: [
+                        '平常心で稽古できた日',
+                        '道半ば',
+                        '鍛錬あるのみ',
+                        '基礎を固める',
+                        '一歩一歩',
+                        '平常心、是道なり'
+                    ]
+                }
+            },
+            'mood-4': {
+                emoji: '😕',
+                en: {
+                    title: 'Not going well...',
+                    subtitles: [
+                        'The day the issue was found',
+                        'Facing a Wall',
+                        'Lost on the Path',
+                        'Form is Breaking',
+                        'The Next Step is Unclear',
+                        'A Day of Stagnation'
+                    ]
+                },
+                ja: {
+                    title: 'うまくいかない…',
+                    subtitles: [
+                        '課題が見つかった日',
+                        '壁に直面',
+                        '道に迷う',
+                        '型が崩れる',
+                        '見えぬ一歩',
+                        '停滞の一日'
+                    ]
+                }
+            },
+            'mood-5': {
+                emoji: '😟',
+                en: {
+                    title: 'Really down...',
+                    subtitles: [
+                        'A day to go back to the beginning',
+                        'With a White Belt\'s Heart',
+                        'A Great Wall',
+                        'Losing Sight of the Way',
+                        'Starting Over',
+                        'Spirit is Tested'
+                    ]
+                },
+                ja: {
+                    title: 'かなり落ち込む…',
+                    subtitles: [
+                        '初心に戻るべき日',
+                        '白帯の心で',
+                        '大きな壁',
+                        '道を見失う',
+                        '一から出直し',
+                        '心が折れそうだ'
+                    ]
+                }
+            }
         };
         
-        if (todayEmotionIcon) todayEmotionIcon.textContent = emotionEmojis[todayData.emotion] || '😐';
-        if (todayEmotionLabel) todayEmotionLabel.textContent = `Today's feeling: ${todayData.emotion}`;
+        const currentLang = window.currentLanguage || 'en';
+        const moodData = emotionData[todayData.emotion] || emotionData['mood-3'];
+        const message = moodData[currentLang] || moodData.en;
+        
+        // Select a random subtitle for variety
+        const subtitle = message.subtitles[Math.floor(Math.random() * message.subtitles.length)];
+        
+        if (todayEmotionIcon) todayEmotionIcon.textContent = moodData.emoji;
+        if (todayEmotionLabel) {
+            todayEmotionLabel.innerHTML = `<strong>${message.title}</strong><br><span style="font-size: 12px; opacity: 0.8;">${subtitle}</span>`;
+        }
     } else {
         // Show button and status, hide emotion display
         if (todayBtn) todayBtn.style.display = 'flex';
@@ -2330,6 +2459,8 @@ function updateUserMessages() {
     // Update guest notice and user welcome messages
     if (window.karateService) {
         window.karateService.updateDashboardForUser();
+        // Update Today's feeling display if shown
+        window.karateService.updateTodayDisplay();
     }
 }
 
