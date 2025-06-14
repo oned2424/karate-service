@@ -13,12 +13,15 @@ const PORT = process.env.PORT || 3000;
 // セッション設定
 app.use(session({
     secret: 'karate-admin-secret-key',
-    resave: false,
-    saveUninitialized: false,
+    resave: true, // セッションデータが変更されていなくても保存
+    saveUninitialized: true, // 初期化されていないセッションも保存
     cookie: { 
         secure: false, // HTTPでも動作するようにfalse
-        maxAge: 24 * 60 * 60 * 1000 // 24時間
-    }
+        httpOnly: true, // XSS攻撃を防ぐ
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7日間
+        sameSite: 'lax' // CSRF攻撃を防ぐ
+    },
+    name: 'karate.session.id' // セッションID名をカスタマイズ
 }));
 
 // ミドルウェア設定

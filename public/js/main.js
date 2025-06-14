@@ -1127,10 +1127,41 @@ KarateVideoService.prototype.checkAuthStatus = async function() {
         if (result.success) {
             this.isLoggedIn = result.isLoggedIn;
             this.currentUser = result.user;
+            
+            // LocalStorageにバックアップ保存（セッション復元用）
+            if (result.isLoggedIn && result.user) {
+                localStorage.setItem('karateUserBackup', JSON.stringify({
+                    isLoggedIn: true,
+                    user: result.user,
+                    timestamp: Date.now()
+                }));
+            } else {
+                localStorage.removeItem('karateUserBackup');
+            }
+            
             this.updateAuthUI();
         }
     } catch (error) {
         console.error('Auth status check error:', error);
+        
+        // ネットワークエラー時はLocalStorageから復元を試行
+        const backup = localStorage.getItem('karateUserBackup');
+        if (backup) {
+            try {
+                const backupData = JSON.parse(backup);
+                // 24時間以内のバックアップのみ有効
+                if (Date.now() - backupData.timestamp < 24 * 60 * 60 * 1000) {
+                    console.log('Using localStorage backup for auth');
+                    this.isLoggedIn = backupData.isLoggedIn;
+                    this.currentUser = backupData.user;
+                    this.updateAuthUI();
+                    return;
+                }
+            } catch (e) {
+                console.error('Failed to parse auth backup:', e);
+            }
+        }
+        
         this.isLoggedIn = false;
         this.currentUser = null;
         this.updateAuthUI();
@@ -1240,6 +1271,10 @@ async function logoutUser() {
             window.karateService.showNotification('ログアウトしました', 'success');
             window.karateService.isLoggedIn = false;
             window.karateService.currentUser = null;
+            
+            // LocalStorageバックアップをクリア
+            localStorage.removeItem('karateUserBackup');
+            
             window.karateService.updateAuthUI();
             window.karateService.updateDashboardForUser();
             
