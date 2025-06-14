@@ -1157,6 +1157,8 @@ KarateVideoService.prototype.loadFullCalendarData = async function() {
             emotionData = { ...emotionData, ...newEmotionData };
             
             console.log('Full calendar emotion data loaded:', Object.keys(emotionData).length, 'entries');
+            console.log('Emotion data keys:', Object.keys(emotionData));
+            console.log('Sample emotion data:', emotionData);
             
             // フルカレンダーの統計を更新
             updateCalendarStats();
@@ -1491,10 +1493,14 @@ function createDayElement(day, isOtherMonth) {
         dayElement.classList.add('other-month');
     } else {
         // emotionDataに該当データがある日だけ色を付与
-        const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
-        const emotionEntry = emotionData[dateKey];
-        if (emotionEntry && emotionEntry.emotion) {
-            dayElement.classList.add('has-emotion', emotionEntry.emotion);
+        const month = String(currentMonth + 1).padStart(2, '0');
+        const dayStr = String(day).padStart(2, '0');
+        const dateKey = `${currentYear}-${month}-${dayStr}`;
+        console.log(`Checking emotion for dateKey: ${dateKey}`);
+        const emotion = emotionData[dateKey];
+        if (emotion) {
+            console.log(`Found emotion ${emotion} for ${dateKey}`);
+            dayElement.classList.add('has-emotion', emotion);
         }
         // クリックハンドラはそのまま
         dayElement.addEventListener('click', () => {
@@ -1975,11 +1981,13 @@ function createMiniDayElement(day, isOtherMonth) {
         dayElement.classList.add('other-month');
     } else {
         // Check if this day has an emotion
-        const dateKey = `${miniCurrentYear}-${miniCurrentMonth + 1}-${day}`;
-        const emotionEntry = emotionData[dateKey];
+        const month = String(miniCurrentMonth + 1).padStart(2, '0');
+        const dayStr = String(day).padStart(2, '0');
+        const dateKey = `${miniCurrentYear}-${month}-${dayStr}`;
+        const emotion = emotionData[dateKey];
         
-        if (emotionEntry && emotionEntry.emotion) {
-            dayElement.classList.add('has-emotion', emotionEntry.emotion);
+        if (emotion) {
+            dayElement.classList.add('has-emotion', emotion);
         }
         
         // Add click handler to scroll to full calendar
