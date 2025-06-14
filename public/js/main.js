@@ -31,7 +31,7 @@ class KarateVideoService {
         await this.initUserAuth();
         
         // 習慣化パッケージ初期化（認証状態確認後）
-        this.initHabitDashboard();
+        await this.initHabitDashboard();
     }
 
     // サンプル動画データを読み込み（開発中のサンプル動画）
@@ -916,29 +916,24 @@ document.addEventListener('DOMContentLoaded', function() {
         generateMiniCalendar(miniCurrentMonth, miniCurrentYear);
     }
     
-    // Initialize full calendar if calendar section exists
-    if (document.getElementById('calendarDays')) {
-        generateCalendar(currentMonth, currentYear);
-        updateCalendarStats();
-    }
+    // フルカレンダーの初期化はinitHabitDashboard()で実行される
     
     // Initialize Today's Practice display
     updateTodayDisplay();
-    
-    // Initialize statistics
-    updateCalendarStats();
-    updateDashboardStats();
 });
 
 // ==== 習慣化パッケージ機能 ====
 
 // 習慣化ダッシュボード初期化
-KarateVideoService.prototype.initHabitDashboard = function() {
+KarateVideoService.prototype.initHabitDashboard = async function() {
     this.loadStreakData();
     this.loadMonthlyPhrase();
     this.setupTodayPracticeButton();
     this.renderMiniCalendar();
     this.setupJournalModal();
+    
+    // フルカレンダー用のemotionDataを読み込み
+    await this.loadFullCalendarData();
 };
 
 // ストリークデータの読み込み
@@ -1111,6 +1106,54 @@ KarateVideoService.prototype.renderMiniCalendar = async function() {
         }
     } catch (error) {
         console.error('Error rendering mini calendar:', error);
+    }
+};
+
+// フルカレンダー用のemotionDataを読み込み
+KarateVideoService.prototype.loadFullCalendarData = async function() {
+    // 認証状態が確定していない場合は待機
+    if (this.isLoggedIn === undefined) {
+        console.log('Auth status not yet determined, skipping full calendar data load');
+        return;
+    }
+    
+    try {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth() + 1;
+        
+        const response = await fetch(`/api/practice/calendar?year=${year}&month=${month}`);
+        const result = await response.json();
+        
+        if (result.success) {
+            const practiceData = result.data;
+            
+            // practiceDataからemotionData形式に変換
+            const newEmotionData = {};
+            practiceData.forEach(record => {
+                if (record.completed && record.emotion) {
+                    // YYYY-MM-DD形式のキーでemotionDataに格納
+                    newEmotionData[record.date] = record.emotion;
+                }
+            });
+            
+            // グローバルのemotionDataを更新
+            emotionData = { ...emotionData, ...newEmotionData };
+            
+            console.log('Full calendar emotion data loaded:', Object.keys(emotionData).length, 'entries');
+            
+            // フルカレンダーの統計を更新
+            updateCalendarStats();
+            
+            // カレンダー表示も更新（既に生成されている場合）
+            if (document.getElementById('calendarDays')) {
+                generateCalendar(currentMonth, currentYear);
+            }
+        } else {
+            console.log('No calendar data available from API');
+        }
+    } catch (error) {
+        console.error('Error loading full calendar data:', error);
     }
 };
 
