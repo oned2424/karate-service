@@ -20,11 +20,12 @@ class KarateVideoService {
     }
 
     async init() {
-        this.loadSampleVideos();
+        // 🔧 FIX: API優先でビデオデータを読み込み、サンプルデータは無効化
+        // this.loadSampleVideos(); // サンプルデータを無効化
         this.setupEventListeners();
         this.setupVideoControls();
         this.setupSmoothScrolling();
-        this.setupVideoLibrary();
+        this.setupVideoLibrary(); // API経由でビデオを読み込み
         
         // ユーザー認証初期化（必ず先に完了）
         await this.initUserAuth();
@@ -518,34 +519,46 @@ class KarateVideoService {
             return;
         }
 
-        videoGrid.innerHTML = videos.map(video => `
-            <div class="video-card" data-video-id="${video.id}">
-                <div class="video-thumbnail" onclick="karateService.playVideoFromAPI(${video.id})">
-                    ${video.filename ? `
-                        <video class="video-preview" preload="metadata">
-                            <source src="/uploads/${video.filename}" type="video/mp4">
-                        </video>
-                    ` : ''}
-                    <button class="play-overlay">
-                        <i class="fas fa-play"></i>
-                    </button>
-                </div>
-                <div class="video-info">
-                    <h3 class="video-title">${this.escapeHtml(video.title)}</h3>
-                    <p class="video-description">${this.escapeHtml(video.description)}</p>
-                    <div class="video-meta">
+        videoGrid.innerHTML = videos.map(video => {
+            // 🔧 FIX: YouTubeビデオとアップロードビデオの両方に対応
+            const isYouTubeVideo = video.url && (video.url.includes('youtube.com') || video.url.includes('youtu.be'));
+            const videoThumbnail = isYouTubeVideo ? video.thumbnail : '';
+            const clickHandler = isYouTubeVideo 
+                ? `karateService.playVideo('${video.url}', '${this.escapeHtml(video.title)}')`
+                : `karateService.playVideoFromAPI(${video.id})`;
+
+            return `
+                <div class="video-card${video.isSample ? ' sample-video' : ''}" data-video-id="${video.id}">
+                    ${video.isSample ? '<div class="sample-badge">SAMPLE</div>' : ''}
+                    <div class="video-thumbnail" onclick="${clickHandler}">
+                        ${isYouTubeVideo ? `
+                            <img class="video-preview" src="${videoThumbnail}" alt="${this.escapeHtml(video.title)}" loading="lazy">
+                        ` : video.filename ? `
+                            <video class="video-preview" preload="metadata">
+                                <source src="/uploads/${video.filename}" type="video/mp4">
+                            </video>
+                        ` : ''}
+                        <button class="play-overlay">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    <div class="video-info">
                         <span class="video-category ${video.category}">${this.getCategoryName(video.category)}</span>
-                        <span class="video-duration">${video.duration || '不明'}</span>
-                    </div>
-                    <div class="video-attribution">
-                        CC-BY: ${this.escapeHtml(video.attribution)}
-                    </div>
-                    <div class="video-views">
-                        <i class="fas fa-eye"></i> ${video.views.toLocaleString()} views
+                        <h3 class="video-title">${this.escapeHtml(video.title)}</h3>
+                        <p class="video-description">${this.escapeHtml(video.description)}</p>
+                        <div class="video-meta">
+                            <span class="video-duration">${video.duration || '不明'}</span>
+                            <span class="video-views">
+                                <i class="fas fa-eye"></i> ${video.views ? video.views.toLocaleString() : '0'} views
+                            </span>
+                        </div>
+                        <div class="video-attribution">
+                            ${this.escapeHtml(video.attribution || 'YouTube Sample')}
+                        </div>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     // Setup video library event listeners
