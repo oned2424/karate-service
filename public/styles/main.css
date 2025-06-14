@@ -1269,36 +1269,36 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
 
 /* Mini calendar day with emotion - full background color */
 .mini-calendar-day.has-emotion.mood-1 {
-    background: #f7e003 !important;
-    color: #333 !important;
+    background: #242424 !important;
+    color: #fff !important;
     font-weight: 600 !important;
     border-radius: 50% !important;
 }
 
 .mini-calendar-day.has-emotion.mood-2 {
-    background: #2b5996 !important;
-    color: white !important;
+    background: #703623 !important;
+    color: #fff !important;
     font-weight: 600 !important;
     border-radius: 50% !important;
 }
 
 .mini-calendar-day.has-emotion.mood-3 {
     background: #286d53 !important;
-    color: white !important;
+    color: #fff !important;
     font-weight: 600 !important;
     border-radius: 50% !important;
 }
 
 .mini-calendar-day.has-emotion.mood-4 {
-    background: #703623 !important;
-    color: white !important;
+    background: #2b5996 !important;
+    color: #fff !important;
     font-weight: 600 !important;
     border-radius: 50% !important;
 }
 
 .mini-calendar-day.has-emotion.mood-5 {
-    background: #242424 !important;
-    color: white !important;
+    background: #f7e003 !important;
+    color: #333 !important;
     font-weight: 600 !important;
     border-radius: 50% !important;
 }
@@ -1430,36 +1430,36 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
 
 /* Calendar day with emotion - full background color */
 .calendar-day.has-emotion.mood-1 {
-    background: #f7e003 !important;
-    color: #333 !important;
+    background: #242424 !important;
+    color: #fff !important;
     font-weight: 600 !important;
     border-radius: 50% !important;
 }
 
 .calendar-day.has-emotion.mood-2 {
-    background: #2b5996 !important;
-    color: white !important;
+    background: #703623 !important;
+    color: #fff !important;
     font-weight: 600 !important;
     border-radius: 50% !important;
 }
 
 .calendar-day.has-emotion.mood-3 {
     background: #286d53 !important;
-    color: white !important;
+    color: #fff !important;
     font-weight: 600 !important;
     border-radius: 50% !important;
 }
 
 .calendar-day.has-emotion.mood-4 {
-    background: #703623 !important;
-    color: white !important;
+    background: #2b5996 !important;
+    color: #fff !important;
     font-weight: 600 !important;
     border-radius: 50% !important;
 }
 
 .calendar-day.has-emotion.mood-5 {
-    background: #242424 !important;
-    color: white !important;
+    background: #f7e003 !important;
+    color: #333 !important;
     font-weight: 600 !important;
     border-radius: 50% !important;
 }
