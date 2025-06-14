@@ -1107,21 +1107,21 @@ KarateVideoService.prototype.updateDashboardForUser = function() {
     const welcomeDiv = document.createElement('div');
     
     if (this.isLoggedIn && this.currentUser) {
-        // ログインユーザー向け表示
+        // Logged in user display
         welcomeDiv.className = 'dashboard-user-welcome';
         welcomeDiv.innerHTML = `
             <h3>Welcome back, ${this.currentUser.displayName || this.currentUser.username}! 🥋</h3>
-            <p>あなた専用の練習記録をトラッキングしています</p>
+            <p>Tracking your personal training records</p>
         `;
     } else {
-        // ゲストユーザー向け表示
+        // Guest user display
         welcomeDiv.className = 'guest-notice';
         welcomeDiv.innerHTML = `
-            <h4>🎯 ゲストモードで体験中</h4>
-            <p>アカウントを作成すると、あなただけの練習記録を永続的に保存できます！</p>
+            <h4>🎯 Guest Mode Experience</h4>
+            <p>Create an account to permanently save your personal training records!</p>
             <a href="/user-login.html" class="login-btn">
                 <i class="fas fa-user-plus"></i>
-                アカウント作成でデータを保存
+                Create Account to Save Data
             </a>
         `;
     }
@@ -1910,3 +1910,360 @@ window.selectEmotionButton = selectEmotionButton;
 window.saveEmotion = saveEmotion;
 window.skipEmotion = skipEmotion;
 window.openTodayEmotionModal = openTodayEmotionModal;
+
+// Language switching functionality
+let currentLanguage = 'en'; // Default to English
+
+const translations = {
+    en: {
+        // Navigation
+        'nav-home': 'Home',
+        'nav-dashboard': 'Dashboard',
+        'nav-calendar': 'Calendar',
+        'nav-library': 'Video Library',
+        'nav-editor': 'Editor',
+        'nav-about': 'About',
+        'nav-login': 'Login',
+        'nav-profile': 'Profile',
+        'nav-logout': 'Logout',
+        
+        // Hero Section
+        'hero-title': 'Master <span class="highlight">Karate</span> with Expert Guidance',
+        'hero-description': 'Professional karate training videos with mirror mode, slow motion, and subtitles. Learn from authentic Japanese masters with CC-BY licensed content.',
+        'hero-start': 'Start Learning',
+        'hero-learn': 'Learn More',
+        'hero-authentic': 'Authentic Japanese Training',
+        'hero-cc': 'CC-BY Licensed Content',
+        'hero-quality': 'Professional Quality',
+        
+        // Dashboard
+        'dashboard-title': 'Practice Dashboard',
+        'dashboard-subtitle': 'Track your daily karate practice and build lasting habits',
+        'today-practice': 'Today\'s Practice',
+        'mark-complete': 'Mark Today Complete',
+        'ready-practice': 'Ready to practice!',
+        'streak': 'Streak',
+        'days': 'Days',
+        'longest': 'Longest',
+        'total': 'Total',
+        'monthly-wisdom': 'Monthly Wisdom',
+        'loading': 'Loading...',
+        
+        // Calendar
+        'calendar-title': 'Practice Calendar',
+        'calendar-subtitle': 'Track your daily training progress',
+        'current-streak': 'CURRENT STREAK',
+        'longest-streak': 'LONGEST STREAK',
+        'completion-rate': 'COMPLETION RATE',
+        'total-completions': 'TOTAL COMPLETIONS',
+        
+        // Video Library
+        'library-title': 'Video Library',
+        'library-subtitle': 'Professional karate training videos with CC-BY licensing',
+        'all-videos': 'All Videos',
+        'kata': 'Kata (Forms)',
+        'kumite': 'Kumite (Sparring)',
+        'kihon': 'Kihon (Basics)',
+        'search-videos': 'Search videos...',
+        'loading-videos': 'Loading videos...',
+        
+        // Editor
+        'editor-title': 'Video Editor Tool',
+        'mirror': 'Mirror',
+        'slow': 'Slow (0.5x)',
+        'normal': 'Normal (1x)',
+        'subtitle-toggle': 'Subtitle Toggle',
+        'edit-options': 'Edit Options',
+        'playback-speed': 'Playback Speed',
+        'subtitle-display': 'Subtitle Display',
+        'subtitle-placeholder': 'Enter subtitle text...',
+        'download-video': 'Download Edited Video',
+        
+        // About
+        'about-title': 'About Karate Pocket Dojo',
+        'about-subtitle': 'Your personal karate training companion',
+        'video-learning': 'Video Learning',
+        'video-learning-desc': 'Learn karate from basics to advanced techniques through video.',
+        'habit-tracking': 'Habit Tracking',
+        'habit-tracking-desc': 'Record your daily practice and support continuous growth.',
+        'practice-journal': 'Practice Journal',
+        'practice-journal-desc': 'Record your practice reflections and visualize your progress.',
+        'community': 'Community',
+        'community-desc': 'Walk the path of karate together with peers who share the same goals.',
+        
+        // Modal
+        'modal-title': 'How was your practice today?',
+        'modal-subtitle': 'Reflect on your training session',
+        'modal-placeholder': 'What did you learn today? How did you feel? Any challenges or breakthroughs? (optional)',
+        'skip': 'Skip',
+        'save-reflection': 'Save Reflection',
+        
+        // Footer
+        'footer-platform': 'Platform',
+        'footer-legal': 'Legal',
+        'footer-support': 'Support',
+        'footer-editor-tools': 'Editor Tools',
+        'footer-about-us': 'About Us',
+        'footer-privacy': 'Privacy Policy',
+        'footer-terms': 'Terms of Service',
+        'footer-licensing': 'CC-BY Licensing',
+        'footer-help': 'Help Center',
+        'footer-contact': 'Contact Us',
+        'footer-copy': '© 2024 Karate Pocket Dojo. Professional training platform with CC-BY licensed content.',
+        'footer-secure': 'Secure Platform',
+        'footer-open': 'Open Content',
+        'footer-tagline': 'Authentic Japanese karate training for global learners',
+        
+        // Guest notice
+        'guest-title': '🎯 Guest Mode Experience',
+        'guest-desc': 'Create an account to permanently save your personal training records!',
+        'guest-button': 'Create Account to Save Data',
+        'user-welcome': 'Welcome back, {name}! 🥋',
+        'user-tracking': 'Tracking your personal training records'
+    },
+    ja: {
+        // Navigation
+        'nav-home': 'ホーム',
+        'nav-dashboard': 'ダッシュボード',
+        'nav-calendar': 'カレンダー',
+        'nav-library': 'ビデオライブラリ',
+        'nav-editor': 'エディター',
+        'nav-about': 'について',
+        'nav-login': 'ログイン',
+        'nav-profile': 'プロフィール',
+        'nav-logout': 'ログアウト',
+        
+        // Hero Section
+        'hero-title': '専門指導で<span class="highlight">空手</span>をマスター',
+        'hero-description': 'ミラーモード、スローモーション、字幕付きのプロフェッショナル空手指導動画。CC-BYライセンスコンテンツで本格的な日本の師匠から学びましょう。',
+        'hero-start': '学習開始',
+        'hero-learn': '詳細を見る',
+        'hero-authentic': '本格的な日本指導',
+        'hero-cc': 'CC-BYライセンスコンテンツ',
+        'hero-quality': 'プロフェッショナル品質',
+        
+        // Dashboard
+        'dashboard-title': '練習ダッシュボード',
+        'dashboard-subtitle': '毎日の空手練習を追跡し、持続的な習慣を構築',
+        'today-practice': '今日の練習',
+        'mark-complete': '今日を完了としてマーク',
+        'ready-practice': '練習の準備完了！',
+        'streak': 'ストリーク',
+        'days': '日',
+        'longest': '最長',
+        'total': '合計',
+        'monthly-wisdom': '月の知恵',
+        'loading': '読み込み中...',
+        
+        // Calendar
+        'calendar-title': '練習カレンダー',
+        'calendar-subtitle': '日々のトレーニング進捗を追跡',
+        'current-streak': '現在のストリーク',
+        'longest-streak': '最長ストリーク',
+        'completion-rate': '完了率',
+        'total-completions': '総完了数',
+        
+        // Video Library
+        'library-title': 'ビデオライブラリ',
+        'library-subtitle': 'CC-BYライセンス付きプロフェッショナル空手指導動画',
+        'all-videos': '全ての動画',
+        'kata': '型',
+        'kumite': '組手',
+        'kihon': '基本',
+        'search-videos': '動画を検索...',
+        'loading-videos': '動画を読み込み中...',
+        
+        // Editor
+        'editor-title': '動画編集ツール',
+        'mirror': '鏡映し',
+        'slow': 'スロー (0.5x)',
+        'normal': '通常 (1x)',
+        'subtitle-toggle': '字幕切替',
+        'edit-options': '編集オプション',
+        'playback-speed': '再生速度',
+        'subtitle-display': '字幕表示',
+        'subtitle-placeholder': '字幕テキストを入力...',
+        'download-video': '編集動画をダウンロード',
+        
+        // About
+        'about-title': 'Karate Pocket Dojoについて',
+        'about-subtitle': 'あなたの個人的な空手トレーニングコンパニオン',
+        'video-learning': '動画学習',
+        'video-learning-desc': '空手の基本技術から応用まで、動画で学習できます。',
+        'habit-tracking': '習慣トラッキング',
+        'habit-tracking-desc': '日々の練習を記録し、継続的な成長をサポートします。',
+        'practice-journal': '練習日記',
+        'practice-journal-desc': '練習の振り返りを記録し、上達のプロセスを可視化します。',
+        'community': 'コミュニティ',
+        'community-desc': '同じ目標を持つ仲間と一緒に、空手の道を歩みます。',
+        
+        // Modal
+        'modal-title': '今日の練習はいかがでしたか？',
+        'modal-subtitle': 'トレーニングセッションを振り返る',
+        'modal-placeholder': '今日何を学びましたか？どう感じましたか？課題や突破口はありましたか？（任意）',
+        'skip': 'スキップ',
+        'save-reflection': '振り返りを保存',
+        
+        // Footer
+        'footer-platform': 'プラットフォーム',
+        'footer-legal': '法的事項',
+        'footer-support': 'サポート',
+        'footer-editor-tools': 'エディターツール',
+        'footer-about-us': '私たちについて',
+        'footer-privacy': 'プライバシーポリシー',
+        'footer-terms': '利用規約',
+        'footer-licensing': 'CC-BYライセンス',
+        'footer-help': 'ヘルプセンター',
+        'footer-contact': 'お問い合わせ',
+        'footer-copy': '© 2024 Karate Pocket Dojo. CC-BYライセンスコンテンツによるプロフェッショナルトレーニングプラットフォーム。',
+        'footer-secure': 'セキュアプラットフォーム',
+        'footer-open': 'オープンコンテンツ',
+        'footer-tagline': 'グローバル学習者向けの本格的な日本空手指導',
+        
+        // Guest notice
+        'guest-title': '🎯 ゲストモードで体験中',
+        'guest-desc': 'アカウントを作成すると、あなただけの練習記録を永続的に保存できます！',
+        'guest-button': 'アカウント作成でデータを保存',
+        'user-welcome': 'おかえりなさい、{name}さん！ 🥋',
+        'user-tracking': 'あなた専用の練習記録をトラッキングしています'
+    }
+};
+
+function switchLanguage() {
+    currentLanguage = currentLanguage === 'en' ? 'ja' : 'en';
+    updatePageLanguage();
+    
+    // Update language toggle button
+    const languageToggle = document.querySelector('.language-toggle');
+    if (languageToggle) {
+        languageToggle.textContent = currentLanguage === 'en' ? '🌐 JP/EN' : '🌐 EN/JP';
+    }
+    
+    // Save language preference
+    localStorage.setItem('preferredLanguage', currentLanguage);
+}
+
+function updatePageLanguage() {
+    const t = translations[currentLanguage];
+    
+    // Update navigation
+    updateElementText('[href="#home"] .nav-link', t['nav-home']);
+    updateElementText('[href="#dashboard"] .nav-link', t['nav-dashboard']);
+    updateElementText('[href="#calendar"] .nav-link', t['nav-calendar']);
+    updateElementText('[href="#library"] .nav-link', t['nav-library']);
+    updateElementText('[href="#editor"] .nav-link', t['nav-editor']);
+    updateElementText('[href="#about"] .nav-link', t['nav-about']);
+    
+    // Update hero section
+    updateElementHTML('.hero-content h1', t['hero-title']);
+    updateElementText('.hero-content p', t['hero-description']);
+    updateElementContent('.cta-button.primary span', t['hero-start']);
+    updateElementContent('.cta-button.secondary span', t['hero-learn']);
+    
+    // Update trust indicators
+    updateElementText('.trust-item:nth-child(1) span', t['hero-authentic']);
+    updateElementText('.trust-item:nth-child(2) span', t['hero-cc']);
+    updateElementText('.trust-item:nth-child(3) span', t['hero-quality']);
+    
+    // Update dashboard
+    updateElementText('.dashboard-header h2', t['dashboard-title']);
+    updateElementText('.dashboard-header p', t['dashboard-subtitle']);
+    updateElementText('.today-practice h3', `<i class="fas fa-calendar-check"></i> ${t['today-practice']}`);
+    updateElementText('.streak-card h3', `<i class="fas fa-fire"></i> ${t['streak']}`);
+    updateElementText('.phrase-card h3', `<i class="fas fa-quote-left"></i> ${t['monthly-wisdom']}`);
+    
+    // Update calendar section
+    updateElementText('#calendar .section-header h2', t['calendar-title']);
+    updateElementText('#calendar .section-header p', t['calendar-subtitle']);
+    
+    // Update video library
+    updateElementText('#library .section-header h2', t['library-title']);
+    updateElementText('#library .section-header p', t['library-subtitle']);
+    
+    // Update filter buttons
+    updateElementText('[data-category="all"]', t['all-videos']);
+    updateElementText('[data-category="kata"]', t['kata']);
+    updateElementText('[data-category="kumite"]', t['kumite']);
+    updateElementText('[data-category="kihon"]', t['kihon']);
+    
+    // Update search placeholder
+    updateElementAttribute('#videoSearch', 'placeholder', t['search-videos']);
+    
+    // Update editor section
+    updateElementText('#editor h2', t['editor-title']);
+    updateElementText('#mirrorBtn', `<i class="fas fa-arrows-alt-h"></i> ${t['mirror']}`);
+    updateElementText('#slowBtn', `<i class="fas fa-turtle"></i> ${t['slow']}`);
+    updateElementText('#normalBtn', `<i class="fas fa-play"></i> ${t['normal']}`);
+    updateElementText('#subtitleBtn', `<i class="fas fa-closed-captioning"></i> ${t['subtitle-toggle']}`);
+    
+    // Update about section
+    updateElementText('#about .section-header h2', t['about-title']);
+    updateElementText('#about .section-header p', t['about-subtitle']);
+    
+    // Update modal
+    updateElementText('.emotion-modal-title', t['modal-title']);
+    updateElementText('.emotion-modal-subtitle', t['modal-subtitle']);
+    updateElementAttribute('#emotionComment', 'placeholder', t['modal-placeholder']);
+    updateElementText('.emotion-skip-btn', t['skip']);
+    updateElementText('#saveEmotionBtn', t['save-reflection']);
+    
+    // Update footer
+    updateElementText('.footer-tagline', t['footer-tagline']);
+    updateElementText('.footer-copy', t['footer-copy']);
+    
+    // Update user messages in JavaScript
+    updateUserMessages();
+}
+
+function updateElementText(selector, text) {
+    const element = document.querySelector(selector);
+    if (element) {
+        element.textContent = text;
+    }
+}
+
+function updateElementHTML(selector, html) {
+    const element = document.querySelector(selector);
+    if (element) {
+        element.innerHTML = html;
+    }
+}
+
+function updateElementContent(selector, text) {
+    const element = document.querySelector(selector);
+    if (element) {
+        element.textContent = text;
+    }
+}
+
+function updateElementAttribute(selector, attribute, value) {
+    const element = document.querySelector(selector);
+    if (element) {
+        element.setAttribute(attribute, value);
+    }
+}
+
+function updateUserMessages() {
+    // Update guest notice and user welcome messages
+    if (window.karateService) {
+        window.karateService.updateDashboardForUser();
+    }
+}
+
+// Load saved language preference on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const savedLanguage = localStorage.getItem('preferredLanguage');
+    if (savedLanguage && savedLanguage !== currentLanguage) {
+        currentLanguage = savedLanguage;
+        updatePageLanguage();
+        
+        // Update language toggle button
+        const languageToggle = document.querySelector('.language-toggle');
+        if (languageToggle) {
+            languageToggle.textContent = currentLanguage === 'en' ? '🌐 JP/EN' : '🌐 EN/JP';
+        }
+    }
+});
+
+// Make language switching globally available
+window.switchLanguage = switchLanguage;

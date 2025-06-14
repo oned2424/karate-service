@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KarateMaster - Authentic Japanese Karate Training Platform</title>
+    <title>Karate Pocket Dojo - Authentic Japanese Karate Training Platform</title>
     
     <!-- CRITICAL: Security headers to prevent unwanted modal injection -->
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'self';">
@@ -18,7 +18,7 @@
         <div class="nav-container">
             <div class="nav-logo">
                 <i class="fas fa-fist-raised"></i>
-                <span>KARATE<span style="font-weight: 400; color: var(--neutral-medium);">MASTER</span></span>
+                <span>Karate <span style="font-weight: 400; color: var(--neutral-medium);">Pocket Dojo</span></span>
             </div>
             <ul class="nav-menu">
                 <li><a href="#home" class="nav-link">Home</a></li>
@@ -27,12 +27,12 @@
                 <li><a href="#library" class="nav-link">Video Library</a></li>
                 <li><a href="#editor" class="nav-link">Editor</a></li>
                 <li><a href="#about" class="nav-link">About</a></li>
-                <li><a href="#" class="nav-link language-toggle">🌐 JP/EN</a></li>
+                <li><a href="#" class="nav-link language-toggle" onclick="switchLanguage()">🌐 JP/EN</a></li>
                 
-                <!-- ユーザー認証メニュー -->
+                <!-- User authentication menu -->
                 <li class="user-menu">
                     <div id="userAuthSection" class="auth-section">
-                        <!-- ゲスト状態 -->
+                        <!-- Guest state -->
                         <div id="guestState" class="auth-state">
                             <a href="/user-login.html" class="login-btn">
                                 <i class="fas fa-sign-in-alt"></i>
@@ -40,7 +40,7 @@
                             </a>
                         </div>
                         
-                        <!-- ログイン状態 -->
+                        <!-- Logged in state -->
                         <div id="loggedInState" class="auth-state" style="display: none;">
                             <div class="user-dropdown">
                                 <button class="user-button" onclick="toggleUserMenu()">
@@ -310,7 +310,7 @@
         <section id="about" class="about">
             <div class="container">
                 <div class="section-header">
-                    <h2>About KarateMaster</h2>
+                    <h2>About Karate Pocket Dojo</h2>
                     <p>Your personal karate training companion</p>
                 </div>
                 
@@ -376,7 +376,7 @@
                 <div class="footer-brand">
                     <div class="nav-logo">
                         <i class="fas fa-fist-raised"></i>
-                        <span>KARATE<span style="font-weight: 400;">MASTER</span></span>
+                        <span>Karate <span style="font-weight: 400;">Pocket Dojo</span></span>
                     </div>
                     <p>Authentic Japanese karate training for global learners</p>
                 </div>
@@ -402,7 +402,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 KarateMaster. Professional training platform with CC-BY licensed content.</p>
+                <p>&copy; 2024 Karate Pocket Dojo. Professional training platform with CC-BY licensed content.</p>
                 <div class="security-badges">
                     <div class="security-badge">
                         <i class="fas fa-shield-alt"></i>
