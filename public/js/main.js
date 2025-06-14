@@ -1,4 +1,4 @@
-// 空手動画サービスのメインJavaScriptファイル
+// Main JavaScript file for Karate Video Service
 
 class KarateVideoService {
     constructor() {
@@ -8,11 +8,11 @@ class KarateVideoService {
         this.showSubtitles = false;
         this.videos = [];
         
-        // 習慣化パッケージ関連
+        // Habit package related
         this.streakData = { current: 0, longest: 0, total: 0 };
         this.todayCompleted = false;
         
-        // ユーザー認証関連
+        // User authentication related
         this.currentUser = null;
         this.isLoggedIn = false;
         
@@ -38,36 +38,36 @@ class KarateVideoService {
         this.videos = [
             {
                 id: 1,
-                title: "空手基本型 - 平安初段",
-                description: "伝統的な空手の型、平安初段の完全な演武です。",
+                title: "Karate Basic Kata - Heian Shodan",
+                description: "Complete performance of the traditional karate kata, Heian Shodan.",
                 category: "kata",
                 url: "/videos/sample1.mp4", // 実際のCC-BY動画URLに置き換え
                 thumbnail: "/images/kata1.jpg",
                 duration: "3:25",
                 license: "CC BY 4.0",
-                attribution: "作成者: Traditional Karate Foundation"
+                attribution: "Creator: Traditional Karate Foundation"
             },
             {
                 id: 2,
-                title: "組手基本技術",
-                description: "基本的な組手の技術とコンビネーションを学習します。",
+                title: "Kumite Basic Techniques",
+                description: "Learn basic kumite techniques and combinations.",
                 category: "kumite",
                 url: "/videos/sample2.mp4",
                 thumbnail: "/images/kumite1.jpg",
                 duration: "5:12",
                 license: "CC BY 4.0",
-                attribution: "作成者: Karate Training Academy"
+                attribution: "Creator: Karate Training Academy"
             },
             {
                 id: 3,
-                title: "基本稽古 - 正拳突き",
-                description: "正拳突きの正しいフォームと練習方法を詳しく解説。",
+                title: "Basic Training - Seiken Tsuki",
+                description: "Detailed explanation of proper form and practice methods for seiken tsuki.",
                 category: "kihon",
                 url: "/videos/sample3.mp4",
                 thumbnail: "/images/kihon1.jpg",
                 duration: "4:33",
                 license: "CC BY 4.0",
-                attribution: "作成者: Martial Arts Education"
+                attribution: "Creator: Martial Arts Education"
             }
         ];
 
@@ -122,7 +122,7 @@ class KarateVideoService {
         });
 
         // 通知表示
-        this.showNotification(`動画「${title}」を読み込みました`, 'success');
+        this.showNotification(`Video "${title}" loaded`, 'success');
     }
 
     // 動画コントロールの設定
@@ -143,7 +143,7 @@ class KarateVideoService {
             playerVideo.style.transform = this.isMirrored ? 'scaleX(-1)' : 'scaleX(1)';
             mirrorBtn.classList.toggle('active', this.isMirrored);
             this.showNotification(
-                this.isMirrored ? '鏡映し表示を有効にしました' : '鏡映し表示を無効にしました'
+                this.isMirrored ? 'Mirror display enabled' : 'Mirror display disabled'
             );
         });
 
@@ -153,7 +153,7 @@ class KarateVideoService {
             playerVideo.playbackRate = this.currentSpeed;
             this.updateSpeedDisplay();
             this.updateSpeedButtons();
-            this.showNotification('スロー再生に切り替えました (0.5x)');
+            this.showNotification('Switched to slow playback (0.5x)');
         });
 
         // 通常再生
@@ -162,7 +162,7 @@ class KarateVideoService {
             playerVideo.playbackRate = this.currentSpeed;
             this.updateSpeedDisplay();
             this.updateSpeedButtons();
-            this.showNotification('通常再生に切り替えました (1x)');
+            this.showNotification('Switched to normal playback (1x)');
         });
 
         // 字幕切り替え
@@ -171,7 +171,7 @@ class KarateVideoService {
             subtitleBtn.classList.toggle('active', this.showSubtitles);
             this.toggleSubtitles();
             this.showNotification(
-                this.showSubtitles ? '字幕表示を有効にしました' : '字幕表示を無効にしました'
+                this.showSubtitles ? 'Subtitles enabled' : 'Subtitles disabled'
             );
         });
 
@@ -225,7 +225,7 @@ class KarateVideoService {
             }
             
             const subtitleText = document.getElementById('subtitleText').value || 
-                '技の名前や説明がここに表示されます';
+                'Technique names and descriptions will be displayed here';
             subtitleOverlay.textContent = subtitleText;
             subtitleOverlay.style.display = 'block';
         } else {
@@ -238,15 +238,15 @@ class KarateVideoService {
     // 編集された動画のダウンロード（模擬実装）
     downloadEditedVideo() {
         if (!this.currentVideo) {
-            this.showNotification('動画が選択されていません', 'error');
+            this.showNotification('No video selected', 'error');
             return;
         }
 
-        this.showNotification('動画の編集とダウンロードを準備中...', 'info');
+        this.showNotification('Preparing video editing and download...', 'info');
         
         // 実際の実装では、FFmpegを使用してサーバーサイドで動画を編集
         setTimeout(() => {
-            this.showNotification('編集機能は開発中です。近日公開予定！', 'info');
+            this.showNotification('Editing feature is under development. Coming soon!', 'info');
         }, 2000);
     }
 
@@ -311,7 +311,7 @@ class KarateVideoService {
             </div>
         `).join('');
 
-        this.showNotification(`${filteredVideos.length}件の動画を表示中`);
+        this.showNotification(`Showing ${filteredVideos.length} videos`);
     }
 
     // 表示オプションの適用

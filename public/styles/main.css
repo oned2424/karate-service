@@ -1695,3 +1695,174 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
         height: 28px;
     }
 }
+
+/* ==== Video Editor Section Styles ==== */
+.video-editor {
+    padding: 6rem 0;
+    background: var(--surface);
+}
+
+.video-editor h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 3rem;
+}
+
+.editor-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    gap: 2rem;
+    align-items: start;
+    justify-content: center;
+}
+
+.video-player {
+    flex: 1;
+    max-width: 700px;
+}
+
+.video-player video {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px var(--shadow);
+}
+
+.video-controls {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.control-btn {
+    padding: 0.75rem 1.25rem;
+    border: 2px solid var(--border);
+    background: white;
+    color: var(--text-primary);
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.control-btn:hover {
+    background: var(--gradient-primary);
+    color: white;
+    border-color: transparent;
+}
+
+.control-btn.active {
+    background: var(--gradient-primary);
+    color: white;
+    border-color: transparent;
+}
+
+.editor-panel {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px var(--shadow);
+    max-width: 400px;
+}
+
+.editor-panel h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+}
+
+.option-group {
+    margin-bottom: 1.5rem;
+}
+
+.option-group label {
+    display: block;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.option-group input[type="range"] {
+    width: 100%;
+    margin: 0.5rem 0;
+}
+
+#speedValue {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+#subtitleText {
+    width: 100%;
+    height: 100px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+    resize: vertical;
+}
+
+.download-btn {
+    width: 100%;
+    padding: 1rem;
+    background: var(--gradient-accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+}
+
+/* Subtitle overlay */
+.subtitle-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1.125rem;
+    font-weight: 500;
+    max-width: 90%;
+    text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .editor-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .video-player,
+    .editor-panel {
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    .video-controls {
+        justify-content: center;
+    }
+}
