@@ -52,12 +52,12 @@ class KarateVideoService {
                 id: 2,
                 title: "Kumite Basic Techniques",
                 description: "Learn basic kumite techniques and combinations (Sample video - Feature in development)",
-                category: "kumite",
-                url: "/videos/sample2.mp4",
-                thumbnail: "/images/kumite1.jpg",
-                duration: "5:12",
+                category: "kihon",
+                url: "https://www.youtube.com/embed/6jEoWCiMTI8",
+                thumbnail: "https://img.youtube.com/vi/6jEoWCiMTI8/maxresdefault.jpg",
+                duration: "10:34",
                 license: "Sample Content",
-                attribution: "Sample Video - Feature in Development",
+                attribution: "YouTube Sample - Feature in Development",
                 isSample: true
             },
             {
