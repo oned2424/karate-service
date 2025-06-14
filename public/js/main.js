@@ -14,22 +14,22 @@ class KarateVideoService {
         
         // User authentication related
         this.currentUser = null;
-        this.isLoggedIn = false;
+        this.isLoggedIn = undefined; // 初期状態は未確定
         
         this.init();
     }
 
-    init() {
+    async init() {
         this.loadSampleVideos();
         this.setupEventListeners();
         this.setupVideoControls();
         this.setupSmoothScrolling();
         this.setupVideoLibrary();
         
-        // ユーザー認証初期化
-        this.initUserAuth();
+        // ユーザー認証初期化（必ず先に完了）
+        await this.initUserAuth();
         
-        // 習慣化パッケージ初期化
+        // 習慣化パッケージ初期化（認証状態確認後）
         this.initHabitDashboard();
     }
 
@@ -896,6 +896,12 @@ KarateVideoService.prototype.initHabitDashboard = function() {
 
 // ストリークデータの読み込み
 KarateVideoService.prototype.loadStreakData = async function() {
+    // 認証状態が確定していない場合は待機
+    if (this.isLoggedIn === undefined) {
+        console.log('Auth status not yet determined, skipping streak data load');
+        return;
+    }
+    
     try {
         const response = await fetch('/api/practice/streak');
         const result = await response.json();
@@ -903,9 +909,16 @@ KarateVideoService.prototype.loadStreakData = async function() {
         if (result.success) {
             this.streakData = result.data;
             this.updateStreakDisplay();
+        } else {
+            // サーバーからエラーが返ってきた場合、デフォルト値を設定
+            this.streakData = { current: 0, longest: 0, total: 0 };
+            this.updateStreakDisplay();
         }
     } catch (error) {
         console.error('Error loading streak data:', error);
+        // ネットワークエラーの場合もデフォルト値を設定
+        this.streakData = { current: 0, longest: 0, total: 0 };
+        this.updateStreakDisplay();
     }
     
     // 今日の練習状況確認
@@ -931,6 +944,12 @@ KarateVideoService.prototype.updateStreakDisplay = function() {
 
 // 今日の練習状況チェック
 KarateVideoService.prototype.checkTodayStatus = async function() {
+    // 認証状態が確定していない場合は待機
+    if (this.isLoggedIn === undefined) {
+        console.log('Auth status not yet determined, skipping today status check');
+        return;
+    }
+    
     try {
         const today = new Date().toISOString().split('T')[0];
         const response = await fetch(`/api/practice/calendar?year=${today.split('-')[0]}&month=${today.split('-')[1]}`);
