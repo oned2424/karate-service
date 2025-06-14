@@ -137,8 +137,12 @@ class KarateVideoService {
 
     // 動画を再生
     playVideo(url, title) {
+        console.log('Playing video:', url, title);
         const playerVideo = document.getElementById('playerVideo');
-        if (!playerVideo) return;
+        if (!playerVideo) {
+            console.error('Player video element not found');
+            return;
+        }
 
         this.currentVideo = { url, title };
         
@@ -156,10 +160,11 @@ class KarateVideoService {
                     id="youtubePlayer"
                     width="100%" 
                     height="400" 
-                    src="${url}?autoplay=1&rel=0" 
+                    src="${url}?autoplay=1&rel=0&modestbranding=1&showinfo=0" 
                     frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                     allowfullscreen
+                    referrerpolicy="strict-origin-when-cross-origin"
                     style="border-radius: 12px; box-shadow: 0 4px 6px var(--shadow);">
                 </iframe>
                 <div class="sample-video-notice" style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1rem; margin-top: 1rem; text-align: center;">
