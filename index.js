@@ -222,8 +222,43 @@ function loadDataFromFile() {
     }
 }
 
+// データマイグレーション：既存記録にemotionフィールドを追加
+function migrateExistingRecords() {
+    console.log('🔄 Starting data migration for emotion fields...');
+    
+    let migrationCount = 0;
+    
+    // userPracticeRecordsをマイグレーション
+    Object.keys(userPracticeRecords).forEach(userId => {
+        userPracticeRecords[userId].forEach(record => {
+            if (!record.emotion) {
+                record.emotion = 'mood-1'; // デフォルト値を設定
+                migrationCount++;
+            }
+        });
+    });
+    
+    // practiceRecordsをマイグレーション
+    practiceRecords.forEach(record => {
+        if (!record.emotion) {
+            record.emotion = 'mood-1'; // デフォルト値を設定
+            migrationCount++;
+        }
+    });
+    
+    if (migrationCount > 0) {
+        console.log(`✅ Migrated ${migrationCount} records with emotion fields`);
+        saveDataToFile(); // マイグレーション後に保存
+    } else {
+        console.log('✅ No migration needed - all records already have emotion fields');
+    }
+}
+
 // アプリ起動時にデータを読み込み
 loadDataFromFile();
+
+// データマイグレーションを実行
+migrateExistingRecords();
 
 // 定期的自動保存（5分毎）
 setInterval(saveDataToFile, 5 * 60 * 1000);
@@ -724,7 +759,8 @@ app.post('/api/practice/today', optionalUser, (req, res) => {
         date: today,
         completed: true,
         timestamp: new Date().toISOString(),
-        userId: userId || null
+        userId: userId || null,
+        emotion: 'mood-1' // デフォルトemotion値を追加
     };
     
     // ユーザー別記録に追加
@@ -806,7 +842,8 @@ app.get('/api/practice/calendar', optionalUser, (req, res) => {
         data: filteredRecords.map(record => ({
             date: record.date,
             completed: record.completed,
-            title: '練習完了'
+            title: '練習完了',
+            emotion: record.emotion || 'mood-1' // デフォルトemotionを追加
         }))
     });
 });
