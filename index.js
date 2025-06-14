@@ -67,35 +67,58 @@ const upload = multer({
 let videos = [
     {
         id: 1,
-        title: "空手基本型 - 平安初段",
-        description: "伝統的な空手の型、平安初段の完全な演武です。",
+        title: "Karate Kata - Traditional Form",
+        description: "Traditional karate kata demonstration (Sample video - Feature in development)",
         category: "kata",
-        filename: "sample1.mp4",
-        duration: "3:25",
-        license: "CC BY 4.0",
-        attribution: "Traditional Karate Foundation",
-        attributionUrl: "https://example.com",
-        tags: ["初心者", "型", "基本"],
+        filename: "https://www.youtube.com/embed/NAn6DocT120",
+        url: "https://www.youtube.com/embed/NAn6DocT120",
+        thumbnail: "https://img.youtube.com/vi/NAn6DocT120/maxresdefault.jpg",
+        duration: "6:42",
+        license: "Sample Content",
+        attribution: "YouTube Sample - Feature in Development",
+        attributionUrl: "https://youtube.com",
+        tags: ["kata", "traditional", "sample"],
         uploadDate: new Date().toISOString().split('T')[0],
-        views: 1250
+        views: 1250,
+        isSample: true
     },
     {
         id: 2,
-        title: "組手基本技術",
-        description: "基本的な組手の技術とコンビネーション",
-        category: "kumite",
-        filename: "sample2.mp4",
-        duration: "5:12",
-        license: "CC BY 4.0",
-        attribution: "Karate Training Academy",
-        attributionUrl: "https://example.com",
-        tags: ["組手", "基本"],
+        title: "Kumite Basic Techniques",
+        description: "Learn basic kumite techniques and combinations (Sample video - Feature in development)",
+        category: "kihon",
+        filename: "https://www.youtube.com/embed/6jEoWCiMTI8",
+        url: "https://www.youtube.com/embed/6jEoWCiMTI8",
+        thumbnail: "https://img.youtube.com/vi/6jEoWCiMTI8/maxresdefault.jpg",
+        duration: "10:34",
+        license: "Sample Content",
+        attribution: "YouTube Sample - Feature in Development",
+        attributionUrl: "https://youtube.com",
+        tags: ["kihon", "basic", "sample"],
         uploadDate: new Date().toISOString().split('T')[0],
-        views: 890
+        views: 890,
+        isSample: true
+    },
+    {
+        id: 3,
+        title: "Basic Training - Seiken Tsuki",
+        description: "Detailed explanation of proper form and practice methods (Sample video - Feature in development)",
+        category: "kihon",
+        filename: "https://www.youtube.com/embed/Bo_11Yy8z2Y",
+        url: "https://www.youtube.com/embed/Bo_11Yy8z2Y",
+        thumbnail: "https://img.youtube.com/vi/Bo_11Yy8z2Y/maxresdefault.jpg",
+        duration: "4:33",
+        license: "Sample Content",
+        attribution: "YouTube Sample - Feature in Development",
+        attributionUrl: "https://youtube.com",
+        tags: ["kihon", "seiken", "tsuki", "sample"],
+        uploadDate: new Date().toISOString().split('T')[0],
+        views: 750,
+        isSample: true
     }
 ];
 
-let nextVideoId = 3;
+let nextVideoId = 4;
 
 // ユーザー認証システム用データ構造
 let users = []; // ユーザーアカウント { id, username, email, password, displayName, createdAt, lastLogin }
