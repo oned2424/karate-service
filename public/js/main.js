@@ -819,13 +819,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // 🔥 ULTRA AGGRESSIVEシステム実行
     DESTROY_THREE_EMOJI_MODALS();
     
-    // 100ms間隔で連続実行（最強レベル）
-    setInterval(DESTROY_THREE_EMOJI_MODALS, 100);
+    // 🔧 FIX: 無限ループ防止 - 5秒間隔に変更
+    setInterval(DESTROY_THREE_EMOJI_MODALS, 5000);
     
     // 🔄 DOM監視システム - 新しい3つ絵文字モーダルを即座に破壊
+    let isProcessing = false; // 🔧 FIX: 無限ループ防止フラグ
     const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            mutation.addedNodes.forEach((node) => {
+        if (isProcessing) return; // 処理中は新しい監視をスキップ
+        isProcessing = true;
+        
+        try {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
                 if (node.nodeType === 1) { // Element node
                     // 即座に3つ絵文字パターンを検出・破壊
                     if (node.textContent && 
@@ -857,11 +862,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         return;
                     }
                 }
+                });
             });
-        });
-        
-        // 監視後も念のため撲滅システム実行
-        setTimeout(DESTROY_THREE_EMOJI_MODALS, 1);
+        } finally {
+            // 🔧 FIX: 処理完了フラグをリセット
+            setTimeout(() => {
+                isProcessing = false;
+            }, 100);
+        }
     });
     
     observer.observe(document.body, { 
@@ -1111,11 +1119,19 @@ KarateVideoService.prototype.renderMiniCalendar = async function() {
 
 // フルカレンダー用のemotionDataを読み込み
 KarateVideoService.prototype.loadFullCalendarData = async function() {
+    // 🔧 FIX: 重複呼び出し防止
+    if (this._loadingCalendarData) {
+        console.log('Calendar data already loading, skipping...');
+        return;
+    }
+    
     // 認証状態が確定していない場合は待機
     if (this.isLoggedIn === undefined) {
         console.log('Auth status not yet determined, skipping full calendar data load');
         return;
     }
+    
+    this._loadingCalendarData = true;
     
     try {
         const today = new Date();
@@ -1154,6 +1170,9 @@ KarateVideoService.prototype.loadFullCalendarData = async function() {
         }
     } catch (error) {
         console.error('Error loading full calendar data:', error);
+    } finally {
+        // 🔧 FIX: 処理完了フラグをリセット
+        this._loadingCalendarData = false;
     }
 };
 
