@@ -166,6 +166,68 @@ let monthlyPhrases = [
 let nextPracticeId = 1;
 // 🚫 nextJournalId removed to eliminate 3-emoji modal issue
 
+// ==== Replit対応: ファイルベース永続化 ====
+const DATA_FILE = 'userData.json';
+
+// データをファイルに保存
+function saveDataToFile() {
+    try {
+        const data = {
+            users,
+            userPracticeRecords,
+            userSettings,
+            practiceRecords,
+            globalUserSettings,
+            nextUserId,
+            nextPracticeId,
+            timestamp: new Date().toISOString()
+        };
+        fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+        console.log('✅ Data saved to file:', new Date().toLocaleString());
+    } catch (error) {
+        console.error('❌ Error saving data to file:', error);
+    }
+}
+
+// ファイルからデータを読み込み
+function loadDataFromFile() {
+    try {
+        if (fs.existsSync(DATA_FILE)) {
+            const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+            
+            // データを復元
+            users = data.users || [];
+            userPracticeRecords = data.userPracticeRecords || {};
+            userSettings = data.userSettings || {};
+            practiceRecords = data.practiceRecords || [];
+            globalUserSettings = data.globalUserSettings || {
+                notifications: { enabled: true, time: '19:00', channels: { push: true, email: false } },
+                streak: { current: 0, longest: 0, total: 0 }
+            };
+            nextUserId = data.nextUserId || 1;
+            nextPracticeId = data.nextPracticeId || 1;
+            
+            console.log('✅ Data loaded from file:', {
+                users: users.length,
+                userRecords: Object.keys(userPracticeRecords).length,
+                practiceRecords: practiceRecords.length,
+                timestamp: data.timestamp
+            });
+        } else {
+            console.log('📄 No existing data file found, starting fresh');
+        }
+    } catch (error) {
+        console.error('❌ Error loading data from file:', error);
+        console.log('🔄 Starting with default data');
+    }
+}
+
+// アプリ起動時にデータを読み込み
+loadDataFromFile();
+
+// 定期的自動保存（5分毎）
+setInterval(saveDataToFile, 5 * 60 * 1000);
+
 // 管理者認証ミドルウェア
 function requireAuth(req, res, next) {
     if (req.session.isAuthenticated) {
@@ -327,6 +389,9 @@ app.post('/api/user/register', (req, res) => {
     req.session.userId = newUser.id;
     req.session.username = newUser.username;
     
+    // データをファイルに保存
+    saveDataToFile();
+    
     res.json({
         success: true,
         message: 'アカウントが作成されました',
@@ -368,6 +433,9 @@ app.post('/api/user/login', (req, res) => {
     // セッション設定
     req.session.userId = user.id;
     req.session.username = user.username;
+    
+    // データをファイルに保存
+    saveDataToFile();
     
     res.json({
         success: true,
@@ -669,6 +737,9 @@ app.post('/api/practice/today', optionalUser, (req, res) => {
         updateUserStreak(userId);
         const streak = userSettings[userId]?.streak || { current: 0, longest: 0, total: 0 };
         
+        // データをファイルに保存
+        saveDataToFile();
+        
         res.json({
             success: true,
             message: '今日の練習を記録しました！',
@@ -684,6 +755,9 @@ app.post('/api/practice/today', optionalUser, (req, res) => {
         // ゲストユーザー（グローバル記録）
         practiceRecords.push(newRecord);
         updateStreak();
+        
+        // データをファイルに保存
+        saveDataToFile();
         
         res.json({
             success: true,
@@ -899,6 +973,22 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log('- 動画一覧・検索・管理');
     console.log('- CC-BYライセンス管理');
     console.log('- 管理者画面（認証機能付き）');
+    console.log('- ファイルベース永続化（Replit対応）');
     console.log('');
     console.log('注意: FFmpeg動画編集機能は除外（Replit制限のため）');
+});
+
+// 🛡️ Replit対応: グレースフルシャットダウン時のデータ保存
+process.on('SIGINT', () => {
+    console.log('\n📄 アプリケーション終了中...');
+    saveDataToFile();
+    console.log('✅ データを保存しました');
+    process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+    console.log('\n📄 アプリケーション終了中...');
+    saveDataToFile();
+    console.log('✅ データを保存しました');
+    process.exit(0);
 });
