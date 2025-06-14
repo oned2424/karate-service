@@ -354,6 +354,25 @@ body {
     box-shadow: 0 4px 6px var(--shadow);
     transition: all 0.3s ease;
     cursor: pointer;
+    position: relative;
+}
+
+.video-card.sample-video {
+    border: 2px solid #ffc107;
+}
+
+.sample-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ffc107;
+    color: #856404;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .video-card:hover {
@@ -388,6 +407,16 @@ body {
     padding: 1.5rem;
 }
 
+.video-category {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+}
+
 .video-title {
     font-size: 1.25rem;
     font-weight: 600;
@@ -414,14 +443,6 @@ body {
     margin-bottom: 1rem;
 }
 
-.video-category {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-}
 
 .video-category.kata {
     background: rgba(99, 102, 241, 0.1);

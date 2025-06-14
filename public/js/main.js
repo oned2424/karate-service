@@ -33,41 +33,44 @@ class KarateVideoService {
         this.initHabitDashboard();
     }
 
-    // サンプル動画データを読み込み（実際のCC-BY動画のメタデータ）
+    // サンプル動画データを読み込み（開発中のサンプル動画）
     loadSampleVideos() {
         this.videos = [
             {
                 id: 1,
-                title: "Karate Basic Kata - Heian Shodan",
-                description: "Complete performance of the traditional karate kata, Heian Shodan.",
+                title: "Karate Kata - Traditional Form",
+                description: "Traditional karate kata demonstration (Sample video - Feature in development)",
                 category: "kata",
-                url: "/videos/sample1.mp4", // 実際のCC-BY動画URLに置き換え
-                thumbnail: "/images/kata1.jpg",
-                duration: "3:25",
-                license: "CC BY 4.0",
-                attribution: "Creator: Traditional Karate Foundation"
+                url: "https://www.youtube.com/embed/NAn6DocT120",
+                thumbnail: "https://img.youtube.com/vi/NAn6DocT120/maxresdefault.jpg",
+                duration: "6:42",
+                license: "Sample Content",
+                attribution: "YouTube Sample - Feature in Development",
+                isSample: true
             },
             {
                 id: 2,
                 title: "Kumite Basic Techniques",
-                description: "Learn basic kumite techniques and combinations.",
+                description: "Learn basic kumite techniques and combinations (Sample video - Feature in development)",
                 category: "kumite",
                 url: "/videos/sample2.mp4",
                 thumbnail: "/images/kumite1.jpg",
                 duration: "5:12",
-                license: "CC BY 4.0",
-                attribution: "Creator: Karate Training Academy"
+                license: "Sample Content",
+                attribution: "Sample Video - Feature in Development",
+                isSample: true
             },
             {
                 id: 3,
                 title: "Basic Training - Seiken Tsuki",
-                description: "Detailed explanation of proper form and practice methods for seiken tsuki.",
+                description: "Detailed explanation of proper form and practice methods (Sample video - Feature in development)",
                 category: "kihon",
                 url: "/videos/sample3.mp4",
                 thumbnail: "/images/kihon1.jpg",
                 duration: "4:33",
-                license: "CC BY 4.0",
-                attribution: "Creator: Martial Arts Education"
+                license: "Sample Content",
+                attribution: "Sample Video - Feature in Development",
+                isSample: true
             }
         ];
 
@@ -79,30 +82,57 @@ class KarateVideoService {
         const videoGrid = document.getElementById('videoGrid');
         if (!videoGrid) return;
 
-        videoGrid.innerHTML = this.videos.map(video => `
-            <div class="video-card" data-video-id="${video.id}">
-                <div class="video-thumbnail" onclick="karateService.playVideo('${video.url}', '${video.title}')">
-                    <div class="play-overlay">
-                        <i class="fas fa-play"></i>
-                    </div>
-                    <!-- 実際の実装では動画のサムネイルを表示 -->
-                    <div style="width: 100%; height: 100%; background: linear-gradient(45deg, #c41e3a, #8b0000); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem;">
-                        <i class="fas fa-fist-raised"></i>
-                    </div>
-                </div>
-                <div class="video-info">
-                    <h3>${video.title}</h3>
-                    <p>${video.description}</p>
-                    <div class="video-meta">
-                        <span><i class="fas fa-clock"></i> ${video.duration}</span>
-                        <span class="license-badge">${video.license}</span>
-                    </div>
-                    <div class="attribution" style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">
-                        ${video.attribution}
-                    </div>
-                </div>
+        // Get current language translations
+        const t = window.translations ? window.translations[window.currentLanguage || 'en'] : {
+            'dev-notice-title': '🚧 Feature in Development',
+            'dev-notice-desc': 'The videos shown here are sample content. The video library feature is currently under development and will include professional karate training videos with CC-BY licensing.'
+        };
+
+        // Show development notice
+        const developmentNotice = `
+            <div class="development-notice" style="grid-column: 1 / -1; background: linear-gradient(135deg, #fff3cd, #ffeaa7); border: 1px solid #ffc107; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; text-align: center;">
+                <h4 style="color: #856404; margin-bottom: 0.5rem;">${t['dev-notice-title']}</h4>
+                <p style="color: #856404; margin: 0; font-size: 0.95rem;">${t['dev-notice-desc']}</p>
             </div>
-        `).join('');
+        `;
+
+        const videoCards = this.videos.map(video => {
+            const thumbnailStyle = video.thumbnail.startsWith('http') 
+                ? `background-image: url('${video.thumbnail}'); background-size: cover; background-position: center;`
+                : `background: linear-gradient(45deg, #c41e3a, #8b0000); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem;`;
+                
+            const thumbnailContent = video.thumbnail.startsWith('http') 
+                ? '' 
+                : '<i class="fas fa-fist-raised"></i>';
+
+            return `
+                <div class="video-card ${video.isSample ? 'sample-video' : ''}" data-video-id="${video.id}">
+                    ${video.isSample ? '<div class="sample-badge">SAMPLE</div>' : ''}
+                    <div class="video-thumbnail" onclick="karateService.playVideo('${video.url}', '${video.title}')">
+                        <div class="play-overlay">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div style="width: 100%; height: 100%; ${thumbnailStyle}">
+                            ${thumbnailContent}
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-category ${video.category}">${video.category.toUpperCase()}</div>
+                        <h3 class="video-title">${video.title}</h3>
+                        <p class="video-description">${video.description}</p>
+                        <div class="video-meta">
+                            <span class="video-duration"><i class="fas fa-clock"></i> ${video.duration}</span>
+                            <span class="license-badge">${video.license}</span>
+                        </div>
+                        <div class="video-attribution">
+                            ${video.attribution}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        videoGrid.innerHTML = developmentNotice + videoCards;
     }
 
     // 動画を再生
@@ -112,9 +142,37 @@ class KarateVideoService {
 
         this.currentVideo = { url, title };
         
-        // 実際のCC-BY動画URLを設定
-        playerVideo.src = url;
-        playerVideo.load();
+        // YouTube動画の場合は別の処理
+        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+            // Get current language translations
+            const t = window.translations ? window.translations[window.currentLanguage || 'en'] : {
+                'sample-video-notice': 'This is a sample video for demonstration purposes. The video editor features below are not functional with YouTube videos.'
+            };
+            
+            // YouTube iframe用のコンテナを作成
+            const videoPlayerContainer = playerVideo.parentElement;
+            videoPlayerContainer.innerHTML = `
+                <iframe 
+                    id="youtubePlayer"
+                    width="100%" 
+                    height="400" 
+                    src="${url}?autoplay=1&rel=0" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen
+                    style="border-radius: 12px; box-shadow: 0 4px 6px var(--shadow);">
+                </iframe>
+                <div class="sample-video-notice" style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1rem; margin-top: 1rem; text-align: center;">
+                    <p style="color: #856404; margin: 0; font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i> ${t['sample-video-notice']}
+                    </p>
+                </div>
+            `;
+        } else {
+            // 通常のビデオファイルの場合
+            playerVideo.src = url;
+            playerVideo.load();
+        }
         
         // エディターセクションにスクロール
         document.getElementById('editor').scrollIntoView({ 
@@ -1979,6 +2037,9 @@ const translations = {
         'kihon': 'Kihon (Basics)',
         'search-videos': 'Search videos...',
         'loading-videos': 'Loading videos...',
+        'dev-notice-title': '🚧 Feature in Development',
+        'dev-notice-desc': 'The videos shown here are sample content. The video library feature is currently under development and will include professional karate training videos with CC-BY licensing.',
+        'sample-video-notice': 'This is a sample video for demonstration purposes. The video editor features below are not functional with YouTube videos.',
         
         // Editor
         'editor-title': 'Video Editor Tool',
@@ -2085,6 +2146,9 @@ const translations = {
         'kihon': '基本',
         'search-videos': '動画を検索...',
         'loading-videos': '動画を読み込み中...',
+        'dev-notice-title': '🚧 開発中の機能',
+        'dev-notice-desc': 'ここに表示されている動画はサンプルコンテンツです。ビデオライブラリ機能は現在開発中で、CC-BYライセンス付きのプロフェッショナル空手指導動画を含む予定です。',
+        'sample-video-notice': 'これはデモンストレーション用のサンプル動画です。以下の動画編集機能はYouTube動画では動作しません。',
         
         // Editor
         'editor-title': '動画編集ツール',
@@ -2144,6 +2208,7 @@ const translations = {
 
 function switchLanguage() {
     currentLanguage = currentLanguage === 'en' ? 'ja' : 'en';
+    window.currentLanguage = currentLanguage; // Update global variable
     updatePageLanguage();
     
     // Update language toggle button
@@ -2226,6 +2291,11 @@ function updatePageLanguage() {
     
     // Update user messages in JavaScript
     updateUserMessages();
+    
+    // Update video library if it exists
+    if (window.karateService) {
+        window.karateService.renderVideoGrid();
+    }
 }
 
 function updateElementText(selector, text) {
@@ -2280,3 +2350,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Make language switching globally available
 window.switchLanguage = switchLanguage;
+window.translations = translations;
+window.currentLanguage = currentLanguage;
