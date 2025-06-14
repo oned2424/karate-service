@@ -739,7 +739,11 @@ app.get('/api/stats', requireAuth, (req, res) => {
 
 // API: 今日の練習記録 (Today✓ボタン)
 app.post('/api/practice/today', optionalUser, (req, res) => {
-    const today = new Date().toISOString().split('T')[0];
+    // 🔧 FIX: Use local date instead of UTC to match frontend
+    const todayDate = new Date();
+    const today = `${todayDate.getFullYear()}-${todayDate.getMonth() + 1}-${todayDate.getDate()}`;
+    console.log('🔍 Backend today date (local):', today);
+    console.log('🔍 UTC comparison would be:', new Date().toISOString().split('T')[0]);
     const userId = req.userId;
     
     // ユーザー記録を取得（ログイン済みまたはゲスト）

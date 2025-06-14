@@ -1001,12 +1001,22 @@ KarateVideoService.prototype.checkTodayStatus = async function() {
     }
     
     try {
-        const today = new Date().toISOString().split('T')[0];
-        const response = await fetch(`/api/practice/calendar?year=${today.split('-')[0]}&month=${today.split('-')[1]}`);
+        // 🔧 FIX: Use consistent local date format to match backend
+        const todayDate = new Date();
+        const today = `${todayDate.getFullYear()}-${todayDate.getMonth() + 1}-${todayDate.getDate()}`;
+        console.log('🔍 Frontend today date (local):', today);
+        
+        const response = await fetch(`/api/practice/calendar?year=${todayDate.getFullYear()}&month=${todayDate.getMonth() + 1}`);
         const result = await response.json();
         
         if (result.success) {
-            this.todayCompleted = result.data.some(record => record.date === today);
+            console.log('🔍 Calendar data received:', result.data);
+            console.log('🔍 Looking for today:', today);
+            
+            this.todayCompleted = result.data.some(record => {
+                console.log('🔍 Checking record date:', record.date, 'vs today:', today);
+                return record.date === today;
+            });
             this.updateTodayButton();
         }
     } catch (error) {
@@ -1493,14 +1503,33 @@ function createDayElement(day, isOtherMonth) {
         dayElement.classList.add('other-month');
     } else {
         // emotionDataに該当データがある日だけ色を付与
-        const month = String(currentMonth + 1).padStart(2, '0');
-        const dayStr = String(day).padStart(2, '0');
-        const dateKey = `${currentYear}-${month}-${dayStr}`;
-        console.log(`Checking emotion for dateKey: ${dateKey}`);
-        const emotion = emotionData[dateKey];
+        // 0埋めありとなし両方のキーで試す
+        const monthPadded = String(currentMonth + 1).padStart(2, '0');
+        const dayPadded = String(day).padStart(2, '0');
+        const dateKeyPadded = `${currentYear}-${monthPadded}-${dayPadded}`;
+        
+        const monthNoPad = String(currentMonth + 1);
+        const dayNoPad = String(day);
+        const dateKeyNoPad = `${currentYear}-${monthNoPad}-${dayNoPad}`;
+        
+        // emotionDataから該当データを探す（両方の形式で）
+        let emotion = emotionData[dateKeyPadded] || emotionData[dateKeyNoPad];
+        
+        // emotionがオブジェクトの場合はemotionプロパティを取得
+        if (emotion && typeof emotion === 'object' && emotion.emotion) {
+            emotion = emotion.emotion;
+        }
+        
         if (emotion) {
-            console.log(`Found emotion ${emotion} for ${dateKey}`);
+            console.log(`Found emotion ${emotion} for ${dateKeyPadded} (day ${day})`);
+            console.log(`Classes added to calendar day:`, ['has-emotion', emotion]);
             dayElement.classList.add('has-emotion', emotion);
+            
+            // Debug: Check if CSS is applied
+            console.log(`Calendar day element classes:`, dayElement.className);
+            console.log(`Calendar day background color:`, getComputedStyle(dayElement).backgroundColor);
+        } else {
+            console.log(`No emotion found for ${dateKeyPadded} or ${dateKeyNoPad} (day ${day})`);
         }
         // クリックハンドラはそのまま
         dayElement.addEventListener('click', () => {
