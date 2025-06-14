@@ -65,11 +65,11 @@ class KarateVideoService {
                 title: "Basic Training - Seiken Tsuki",
                 description: "Detailed explanation of proper form and practice methods (Sample video - Feature in development)",
                 category: "kihon",
-                url: "/videos/sample3.mp4",
-                thumbnail: "/images/kihon1.jpg",
+                url: "https://www.youtube.com/embed/Bo_11Yy8z2Y",
+                thumbnail: "https://img.youtube.com/vi/Bo_11Yy8z2Y/maxresdefault.jpg",
                 duration: "4:33",
                 license: "Sample Content",
-                attribution: "Sample Video - Feature in Development",
+                attribution: "YouTube Sample - Feature in Development",
                 isSample: true
             }
         ];
