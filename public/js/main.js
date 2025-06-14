@@ -2048,7 +2048,16 @@ function updateTodayDisplay() {
             }
         };
         
-        const currentLang = window.currentLanguage || 'en';
+        // Get current language reliably
+        function getCurrentLanguage() {
+            return window.currentLanguage || 
+                   (typeof currentLanguage !== 'undefined' ? currentLanguage : null) || 
+                   localStorage.getItem('preferredLanguage') || 
+                   'en';
+        }
+        
+        const currentLang = getCurrentLanguage();
+        console.log('updateTodayDisplay currentLang:', currentLang); // Debug log
         const moodData = emotionData[todayData.emotion] || emotionData['mood-3'];
         const message = moodData[currentLang] || moodData.en;
         
@@ -2460,7 +2469,10 @@ function updateUserMessages() {
     if (window.karateService) {
         window.karateService.updateDashboardForUser();
         // Update Today's feeling display if shown
-        window.karateService.updateTodayDisplay();
+        // Force update with current language
+        setTimeout(() => {
+            window.karateService.updateTodayDisplay();
+        }, 100); // Small delay to ensure language change is processed
     }
 }
 
@@ -2469,6 +2481,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const savedLanguage = localStorage.getItem('preferredLanguage');
     if (savedLanguage && savedLanguage !== currentLanguage) {
         currentLanguage = savedLanguage;
+        window.currentLanguage = currentLanguage; // Update global variable
         updatePageLanguage();
         
         // Update language toggle button
@@ -2476,6 +2489,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (languageToggle) {
             languageToggle.textContent = currentLanguage === 'en' ? '🌐 JP/EN' : '🌐 EN/JP';
         }
+    } else {
+        // Ensure global variable is set even if no saved language
+        window.currentLanguage = currentLanguage;
     }
 });
 
