@@ -31,9 +31,10 @@ app.get('/admin/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/admin/index.html'));
 });
 
-// About page route
+// About page route - serve built React app
+app.use('/about', express.static(path.join(__dirname, '../about/dist')));
 app.get('/about', (req, res) => {
-    res.sendFile(path.join(__dirname, '../about/index.html'));
+    res.sendFile(path.join(__dirname, '../about/dist/index.html'));
 });
 
 // ファイルアップロード設定
