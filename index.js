@@ -869,6 +869,78 @@ app.get('/api/practice/calendar', optionalUser, (req, res) => {
 
 // 🚫 Journal API removed to eliminate 3-emoji modal issue
 
+// API: 練習記録のemotion更新
+app.put('/api/practice/emotion', optionalUser, (req, res) => {
+    const { date, emotion, comment } = req.body;
+    const userId = req.userId;
+    
+    if (!date || !emotion) {
+        return res.status(400).json({
+            success: false,
+            message: '日付と感情は必須です'
+        });
+    }
+    
+    // ユーザー記録を取得（ログイン済みまたはゲスト）
+    let records;
+    if (userId) {
+        // ユーザー記録を初期化（存在しない場合）
+        if (!userPracticeRecords[userId]) {
+            userPracticeRecords[userId] = [];
+        }
+        records = userPracticeRecords[userId];
+    } else {
+        // ゲストユーザーの場合はglobal practiceRecordsを使用
+        records = practiceRecords;
+    }
+    
+    // 該当日の記録を検索
+    let existingRecord = records.find(record => record.date === date);
+    
+    if (existingRecord) {
+        // 既存の記録のemotionを更新
+        existingRecord.emotion = emotion;
+        if (comment !== undefined) {
+            existingRecord.comment = comment;
+        }
+    } else {
+        // 新しい記録を作成
+        const newRecord = {
+            id: nextPracticeId++,
+            date: date,
+            completed: true,
+            timestamp: new Date().toISOString(),
+            userId: userId || null,
+            emotion: emotion,
+            comment: comment || ''
+        };
+        
+        if (userId) {
+            if (!userPracticeRecords[userId]) {
+                userPracticeRecords[userId] = [];
+            }
+            userPracticeRecords[userId].push(newRecord);
+        } else {
+            practiceRecords.push(newRecord);
+        }
+        
+        existingRecord = newRecord;
+    }
+    
+    // データをファイルに保存
+    saveDataToFile();
+    
+    res.json({
+        success: true,
+        message: '感情記録を更新しました',
+        data: {
+            date: existingRecord.date,
+            emotion: existingRecord.emotion,
+            comment: existingRecord.comment || ''
+        }
+    });
+});
+
 // 🔧 DEBUG: データベース状況確認用API
 app.get('/api/debug/data', optionalUser, (req, res) => {
     const userId = req.userId;

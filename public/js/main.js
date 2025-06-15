@@ -1772,7 +1772,7 @@ function selectEmotionButton(emotion) {
     }, 500); // 500ms後に安全に再開
 }
 
-function saveEmotion() {
+async function saveEmotion() {
     if (selectedDay && selectedEmotion) {
         const dateKey = `${currentYear}-${currentMonth + 1}-${selectedDay}`;
         const commentTextarea = document.getElementById('emotionComment');
@@ -1783,11 +1783,52 @@ function saveEmotion() {
         console.log('Selected day:', selectedDay);
         console.log('Current year:', currentYear, 'Current month (0-indexed):', currentMonth);
         console.log('Generated date key:', dateKey);
+        console.log('Emotion:', selectedEmotion);
+        console.log('Comment:', comment);
         
-        emotionData[dateKey] = {
-            emotion: selectedEmotion,
-            comment: comment
-        };
+        try {
+            // Save to server
+            const response = await fetch('/api/practice/emotion', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    date: dateKey,
+                    emotion: selectedEmotion,
+                    comment: comment
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Update local emotionData only after successful server save
+                emotionData[dateKey] = {
+                    emotion: selectedEmotion,
+                    comment: comment
+                };
+                
+                console.log('✅ Emotion saved to server successfully');
+                
+                // Show success notification
+                if (window.karateService && window.karateService.showNotification) {
+                    window.karateService.showNotification(`${selectedDay}日の練習記録を保存しました`, 'success');
+                }
+            } else {
+                console.error('❌ Failed to save emotion to server:', result.message);
+                if (window.karateService && window.karateService.showNotification) {
+                    window.karateService.showNotification('感情記録の保存に失敗しました: ' + result.message, 'error');
+                }
+                return; // Don't update local data if server save failed
+            }
+        } catch (error) {
+            console.error('❌ Network error saving emotion:', error);
+            if (window.karateService && window.karateService.showNotification) {
+                window.karateService.showNotification('ネットワークエラーが発生しました', 'error');
+            }
+            return; // Don't update local data if network error
+        }
         
         // Update calendar displays
         generateCalendar(currentMonth, currentYear);
@@ -1801,20 +1842,17 @@ function saveEmotion() {
         const today = new Date();
         const todayKey = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
         if (dateKey === todayKey) {
-            // If this is today's practice, record it on the server
+            // CRITICAL: ALWAYS update Today's display to ensure calendar changes sync
+            // This fixes the issue where calendar edits don't update Today's Practice display
+            updateTodayDisplay();
+            
+            // Also update karate service state for today's completion
             if (window.karateService) {
-                recordTodayPractice();
+                window.karateService.todayCompleted = true;
+                window.karateService.updateTodayButton();
+                // Update streak data since we now have today's practice
+                window.karateService.loadStreakData();
             }
-        }
-        
-        // CRITICAL: ALWAYS update Today's display to ensure calendar changes sync
-        // This fixes the issue where calendar edits don't update Today's Practice display
-        updateTodayDisplay();
-        
-        // Also update karate service state for today's completion
-        if (dateKey === todayKey && window.karateService) {
-            window.karateService.todayCompleted = true;
-            window.karateService.updateTodayButton();
         }
         
         // If this was for today, reset the flag
@@ -1824,11 +1862,6 @@ function saveEmotion() {
         
         // Close modal
         closeEmotionModal();
-        
-        // Show notification if available
-        if (window.karateService && window.karateService.showNotification) {
-            window.karateService.showNotification(`${selectedDay}日の練習記録を保存しました`, 'success');
-        }
     }
 }
 
