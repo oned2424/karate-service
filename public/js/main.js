@@ -1169,12 +1169,15 @@ KarateVideoService.prototype.loadFullCalendarData = async function() {
             
             // practiceDataからemotionData形式に変換
             const newEmotionData = {};
+            console.log('🔄 Converting practice data to emotion data:', practiceData);
             practiceData.forEach(record => {
                 if (record.completed && record.emotion) {
+                    console.log(`   📝 Converting record: date=${record.date}, emotion=${record.emotion}`);
                     // YYYY-MM-DD形式のキーでemotionDataに格納
                     newEmotionData[record.date] = record.emotion;
                 }
             });
+            console.log('🔄 New emotion data created:', newEmotionData);
             
             // グローバルのemotionDataを更新
             emotionData = { ...emotionData, ...newEmotionData };
@@ -1479,16 +1482,35 @@ function generateCalendar(month, year) {
     
     calendarDays.innerHTML = '';
     
+    // 🔧 FIX: 前月・次月の正確な年月を計算
+    let prevMonth = month - 1;
+    let prevYear = year;
+    if (prevMonth < 0) {
+        prevMonth = 11;
+        prevYear = year - 1;
+    }
+    
+    let nextMonth = month + 1;
+    let nextYear = year;
+    if (nextMonth > 11) {
+        nextMonth = 0;
+        nextYear = year + 1;
+    }
+    
+    console.log(`🗓️ Generating calendar for ${year}-${month + 1}`);
+    console.log(`   Previous month: ${prevYear}-${prevMonth + 1}`);
+    console.log(`   Next month: ${nextYear}-${nextMonth + 1}`);
+    
     // Previous month's trailing days
     for (let i = firstDay - 1; i >= 0; i--) {
         const day = daysInPrevMonth - i;
-        const dayElement = createDayElement(day, true);
+        const dayElement = createDayElement(day, true, prevMonth, prevYear);
         calendarDays.appendChild(dayElement);
     }
     
     // Current month's days
     for (let day = 1; day <= daysInMonth; day++) {
-        const dayElement = createDayElement(day, false);
+        const dayElement = createDayElement(day, false, month, year);
         calendarDays.appendChild(dayElement);
     }
     
@@ -1496,7 +1518,7 @@ function generateCalendar(month, year) {
     const totalCells = calendarDays.children.length;
     const remainingCells = 42 - totalCells; // 6 rows × 7 days
     for (let day = 1; day <= remainingCells; day++) {
-        const dayElement = createDayElement(day, true);
+        const dayElement = createDayElement(day, true, nextMonth, nextYear);
         calendarDays.appendChild(dayElement);
     }
     
@@ -1507,7 +1529,7 @@ function generateCalendar(month, year) {
     }
 }
 
-function createDayElement(day, isOtherMonth) {
+function createDayElement(day, isOtherMonth, actualMonth = null, actualYear = null) {
     const dayElement = document.createElement('div');
     dayElement.className = 'calendar-day';
     dayElement.textContent = day;
@@ -1515,18 +1537,25 @@ function createDayElement(day, isOtherMonth) {
     if (isOtherMonth) {
         dayElement.classList.add('other-month');
     } else {
-        // emotionDataに該当データがある日だけ色を付与
-        // 0埋めありとなし両方のキーで試す
-        const monthPadded = String(currentMonth + 1).padStart(2, '0');
-        const dayPadded = String(day).padStart(2, '0');
-        const dateKeyPadded = `${currentYear}-${monthPadded}-${dayPadded}`;
+        // 🔧 FIX: 実際の日付を使用してemotionデータを検索
+        const year = actualYear || currentYear;
+        const month = actualMonth !== null ? actualMonth : currentMonth;
         
-        const monthNoPad = String(currentMonth + 1);
+        // 正確な日付文字列を生成（バックエンドと同じ形式）
+        const monthNoPad = String(month + 1);
         const dayNoPad = String(day);
-        const dateKeyNoPad = `${currentYear}-${monthNoPad}-${dayNoPad}`;
+        const dateKeyNoPad = `${year}-${monthNoPad}-${dayNoPad}`;
+        
+        // 0埋めバージョンも試行（互換性のため）
+        const monthPadded = String(month + 1).padStart(2, '0');
+        const dayPadded = String(day).padStart(2, '0');
+        const dateKeyPadded = `${year}-${monthPadded}-${dayPadded}`;
+        
+        console.log(`🔍 Checking emotion for day ${day}, month ${month + 1}, year ${year}`);
+        console.log(`   📅 Date keys: ${dateKeyNoPad}, ${dateKeyPadded}`);
         
         // emotionDataから該当データを探す（両方の形式で）
-        let emotion = emotionData[dateKeyPadded] || emotionData[dateKeyNoPad];
+        let emotion = emotionData[dateKeyNoPad] || emotionData[dateKeyPadded];
         
         // emotionがオブジェクトの場合はemotionプロパティを取得
         if (emotion && typeof emotion === 'object' && emotion.emotion) {
@@ -1534,15 +1563,23 @@ function createDayElement(day, isOtherMonth) {
         }
         
         if (emotion) {
-            console.log(`Found emotion ${emotion} for ${dateKeyPadded} (day ${day})`);
-            console.log(`Classes added to calendar day:`, ['has-emotion', emotion]);
+            console.log(`🎯 FOUND EMOTION: ${emotion} for day ${day} (month ${month + 1})`);
+            console.log(`   📅 Matched date key: ${dateKeyNoPad}`);
+            console.log(`   📊 All emotionData keys:`, Object.keys(emotionData));
+            console.log(`   🎨 Adding classes: has-emotion, ${emotion}`);
             dayElement.classList.add('has-emotion', emotion);
             
-            // Debug: Check if CSS is applied
-            console.log(`Calendar day element classes:`, dayElement.className);
-            console.log(`Calendar day background color:`, getComputedStyle(dayElement).backgroundColor);
+            // Debug: CSS適用状態を即座にチェック
+            setTimeout(() => {
+                const computedStyle = getComputedStyle(dayElement);
+                console.log(`   🖌️ Day ${day} final styles:`, {
+                    backgroundColor: computedStyle.backgroundColor,
+                    color: computedStyle.color,
+                    className: dayElement.className
+                });
+            }, 100);
         } else {
-            console.log(`No emotion found for ${dateKeyPadded} or ${dateKeyNoPad} (day ${day})`);
+            console.log(`❌ No emotion for day ${day} (keys: ${dateKeyNoPad}, ${dateKeyPadded})`);
         }
         // クリックハンドラはそのまま
         dayElement.addEventListener('click', () => {
