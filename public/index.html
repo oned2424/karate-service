@@ -20,14 +20,22 @@
                 <i class="fas fa-fist-raised"></i>
                 <span>Karate <span style="font-weight: 400; color: var(--neutral-medium);">Pocket Dojo</span></span>
             </div>
-            <ul class="nav-menu">
-                <li><a href="#home" class="nav-link">Home</a></li>
-                <li><a href="#dashboard" class="nav-link">Dashboard</a></li>
-                <li><a href="#calendar" class="nav-link">Calendar</a></li>
-                <li><a href="#library" class="nav-link">Video Library</a></li>
-                <li><a href="#editor" class="nav-link">Editor</a></li>
-                <li><a href="#about" class="nav-link">About</a></li>
-                <li><a href="#" class="nav-link language-toggle" onclick="switchLanguage()">🌐 JP/EN</a></li>
+            
+            <!-- Hamburger menu button for mobile -->
+            <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home" class="nav-link" onclick="closeMobileMenu()">Home</a></li>
+                <li><a href="#dashboard" class="nav-link" onclick="closeMobileMenu()">Dashboard</a></li>
+                <li><a href="#calendar" class="nav-link" onclick="closeMobileMenu()">Calendar</a></li>
+                <li><a href="#library" class="nav-link" onclick="closeMobileMenu()">Video Library</a></li>
+                <li><a href="#editor" class="nav-link" onclick="closeMobileMenu()">Editor</a></li>
+                <li><a href="#about" class="nav-link" onclick="closeMobileMenu()">About</a></li>
+                <li><a href="#" class="nav-link language-toggle" onclick="switchLanguage(); closeMobileMenu()">🌐 JP/EN</a></li>
                 
                 <!-- User authentication menu -->
                 <li class="user-menu">

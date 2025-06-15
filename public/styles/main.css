@@ -1887,3 +1887,203 @@ div[style*="flex"]:has-text("😊"):has-text("😐"):has-text("😫") {
         justify-content: center;
     }
 }
+
+/* ==== Hamburger Menu & Mobile Navigation ==== */
+
+/* Hamburger Menu Button */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    z-index: 1001;
+    transition: transform 0.3s ease;
+}
+
+.hamburger:hover {
+    transform: scale(1.1);
+}
+
+.hamburger-line {
+    width: 25px;
+    height: 3px;
+    background-color: var(--text-primary);
+    margin: 3px 0;
+    transition: 0.3s ease;
+    border-radius: 2px;
+}
+
+/* Hamburger animation when active */
+.hamburger.active .hamburger-line:nth-child(1) {
+    transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.hamburger.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active .hamburger-line:nth-child(3) {
+    transform: rotate(45deg) translate(-5px, -6px);
+}
+
+/* Mobile Navigation Styles */
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
+    
+    .nav-container {
+        justify-content: space-between;
+    }
+    
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 280px;
+        height: 100vh;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 6rem 2rem 2rem;
+        transition: right 0.3s ease;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        gap: 1.5rem;
+        overflow-y: auto;
+        align-items: stretch;
+    }
+    
+    .nav-menu.active {
+        right: 0;
+    }
+    
+    .nav-menu li {
+        width: 100%;
+        list-style: none;
+    }
+    
+    .nav-link {
+        display: block;
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+        font-size: 1.1rem;
+        text-align: left;
+        color: var(--text-primary);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .nav-link::after {
+        display: none;
+    }
+    
+    .nav-link:hover {
+        background: rgba(30, 58, 138, 0.1);
+        color: var(--primary-color);
+        transform: translateX(5px);
+    }
+    
+    /* User menu mobile styles */
+    .user-menu {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid var(--border);
+        width: 100%;
+    }
+    
+    .auth-section {
+        width: 100%;
+    }
+    
+    .login-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 1rem;
+        font-size: 1rem;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .user-button {
+        width: 100%;
+        justify-content: space-between;
+        padding: 1rem;
+        font-size: 1rem;
+        text-align: left;
+    }
+    
+    .dropdown-menu {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+        border: none;
+        background: transparent;
+        margin-top: 1rem;
+        display: block;
+    }
+    
+    .dropdown-menu.show {
+        display: block;
+    }
+    
+    .dropdown-menu a {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+        background: rgba(30, 58, 138, 0.05);
+        margin-bottom: 0.5rem;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1rem;
+    }
+    
+    .dropdown-menu a:hover {
+        background: rgba(30, 58, 138, 0.15);
+        transform: translateX(5px);
+    }
+    
+    /* Hide desktop nav elements on mobile */
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-content p {
+        font-size: 1.125rem;
+    }
+    
+    .trust-indicators {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+    }
+}
+
+/* Tablet Navigation Styles */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .nav-menu {
+        gap: 1.5rem;
+    }
+    
+    .nav-link {
+        font-size: 0.9rem;
+        padding: 0.4rem 0;
+    }
+    
+    .login-btn {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .user-button {
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+    }
+}

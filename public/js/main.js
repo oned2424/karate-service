@@ -1473,6 +1473,53 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// ==== Mobile Navigation Functions ====
+
+// Toggle mobile navigation menu
+function toggleMobileMenu() {
+    const hamburger = document.getElementById('hamburgerBtn');
+    const navMenu = document.getElementById('navMenu');
+    
+    hamburger.classList.toggle('active');
+    navMenu.classList.toggle('active');
+    
+    // Prevent body scroll when menu is open
+    if (navMenu.classList.contains('active')) {
+        document.body.style.overflow = 'hidden';
+    } else {
+        document.body.style.overflow = '';
+    }
+}
+
+// Close mobile menu
+function closeMobileMenu() {
+    const hamburger = document.getElementById('hamburgerBtn');
+    const navMenu = document.getElementById('navMenu');
+    
+    hamburger.classList.remove('active');
+    navMenu.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', (e) => {
+    const navMenu = document.getElementById('navMenu');
+    const hamburger = document.getElementById('hamburgerBtn');
+    
+    if (navMenu && navMenu.classList.contains('active') && 
+        !navMenu.contains(e.target) && 
+        !hamburger.contains(e.target)) {
+        closeMobileMenu();
+    }
+});
+
+// Close mobile menu on window resize to desktop size
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+        closeMobileMenu();
+    }
+});
+
 // Calendar functionality
 let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
@@ -2003,48 +2050,18 @@ function updateCalendarStats() {
     const daysInCurrentMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const completionRate = thisMonthEntries.length > 0 ? Math.round((thisMonthEntries.length / daysInCurrentMonth) * 100) : 0;
     
-    // Calculate streaks
+    // 🔧 FIX: サーバーから取得したストリークデータを使用（統一性確保）
     let currentStreak = 0;
     let longestStreak = 0;
     
-    // Calculate current streak (backwards from today)
-    for (let i = 0; i >= -30; i--) {
-        const checkDate = new Date(today);
-        checkDate.setDate(checkDate.getDate() + i);
-        const checkKey = `${checkDate.getFullYear()}-${checkDate.getMonth() + 1}-${checkDate.getDate()}`;
-        
-        if (emotionData[checkKey]) {
-            if (i === 0) currentStreak = 1;
-            else if (currentStreak > 0) currentStreak++;
-        } else {
-            if (i === 0) currentStreak = 0;
-            break;
-        }
+    // KarateVideoServiceのストリークデータを使用
+    if (window.karateService && window.karateService.streakData) {
+        currentStreak = window.karateService.streakData.current || 0;
+        longestStreak = window.karateService.streakData.longest || 0;
+        console.log('🔧 Using server streak data for calendar stats:', window.karateService.streakData);
+    } else {
+        console.log('⚠️ No server streak data available, using default values');
     }
-    
-    // Calculate longest streak
-    const sortedDates = Object.keys(emotionData).sort();
-    let tempStreak = 0;
-    let currentStreakCount = 0;
-    let lastDate = null;
-    
-    for (let dateStr of sortedDates) {
-        const currentDate = new Date(dateStr);
-        if (lastDate) {
-            const diffTime = currentDate - lastDate;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            if (diffDays === 1) {
-                currentStreakCount++;
-            } else {
-                longestStreak = Math.max(longestStreak, currentStreakCount);
-                currentStreakCount = 1;
-            }
-        } else {
-            currentStreakCount = 1;
-        }
-        lastDate = currentDate;
-    }
-    longestStreak = Math.max(longestStreak, currentStreakCount);
     
     // Update full calendar stats display
     const fullCurrentStreakEl = document.getElementById('fullCurrentStreak');
