@@ -326,6 +326,11 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
+// About page route - serve standalone HTML
+app.get('/about', (req, res) => {
+    res.sendFile(path.join(__dirname, 'about-standalone.html'));
+});
+
 // 管理者画面（認証が必要）
 app.get('/admin-standalone', requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'admin-standalone.html'));
