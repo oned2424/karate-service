@@ -978,15 +978,28 @@ KarateVideoService.prototype.updateStreakDisplay = function() {
     const longestStreakEl = document.getElementById('longestStreak');
     const totalPracticeEl = document.getElementById('totalPractice');
     
-    // 強化されたログイン状態チェック - ゲストユーザーには適切な値を表示
-    const isLoggedIn = this.isLoggedIn === true && this.currentUser !== null;
+    console.log('🔧 Updating streak display:', {
+        isLoggedIn: this.isLoggedIn,
+        currentUser: this.currentUser,
+        streakData: this.streakData
+    });
     
-    if (currentStreakEl) currentStreakEl.textContent = isLoggedIn ? this.streakData.current : 0;
-    // LONGEST STREAK - ゲストユーザーは必ず0を表示
-    if (longestStreakEl) {
-        longestStreakEl.textContent = isLoggedIn ? this.streakData.longest : 0;
+    // ストリークデータを表示（ログイン状態に関係なく、サーバーからのデータを使用）
+    if (currentStreakEl) {
+        currentStreakEl.textContent = this.streakData?.current || 0;
     }
-    if (totalPracticeEl) totalPracticeEl.textContent = isLoggedIn ? this.streakData.total : 0;
+    if (longestStreakEl) {
+        longestStreakEl.textContent = this.streakData?.longest || 0;
+    }
+    if (totalPracticeEl) {
+        totalPracticeEl.textContent = this.streakData?.total || 0;
+    }
+    
+    console.log('🔧 Streak display updated:', {
+        current: this.streakData?.current || 0,
+        longest: this.streakData?.longest || 0,
+        total: this.streakData?.total || 0
+    });
 };
 
 // 今日の練習状況チェック
@@ -1126,6 +1139,9 @@ KarateVideoService.prototype.ensureCalendarInitialization = async function() {
     
     // データロード
     await this.loadFullCalendarData();
+    
+    // ストリークデータの再読み込み（カレンダーデータ読み込み後）
+    await this.loadStreakData();
     
     // カレンダー表示の初期化
     if (document.getElementById('calendarDays')) {
@@ -1810,6 +1826,14 @@ async function saveEmotion() {
                 };
                 
                 console.log('✅ Emotion saved to server successfully');
+                console.log('Server response:', result);
+                
+                // Update streak data if returned from server
+                if (result.data.streak && window.karateService) {
+                    window.karateService.streakData = result.data.streak;
+                    window.karateService.updateStreakDisplay();
+                    console.log('✅ Streak data updated:', result.data.streak);
+                }
                 
                 // Show success notification
                 if (window.karateService && window.karateService.showNotification) {

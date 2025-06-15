@@ -927,8 +927,20 @@ app.put('/api/practice/emotion', optionalUser, (req, res) => {
         existingRecord = newRecord;
     }
     
+    // ストリーク計算を更新
+    if (userId) {
+        updateUserStreak(userId);
+    } else {
+        updateStreak();
+    }
+    
     // データをファイルに保存
     saveDataToFile();
+    
+    // 更新されたストリーク情報も含めてレスポンス
+    const streakData = userId 
+        ? userSettings[userId]?.streak || { current: 0, longest: 0, total: 0 }
+        : globalUserSettings.streak;
     
     res.json({
         success: true,
@@ -936,7 +948,8 @@ app.put('/api/practice/emotion', optionalUser, (req, res) => {
         data: {
             date: existingRecord.date,
             emotion: existingRecord.emotion,
-            comment: existingRecord.comment || ''
+            comment: existingRecord.comment || '',
+            streak: streakData
         }
     });
 });
