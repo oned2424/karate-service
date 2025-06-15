@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>空手ポケット道場 - Karate Pocket Dojo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background: #ffffff;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #dc2626 0%, #f97316 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .logo-text-sub {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #4b5563;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #dc2626;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #dc2626 0%, #f97316 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 80px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fee2e2 50%, #fce7f3 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4b5563;
+        }
+
+        .hero-badge i {
+            color: #dc2626;
+            margin-right: 0.5rem;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero-highlight {
+            background: linear-gradient(135deg, #dc2626 0%, #f97316 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+            margin-top: 0.5rem;
+        }
+
+        .hero-description {
+            font-size: 1.25rem;
+            color: #4b5563;
+            margin-bottom: 1rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.8;
+        }
+
+        .hero-description-en {
+            font-size: 1.125rem;
+            color: #6b7280;
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+
+        .primary-button {
+            background: linear-gradient(135deg, #dc2626 0%, #f97316 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-size: 1.125rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+        }
+
+        .primary-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.35);
+        }
+
+        .secondary-button {
+            background: white;
+            color: #4b5563;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-size: 1.125rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .secondary-button:hover {
+            background: #f9fafb;
+        }
+
+        .hero-features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+
+        .hero-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hero-feature i {
+            font-size: 1.25rem;
+        }
+
+        /* Calendar Demo */
+        .calendar-demo {
+            max-width: 1000px;
+            margin: 4rem auto 0;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            padding: 2rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .calendar-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .calendar-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .calendar-subtitle {
+            color: #6b7280;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .stat-card:nth-child(2) {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        }
+
+        .stat-card:nth-child(3) {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        }
+
+        .stat-card:nth-child(4) {
+            background: linear-gradient(135deg, #e9d5ff 0%, #d8b4fe 100%);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .about-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .about-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .about-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+        }
+
+        .about-description {
+            font-size: 1.25rem;
+            line-height: 1.8;
+            margin-bottom: 3rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .about-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .about-feature {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .about-feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-feature-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .about-feature-text {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 5rem 0;
+            background: #ffffff;
+        }
+
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.25rem;
+            color: #6b7280;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .feature-card:nth-child(2) .feature-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .feature-card:nth-child(3) .feature-header {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        .feature-card:nth-child(4) .feature-header {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-subtitle {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        .feature-body {
+            padding: 1.5rem;
+        }
+
+        .feature-description {
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        /* Video Features */
+        .video-features {
+            padding: 5rem 0;
+            background: #f9fafb;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .video-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+        }
+
+        .video-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .video-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 2.5rem;
+        }
+
+        .video-card:nth-child(2) .video-icon-wrapper {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .video-card:nth-child(3) .video-icon-wrapper {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        .video-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .video-description {
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .video-highlight {
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .video-card:nth-child(2) .video-highlight {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .video-card:nth-child(3) .video-highlight {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+
+        /* How it Works */
+        .steps-section {
+            padding: 5rem 0;
+            background: white;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step-card {
+            position: relative;
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+        }
+
+        .step-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .step-number {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 32px;
+            height: 32px;
+            background: #dc2626;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.875rem;
+        }
+
+        .step-emoji {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-subtitle {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .step-description {
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, #fef3c7 0%, #fee2e2 100%);
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .faq-question:hover {
+            background: #f9fafb;
+        }
+
+        .faq-question-text {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .faq-question-text-en {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        .faq-icon {
+            color: #9ca3af;
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 0 1.5rem 1.5rem;
+            max-height: 300px;
+        }
+
+        .faq-answer-text {
+            color: #4b5563;
+            line-height: 1.6;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, #dc2626 0%, #f97316 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .cta-subtitle {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .cta-primary {
+            background: white;
+            color: #dc2626;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-size: 1.125rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .cta-primary:hover {
+            background: #f9fafb;
+            transform: scale(1.05);
+        }
+
+        .cta-secondary {
+            background: transparent;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border: 2px solid white;
+            transition: all 0.3s;
+        }
+
+        .cta-secondary:hover {
+            background: white;
+            color: #dc2626;
+        }
+
+        .cta-benefits {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .cta-benefit {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 4rem 0 2rem;
+            background: #111827;
+            color: #9ca3af;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .footer-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #dc2626 0%, #f97316 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .footer-brand-text {
+            color: white;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .footer-brand-sub {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        .footer-description {
+            line-height: 1.6;
+            margin-top: 1rem;
+        }
+
+        .footer-title {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-link {
+            color: #9ca3af;
+            text-decoration: none;
+            display: block;
+            padding: 0.5rem 0;
+            transition: color 0.3s;
+        }
+
+        .footer-link:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #374151;
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-copyright {
+            font-size: 0.875rem;
+        }
+
+        .footer-legal {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-legal a {
+            color: #9ca3af;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.3s;
+        }
+
+        .footer-legal a:hover {
+            color: white;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-button {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #4b5563;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-button {
+                display: block;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-description {
+                font-size: 1rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto 3rem;
+            }
+
+            .primary-button,
+            .secondary-button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .hero-features {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-container > * {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        .hero-container > *:nth-child(1) { animation-delay: 0.1s; }
+        .hero-container > *:nth-child(2) { animation-delay: 0.2s; }
+        .hero-container > *:nth-child(3) { animation-delay: 0.3s; }
+        .hero-container > *:nth-child(4) { animation-delay: 0.4s; }
+        .hero-container > *:nth-child(5) { animation-delay: 0.5s; }
+        .hero-container > *:nth-child(6) { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-award"></i>
+                </div>
+                <div>
+                    <div class="logo-text">空手ポケット道場</div>
+                    <div class="logo-text-sub">Karate Pocket Dojo</div>
+                </div>
+            </div>
+            
+            <div class="nav-links">
+                <a href="#features" class="nav-link">特徴</a>
+                <a href="#how-it-works" class="nav-link">使い方</a>
+                <a href="#faq" class="nav-link">FAQ</a>
+                <a href="#" class="cta-button">無料で始める</a>
+            </div>
+            
+            <button class="mobile-menu-button">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-badge">
+                <i class="fas fa-heart"></i>
+                まもなくリリース予定
+            </div>
+            
+            <h1 class="hero-title">
+                自宅で始める
+                <span class="hero-highlight">空手の習慣化</span>
+            </h1>
+            
+            <p class="hero-description">
+                忙しい毎日でも続けられる。動画学習と習慣化サポートで、<br>
+                あなたの空手ライフを始めませんか？
+            </p>
+            
+            <p class="hero-description-en">
+                Transform your daily routine with comprehensive karate video learning platform.<br>
+                Build lasting habits while mastering traditional techniques from home.
+            </p>
+            
+            <div class="hero-buttons">
+                <a href="#" class="primary-button">
+                    事前登録で特典GET
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="#" class="secondary-button">
+                    デモを見る
+                    <i class="fas fa-play"></i>
+                </a>
+            </div>
+            
+            <div class="hero-features">
+                <div class="hero-feature">
+                    <i class="fas fa-video" style="color: #dc2626;"></i>
+                    <span>高品質動画</span>
+                </div>
+                <div class="hero-feature">
+                    <i class="fas fa-sync-alt" style="color: #3b82f6;"></i>
+                    <span>鏡映し対応</span>
+                </div>
+                <div class="hero-feature">
+                    <i class="fas fa-globe" style="color: #10b981;"></i>
+                    <span>世界対応</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Demo -->
+        <div class="calendar-demo">
+            <div class="calendar-header">
+                <h3 class="calendar-title">練習カレンダー</h3>
+                <p class="calendar-subtitle">日々のトレーニング進捗を追跡</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">1</div>
+                    <div class="stat-label">今日の練習回数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">1</div>
+                    <div class="stat-label">練習日数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">3%</div>
+                    <div class="stat-label">達成率</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">1</div>
+                    <div class="stat-label">今月の目標</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section">
+        <div class="about-container">
+            <div class="about-badge">
+                <i class="fas fa-comment-dots"></i>
+                空手ポケット道場って何？
+            </div>
+            
+            <h2 class="about-title">
+                より簡単に、あなたの物語を。
+            </h2>
+            
+            <p class="about-description">
+                空手ポケット道場は、忙しい現代人のために作られた革新的な動画学習プラットフォームです。
+                伝統的な空手の技術と現代の習慣化科学を組み合わせ、
+                誰でも自宅で本格的な空手を自習で学べる環境を提供します。
+            </p>
+            
+            <div class="about-features">
+                <div class="about-feature">
+                    <div class="about-feature-icon">📱</div>
+                    <h3 class="about-feature-title">いつでもどこでも</h3>
+                    <p class="about-feature-text">
+                        スマートフォンがあれば、通勤中でも自宅でも、
+                        あなたの好きな時間に空手を学習できます。
+                    </p>
+                </div>
+                
+                <div class="about-feature">
+                    <div class="about-feature-icon">🎯</div>
+                    <h3 class="about-feature-title">習慣化をサポート</h3>
+                    <p class="about-feature-text">
+                        科学的な習慣形成理論に基づいて、
+                        無理なく継続できる学習プランを提案します。
+                    </p>
+                </div>
+                
+                <div class="about-feature">
+                    <div class="about-feature-icon">🔄</div>
+                    <h3 class="about-feature-title">鏡映し・スロー再生</h3>
+                    <p class="about-feature-text">
+                        鏡映し表示とスロー再生で、
+                        複雑な動きも正確に理解できます。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="features-container">
+            <div class="section-header">
+                <h2 class="section-title">選ばれる理由</h2>
+                <p class="section-subtitle">空手ポケット道場が多くの学習者に愛される4つの特徴</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <h3 class="feature-title">毎日の習慣づくり</h3>
+                        <p class="feature-subtitle">Daily Habit Building</p>
+                    </div>
+                    <div class="feature-body">
+                        <p class="feature-description">
+                            あなたのペースに合わせた個別の練習プランで、無理なく空手を習慣化できます。
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <h3 class="feature-title">動画で自習学習</h3>
+                        <p class="feature-subtitle">Video Self-Learning</p>
+                    </div>
+                    <div class="feature-body">
+                        <p class="feature-description">
+                            高品質な動画コンテンツで、基礎から応用まで段階的に自分のペースで学習できます。
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <h3 class="feature-title">鏡映し・スロー再生</h3>
+                        <p class="feature-subtitle">Mirror & Slow Motion</p>
+                    </div>
+                    <div class="feature-body">
+                        <p class="feature-description">
+                            鏡映し表示とスロー再生（0.5倍速）で、動きを正確に理解し練習できます。
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h3 class="feature-title">世界中の仲間</h3>
+                        <p class="feature-subtitle">Global Community</p>
+                    </div>
+                    <div class="feature-body">
+                        <p class="feature-description">
+                            世界中の空手愛好家とつながり、お互いの成長を応援し合えるコミュニティです。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Features Section -->
+    <section class="video-features">
+        <div class="features-container">
+            <div class="section-header">
+                <h2 class="section-title">動画学習の特徴</h2>
+                <p class="section-subtitle">最適な学習環境を提供する3つの動画機能</p>
+            </div>
+            
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-icon-wrapper">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <h3 class="video-title">鏡映し表示</h3>
+                    <p class="video-description">
+                        動画を左右反転して表示。まるで鏡を見ているように、講師と同じ向きで練習できます。
+                    </p>
+                    <div class="video-highlight">
+                        ✨ 正確なフォームを身につけやすい
+                    </div>
+                </div>
+                
+                <div class="video-card">
+                    <div class="video-icon-wrapper">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h3 class="video-title">スロー再生</h3>
+                    <p class="video-description">
+                        0.5倍速でゆっくり再生。複雑な動きや技を細かく確認しながら練習できます。
+                    </p>
+                    <div class="video-highlight">
+                        ✨ 細かい動作まで理解できる
+                    </div>
+                </div>
+                
+                <div class="video-card">
+                    <div class="video-icon-wrapper">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <h3 class="video-title">通常再生</h3>
+                    <p class="video-description">
+                        1倍速の通常再生で、実際のスピードでの動きを確認。リズムを掴めます。
+                    </p>
+                    <div class="video-highlight">
+                        ✨ 実践的なリズム感を養える
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="steps-section">
+        <div class="features-container">
+            <div class="section-header">
+                <h2 class="section-title">使い方はとても簡単</h2>
+                <p class="section-subtitle">4つのステップで空手の習慣化を始められます</p>
+            </div>
+            
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-emoji">🥋</div>
+                    <h3 class="step-title">レベルを選択</h3>
+                    <p class="step-subtitle">Choose Your Level</p>
+                    <p class="step-description">
+                        初心者から上級者まで、あなたの経験に合わせてコースを選択します。
+                    </p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-emoji">📅</div>
+                    <h3 class="step-title">習慣を設定</h3>
+                    <p class="step-subtitle">Set Your Routine</p>
+                    <p class="step-description">
+                        ライフスタイルに合わせて、毎日の練習スケジュールを作成します。
+                    </p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-emoji">📱</div>
+                    <h3 class="step-title">動画で学習</h3>
+                    <p class="step-subtitle">Learn with Videos</p>
+                    <p class="step-description">
+                        高品質な動画を見ながら、自宅で本格的な空手を自習で学びます。
+                    </p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-emoji">🏆</div>
+                    <h3 class="step-title">成長を実感</h3>
+                    <p class="step-subtitle">Track Progress</p>
+                    <p class="step-description">
+                        詳細な分析と達成バッジで、あなたの上達を可視化します。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="faq-section">
+        <div class="faq-container">
+            <div class="section-header">
+                <h2 class="section-title">よくある質問</h2>
+                <p class="section-subtitle">お客様からよくいただく質問にお答えします</p>
+            </div>
+            
+            <div class="faq-list" id="faqList">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(0)">
+                        <div>
+                            <div class="faq-question-text">空手初心者でも大丈夫ですか？</div>
+                            <div class="faq-question-text-en">Is it okay for karate beginners?</div>
+                        </div>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="faq-answer-text">
+                            はい、完全初心者の方でも安心して始められます。基礎の基礎から丁寧な動画で、あなたのペースに合わせて進められます。
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(1)">
+                        <div>
+                            <div class="faq-question-text">どのくらいの時間が必要ですか？</div>
+                            <div class="faq-question-text-en">How much time do I need?</div>
+                        </div>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="faq-answer-text">
+                            1日15分から始められます。忙しい方でも続けやすいよう、短時間で効果的な練習メニューを用意しています。
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(2)">
+                        <div>
+                            <div class="faq-question-text">スマートフォンでも利用できますか？</div>
+                            <div class="faq-question-text-en">Can I use it on my smartphone?</div>
+                        </div>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="faq-answer-text">
+                            はい、スマートフォン、タブレット、パソコンなど、どのデバイスでもご利用いただけます。
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(3)">
+                        <div>
+                            <div class="faq-question-text">海外からでも利用できますか？</div>
+                            <div class="faq-question-text-en">Can I use it from overseas?</div>
+                        </div>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="faq-answer-text">
+                            はい、世界中どこからでもご利用いただけます。多言語対応も順次拡大予定です。
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(4)">
+                        <div>
+                            <div class="faq-question-text">鏡映し機能とは何ですか？</div>
+                            <div class="faq-question-text-en">What is the mirror function?</div>
+                        </div>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="faq-answer-text">
+                            動画を左右反転して表示する機能です。まるで鏡を見ているように、講師と同じ向きで練習できるため、動きを正確に覚えられます。
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(5)">
+                        <div>
+                            <div class="faq-question-text">スロー再生はどのように使いますか？</div>
+                            <div class="faq-question-text-en">How do I use slow motion playback?</div>
+                        </div>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="faq-answer-text">
+                            複雑な動きや技を0.5倍速でゆっくり再生できます。細かい動作を確認しながら、正確なフォームを身につけることができます。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="features-container">
+            <h2 class="cta-title">今すぐ空手の習慣を始めませんか？</h2>
+            <p class="cta-subtitle">世界中の仲間と一緒に、あなたの空手ライフをスタートしましょう</p>
+            
+            <div class="cta-buttons">
+                <a href="#" class="cta-primary">
+                    事前登録で特典GET
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="#" class="cta-secondary">
+                    詳しく相談する
+                </a>
+            </div>
+            
+            <div class="cta-benefits">
+                <div class="cta-benefit">
+                    <i class="fas fa-check"></i>
+                    <span>メール登録のみ</span>
+                </div>
+                <div class="cta-benefit">
+                    <i class="fas fa-check"></i>
+                    <span>リリース時特典あり</span>
+                </div>
+                <div class="cta-benefit">
+                    <i class="fas fa-check"></i>
+                    <span>いつでも配信停止可能</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-brand">
+                        <div class="footer-logo">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <div>
+                            <div class="footer-brand-text">空手ポケット道場</div>
+                            <div class="footer-brand-sub">Karate Pocket Dojo</div>
+                        </div>
+                    </div>
+                    <p class="footer-description">
+                        自宅で始める空手の習慣化プラットフォーム。
+                        あなたのペースで、確実に上達できます。
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="footer-title">サービス</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">特徴</a></li>
+                        <li><a href="#" class="footer-link">動画学習</a></li>
+                        <li><a href="#" class="footer-link">習慣化サポート</a></li>
+                        <li><a href="#" class="footer-link">モバイルアプリ</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="footer-title">サポート</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">ヘルプセンター</a></li>
+                        <li><a href="#" class="footer-link">コミュニティ</a></li>
+                        <li><a href="#" class="footer-link">お問い合わせ</a></li>
+                        <li><a href="#" class="footer-link">FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="footer-title">会社情報</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">私たちについて</a></li>
+                        <li><a href="#" class="footer-link">ブログ</a></li>
+                        <li><a href="#" class="footer-link">採用情報</a></li>
+                        <li><a href="#" class="footer-link">プレス</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p class="footer-copyright">
+                    © 2024 空手ポケット道場 / Karate Pocket Dojo. All rights reserved.
+                </p>
+                <div class="footer-legal">
+                    <a href="#">プライバシーポリシー</a>
+                    <a href="#">利用規約</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // FAQ Toggle
+        function toggleFaq(index) {
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems[index].classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

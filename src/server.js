@@ -31,9 +31,9 @@ app.get('/admin/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/admin/index.html'));
 });
 
-// About page route
+// About page route - serve standalone HTML
 app.get('/about', (req, res) => {
-    res.sendFile(path.join(__dirname, '../about/index.html'));
+    res.sendFile(path.join(__dirname, '../about-standalone.html'));
 });
 
 // ファイルアップロード設定
