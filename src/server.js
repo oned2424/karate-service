@@ -31,6 +31,11 @@ app.get('/admin/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/admin/index.html'));
 });
 
+// About page route
+app.get('/about', (req, res) => {
+    res.sendFile(path.join(__dirname, '../about/index.html'));
+});
+
 // ファイルアップロード設定
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
